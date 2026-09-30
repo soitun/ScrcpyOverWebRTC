@@ -2,8 +2,13 @@
   <transition name="fade">
     <div v-if="visible" class="license-panel-overlay" @click="$emit('close')">
       <div class="license-panel-card" @click.stop>
-        <button class="panel-close-btn" @click="$emit('close')">✕</button>
-        <div class="panel-title">授权管理</div>
+        <button class="panel-close-btn" @click="$emit('close')" :title="$t('common.close') || '关闭'">
+          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+        <div class="panel-title">{{ $t('license.licenseManagement') }}</div>
 
         <!-- 当前计划徽标 -->
         <div class="plan-badge" :class="planBadgeClass">{{ planBadgeText }}</div>
@@ -12,8 +17,8 @@
           <!-- 用量进度条（普通用户拿不到设备上限等详细字段时整体隐藏） -->
           <template v-if="deviceStore.licenseDetailsLoaded">
             <div class="usage-row">
-              <span class="status-label">虚机用量</span>
-              <span class="status-value highlight">{{ currentDevices }} / {{ deviceStore.licenseMaxDevices }} 台</span>
+              <span class="status-label">{{ $t('license.deviceUsage') }}</span>
+              <span class="status-value highlight">{{ currentDevices }} / {{ deviceStore.licenseMaxDevices }} {{ $t('license.units') }}</span>
             </div>
             <div class="usage-bar-track">
               <div class="usage-bar-fill" :class="usageBarClass" :style="{ width: usagePercent + '%' }"></div>
@@ -23,47 +28,46 @@
           <!-- 授权状态明细（详细字段缺失时整块隐藏） -->
           <div class="license-status-display" v-if="deviceStore.licenseDetailsLoaded">
             <div class="status-item" v-if="deviceStore.licenseActivated">
-              <span class="status-label">剩余有效期:</span>
-              <span class="status-value highlight">{{ deviceStore.licenseDaysRemaining }} 天</span>
+              <span class="status-label">{{ $t('license.remainingValidity') }}</span>
+              <span class="status-value highlight">{{ deviceStore.licenseDaysRemaining }} {{ $t('license.daysUnits') }}</span>
             </div>
             <div class="status-item">
-              <span class="status-label">最大虚机限制:</span>
-              <span class="status-value highlight">{{ deviceStore.licenseMaxDevices }} 台</span>
+              <span class="status-label">{{ $t('license.maxDeviceLimit') }}</span>
+              <span class="status-value highlight">{{ deviceStore.licenseMaxDevices }} {{ $t('license.units') }}</span>
             </div>
             <div class="status-item" v-if="deviceStore.licenseExpiresAt">
-              <span class="status-label">到期时间:</span>
+              <span class="status-label">{{ $t('license.expireTime') }}</span>
               <span class="status-value">{{ deviceStore.licenseExpiresAt }}</span>
             </div>
           </div>
 
           <!-- 限时特惠说明 -->
           <div v-if="!deviceStore.licenseActivated && deviceStore.licensePromo" class="promo-tip">
-            限时特惠：{{ deviceStore.licenseExpiresAt }} 前 {{ deviceStore.licenseMaxDevices }} 台，
-            到期后恢复 {{ deviceStore.licensePostPromoMaxDevices }} 台
+            {{ $t('license.promoNotice', { date: deviceStore.licenseExpiresAt, max: deviceStore.licenseMaxDevices, post: deviceStore.licensePostPromoMaxDevices }) }}
           </div>
 
           <!-- 机器码 + 一键复制（仅详细粒度响应中才有，缺失时隐藏） -->
           <div class="license-info-row" v-if="deviceStore.globalMachineID">
-            <span class="info-label">服务器机器码:</span>
+            <span class="info-label">{{ $t('license.serverMachineId') }}</span>
             <div class="machine-id-container">
               <code>{{ deviceStore.globalMachineID }}</code>
               <button class="copy-btn" @click="copyMachineID" :disabled="!deviceStore.globalMachineID">
-                {{ copySuccess ? '已复制' : '复制' }}
+                {{ copySuccess ? $t('common.copied') : $t('common.copy') }}
               </button>
             </div>
           </div>
 
           <!-- 激活码输入 -->
           <div class="license-input-group">
-            <label for="license-panel-input">授权激活码:</label>
+            <label for="license-panel-input">{{ $t('license.licenseCodeLabel') }}</label>
             <textarea
               id="license-panel-input"
               v-model="activationKey"
-              placeholder="请粘贴购买后获得的激活码..."
+              :placeholder="$t('license.codePlaceholder')"
               rows="3"
             ></textarea>
             <button class="activate-btn" :disabled="isActivating || !activationKey.trim()" @click="submitActivation">
-              {{ isActivating ? '正在激活...' : '提交激活' }}
+              {{ isActivating ? $t('license.activating') : $t('license.submitActivate') }}
             </button>
           </div>
           <div v-if="activationError" class="activation-error-msg">
@@ -72,8 +76,8 @@
 
           <!-- 购买激活码入口 -->
           <div class="purchase-row">
-            <span class="purchase-tip">没有激活码？</span>
-            <a :href="purchaseURL" target="_blank" rel="noopener" class="purchase-link">🛒 前往官网购买「穿云投屏授权码服务」</a>
+            <span class="purchase-tip">{{ $t('license.noCodeTip') }}</span>
+            <a :href="purchaseURL" target="_blank" rel="noopener" class="purchase-link">{{ $t('license.buyLicenseLink') }}</a>
           </div>
         </div>
       </div>
@@ -83,7 +87,10 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useDeviceStore } from '@/stores/devices'
+
+const { t } = useI18n()
 
 const props = defineProps({
   visible: { type: Boolean, default: false }
@@ -108,11 +115,16 @@ watch(() => props.visible, (val) => {
   }
 })
 
-// 当前计划徽标文案与样式
+// 当前计划徽标文案与样式（支持国际化）
 const planBadgeText = computed(() => {
-  if (deviceStore.licenseActivated) return `已授权 · ${deviceStore.licenseCustomer || '正式版'}`
-  if (deviceStore.licensePromo) return '免费版 · 限时特惠中'
-  return '免费版'
+  if (deviceStore.licenseActivated) {
+    const customer = deviceStore.licenseCustomer || t('license.badgeOfficial')
+    return t('license.badgeLicensed', { customer })
+  }
+  if (deviceStore.licensePromo) {
+    return t('license.badgePromo')
+  }
+  return t('license.badgeFree')
 })
 const planBadgeClass = computed(() => {
   if (deviceStore.licenseActivated) return 'badge-activated'
@@ -156,7 +168,7 @@ async function submitActivation() {
   if (res.success) {
     activationKey.value = ''
     await deviceStore.fetchLicenseStatus()
-    alert('系统激活成功！授权已实时重载并应用。')
+    alert(t('license.activatedSuccess'))
   } else {
     activationError.value = res.error
   }
@@ -191,25 +203,31 @@ async function submitActivation() {
 
 .panel-close-btn {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  background: transparent;
-  border: none;
+  top: 14px;
+  right: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   color: #8b949e;
-  font-size: 16px;
   cursor: pointer;
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-  transition: all 0.2s ease;
+  border-radius: 8px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 0;
 }
 
 .panel-close-btn:hover {
-  color: #c9d1d9;
-  background: rgba(255, 255, 255, 0.08);
+  color: #fca5a5;
+  background: rgba(239, 68, 68, 0.16);
+  border-color: rgba(239, 68, 68, 0.35);
+  transform: scale(1.05);
+}
+
+.panel-close-btn:active {
+  transform: scale(0.95);
 }
 
 .panel-title {

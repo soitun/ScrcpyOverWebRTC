@@ -5,7 +5,7 @@
       <div class="modal-header">
         <div class="header-title">
           <span class="icon">🔗</span>
-          <h3>机器分享与卡密生成</h3>
+          <h3>{{ $t('share.modalTitle') }}</h3>
         </div>
         <button type="button" class="close-btn" @click.stop.prevent="close">✕</button>
       </div>
@@ -13,7 +13,7 @@
       <div class="modal-body custom-scrollbar">
         <!-- 设备信息 Banner -->
         <div class="device-badge">
-          <span class="label">目标设备:</span>
+          <span class="label">{{ $t('share.targetDevice') }}</span>
           <span class="device-id">{{ deviceId }}</span>
         </div>
 
@@ -24,14 +24,14 @@
             :class="['tab-btn', { active: activeTab === 'create' }]"
             @click.stop.prevent="activeTab = 'create'"
           >
-            ✨ 新增分享
+            {{ $t('share.tabNewShare') }}
           </button>
           <button 
             type="button"
             :class="['tab-btn', { active: activeTab === 'list' }]"
             @click.stop.prevent="fetchShareList(); activeTab = 'list'"
           >
-            📋 活跃链接 & 卡密 ({{ shareList.length }})
+            {{ $t('share.tabActiveShares', { count: shareList.length }) }}
           </button>
         </div>
 
@@ -41,91 +41,91 @@
           <div class="form-grid">
             <!-- 有效期设置 -->
             <div class="form-group">
-              <label>⏱️ 有效期限</label>
+              <label>{{ $t('share.durationLabel') }}</label>
               <select v-model="expireOption" class="custom-select">
-                <option :value="1800">30 分钟</option>
-                <option :value="3600">1 小时</option>
-                <option :value="43200">12 小时</option>
-                <option :value="86400">24 小时 (1 天)</option>
-                <option :value="604800">7 天</option>
-                <option :value="0">♾️ 永久有效</option>
-                <option value="custom">⚙️ 自定义天数</option>
+                <option :value="1800">{{ $t('share.duration30m') }}</option>
+                <option :value="3600">{{ $t('share.duration1h') }}</option>
+                <option :value="43200">{{ $t('share.duration12h') }}</option>
+                <option :value="86400">{{ $t('share.duration24h') }}</option>
+                <option :value="604800">{{ $t('share.duration7d') }}</option>
+                <option :value="0">{{ $t('share.durationForever') }}</option>
+                <option value="custom">{{ $t('share.durationCustom') }}</option>
               </select>
               <input 
                 v-if="expireOption === 'custom'" 
                 v-model.number="customDays" 
                 type="number" 
                 min="1" 
-                placeholder="输入有效天数..." 
+                :placeholder="$t('share.durationCustomPlaceholder')" 
                 class="custom-input mt-2"
               />
             </div>
 
             <!-- 控制模式 -->
             <div class="form-group">
-              <label>🎮 访问与控制权限</label>
+              <label>{{ $t('share.permissionsLabel') }}</label>
               <div class="radio-group">
                 <label :class="['radio-card', { selected: accessMode === 'full' }]">
                   <input type="radio" value="full" v-model="accessMode" />
-                  <span class="radio-title">⚡ 完整控制</span>
-                  <span class="radio-desc">允许投屏视讯 + 触控点击 + 键盘鼠标注入</span>
+                  <span class="radio-title">{{ $t('share.modeFull') }}</span>
+                  <span class="radio-desc">{{ $t('share.modeFullDesc') }}</span>
                 </label>
                 <label :class="['radio-card', { selected: accessMode === 'view_only' }]">
                   <input type="radio" value="view_only" v-model="accessMode" />
-                  <span class="radio-title">👁️ 仅观看 (只读)</span>
-                  <span class="radio-desc">仅拉取实时画面，禁止触控与任何控制指令</span>
+                  <span class="radio-title">{{ $t('share.modeViewOnly') }}</span>
+                  <span class="radio-desc">{{ $t('share.modeViewOnlyDesc') }}</span>
                 </label>
               </div>
             </div>
 
             <!-- 细粒度设置权限 -->
             <div class="form-group">
-              <label>🎚️ 访客可修改的设置项</label>
+              <label>{{ $t('share.guestEditableSettings') }}</label>
               <div class="perm-checks">
-                <label class="perm-check"><input type="checkbox" v-model="allowBitrate" /> 码率</label>
-                <label class="perm-check"><input type="checkbox" v-model="allowFps" /> 帧率</label>
-                <label class="perm-check"><input type="checkbox" v-model="allowResolution" /> 分辨率</label>
-                <label class="perm-check"><input type="checkbox" v-model="allowAudio" /> 音频</label>
+                <label class="perm-check"><input type="checkbox" v-model="allowBitrate" /> {{ $t('share.permBitrate') }}</label>
+                <label class="perm-check"><input type="checkbox" v-model="allowFps" /> {{ $t('share.permFps') }}</label>
+                <label class="perm-check"><input type="checkbox" v-model="allowResolution" /> {{ $t('share.permResolution') }}</label>
+                <label class="perm-check"><input type="checkbox" v-model="allowAudio" /> {{ $t('share.permAudio') }}</label>
               </div>
-              <span class="addr-hint">取消勾选的项访客无法修改（服务端强制）；设置值可在「分享管理」⚙️ 配置中指定</span>
+              <span class="addr-hint">{{ $t('share.permLockedHint') }}</span>
             </div>
 
             <!-- 可选访问密码 -->
             <div class="form-group">
-              <label>🔒 访问密码 (PIN码, 可选)</label>
+              <label>{{ $t('share.passwordLabel') }}</label>
               <input 
                 v-model="password" 
                 type="password" 
-                placeholder="留空代表免密码直接访问" 
+                :placeholder="$t('share.passwordPlaceholder')" 
                 class="custom-input"
               />
             </div>
 
             <!-- 描述 / 备注 -->
             <div class="form-group">
-              <label>📝 分享备注 (可选)</label>
+              <label>{{ $t('share.noteLabel') }}</label>
               <input 
                 v-model="description" 
                 type="text" 
-                placeholder="例: 提供给测试人员小王临时调试" 
+                :placeholder="$t('share.notePlaceholder')" 
                 class="custom-input"
               />
             </div>
 
             <!-- 分享链接地址 -->
             <div class="form-group">
-              <label>🌐 分享链接地址</label>
+              <label>{{ $t('share.serverUrlLabel') }}</label>
               <select v-model="selectedAddress" class="custom-select">
                 <option v-for="addr in serverAddresses" :key="addr" :value="addr">{{ addr }}</option>
               </select>
-              <span class="addr-hint">选择访客可访问的服务器地址，含 IPv6 地址时可直接切换</span>
+              <span class="addr-hint">{{ $t('share.serverUrlHint') }}</span>
             </div>
           </div>
 
           <div class="action-bar">
             <button type="button" class="btn-primary glow-btn" :disabled="loading" @click.stop.prevent="createShare">
               <span v-if="loading" class="spinner"></span>
-              <span v-else>🚀 立即生成分享链接与卡密</span>
+              <span v-else>{{ $t('share.btnGenerate') }}</span>
             </button>
           </div>
 
@@ -133,22 +133,22 @@
           <div v-if="createdResult" class="result-card">
             <div class="result-header">
               <span class="check-icon">✓</span>
-              <h4>分享链接与卡密已成功生成！</h4>
+              <h4>{{ $t('share.generateSuccessTitle') }}</h4>
             </div>
 
             <div class="result-row">
-              <label>🔑 卡密提取码:</label>
+              <label>{{ $t('share.cardCodeLabel') }}</label>
               <div class="code-box highlight-card-code">{{ createdResult.card_code }}</div>
               <button type="button" class="copy-btn" @click.stop.prevent="copyText(createdResult.card_code, 'card')">
-                {{ copiedType === 'card' ? '已复制 ✓' : '复制卡密' }}
+                {{ copiedType === 'card' ? $t('share.copiedCheck') : $t('share.copyCardCode') }}
               </button>
             </div>
 
             <div class="result-row mt-3">
-              <label>🔗 完整分享链接:</label>
+              <label>{{ $t('share.fullShareUrlLabel') }}</label>
               <input type="text" readonly :value="fullShareUrl(createdResult.token)" class="url-input" />
               <button type="button" class="copy-btn" @click.stop.prevent="copyText(fullShareUrl(createdResult.token), 'url')">
-                {{ copiedType === 'url' ? '已复制 ✓' : '复制链接' }}
+                {{ copiedType === 'url' ? $t('share.copiedCheck') : $t('share.copyShareUrl') }}
               </button>
             </div>
           </div>
@@ -156,19 +156,19 @@
 
         <!-- 活跃链接 & 卡密列表 Tab 内容 -->
         <div v-else class="list-section">
-          <div v-if="listLoading" class="loading-state">加载分享记录中...</div>
+          <div v-if="listLoading" class="loading-state">{{ $t('share.loadingRecords') }}</div>
           <div v-else-if="shareList.length === 0" class="empty-state">
-            <span>📭 暂无活跃的分享链接或卡密</span>
+            <span>{{ $t('share.noActiveShares') }}</span>
           </div>
           <div v-else class="share-table-wrapper">
             <table class="share-table">
               <thead>
                 <tr>
-                  <th>卡密提取码</th>
-                  <th>权限模式</th>
-                  <th>到期时间</th>
-                  <th>备注</th>
-                  <th>操作</th>
+                  <th>{{ $t('share.thCardCode') }}</th>
+                  <th>{{ $t('share.thMode') }}</th>
+                  <th>{{ $t('share.thExpire') }}</th>
+                  <th>{{ $t('share.thNote') }}</th>
+                  <th>{{ $t('share.thActions') }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -178,7 +178,7 @@
                   </td>
                   <td>
                     <span :class="['mode-badge', item.access_mode]">
-                      {{ item.access_mode === 'full' ? '⚡ 完整控制' : '👁️ 仅观看' }}
+                      {{ item.access_mode === 'full' ? $t('share.modeFull') : $t('share.modeViewOnly') }}
                     </span>
                   </td>
                   <td>
@@ -187,10 +187,10 @@
                   <td class="desc-cell">{{ item.description || '-' }}</td>
                   <td class="action-cell">
                     <button type="button" class="table-btn copy-sm" @click.stop.prevent="copyText(fullShareUrl(item.token_id), 'list-' + item.token_id)">
-                      {{ copiedType === 'list-' + item.token_id ? '已复制' : '复制链接' }}
+                      {{ copiedType === 'list-' + item.token_id ? $t('share.copied') : $t('share.copyShareUrl') }}
                     </button>
                     <button type="button" class="table-btn revoke-sm" @click.stop.prevent="revokeShare(item.token_id)">
-                      撤销
+                      {{ $t('share.revoke') }}
                     </button>
                   </td>
                 </tr>
@@ -205,6 +205,9 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
@@ -273,7 +276,7 @@ async function createShare() {
         const errJson = await res.json()
         if (errJson && errJson.msg) errMsg = errJson.msg
       } catch (e) {}
-      alert('创建失败: ' + errMsg)
+      alert(t('share.createFailed') + errMsg)
       return
     }
 
@@ -282,10 +285,10 @@ async function createShare() {
       createdResult.value = json.data
       fetchShareList()
     } else {
-      alert('创建失败: ' + (json.msg || '未知错误'))
+      alert(t('share.createFailedAlert') + (json.msg || 'Error'))
     }
   } catch (err) {
-    alert('网络请求异常: ' + err.message)
+    alert(t('share.networkError') + err.message)
   } finally {
     loading.value = false
   }
@@ -310,7 +313,7 @@ async function fetchShareList() {
 }
 
 async function revokeShare(tokenID) {
-  if (!confirm('确定要撤销此分享链接与卡密吗？撤销后访客将立即断开连接。')) return
+  if (!confirm(t('share.revokeConfirm'))) return
   try {
     const res = await fetch('/api/share/revoke', {
       method: 'POST',
@@ -358,7 +361,7 @@ function formatTime(expiresAt) {
   const t = new Date(expiresAt)
   if (Number.isNaN(t.getTime())) return '-'
   // Go time.Time 零值序列化为 "0001-01-01T00:00:00Z"，代表永久有效
-  if (t.getFullYear() <= 1) return '♾️ 永久有效'
+  if (t.getFullYear() <= 1) return t('share.durationForever')
   return t.toLocaleString('zh-CN', { hour12: false })
 }
 

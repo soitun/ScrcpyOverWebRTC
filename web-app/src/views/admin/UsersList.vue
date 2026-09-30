@@ -5,28 +5,28 @@
       <div class="stat-card">
         <div class="stat-icon-wrap">👥</div>
         <div class="stat-content">
-          <div class="stat-label">总用户数</div>
+          <div class="stat-label">{{ $t('users.stats.total') }}</div>
           <div class="stat-val">{{ users.length }}</div>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-icon-wrap">🟢</div>
         <div class="stat-content">
-          <div class="stat-label">当前在线</div>
+          <div class="stat-label">{{ $t('users.stats.online') }}</div>
           <div class="stat-val text-online">{{ onlineUsersCount }}</div>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-icon-wrap">📱</div>
         <div class="stat-content">
-          <div class="stat-label">活跃租约数</div>
+          <div class="stat-label">{{ $t('users.stats.leases') }}</div>
           <div class="stat-val">{{ activeLeaseCount }}</div>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-icon-wrap">⏳</div>
         <div class="stat-content">
-          <div class="stat-label">已停用 / 临近截止</div>
+          <div class="stat-label">{{ $t('users.stats.expiring') }}</div>
           <div class="stat-val" :class="{ 'text-warn': expiringUsersCount > 0 }">{{ expiringUsersCount }}</div>
         </div>
       </div>
@@ -35,16 +35,16 @@
     <div class="admin-card user-list-panel">
       <div class="panel-header">
         <div class="header-left">
-          <h2>👥 用户管理与控制中心</h2>
-          <span class="user-count">共 {{ filteredUsers.length }} / {{ users.length }} 个用户</span>
+          <h2>👥 {{ $t('users.title') }}</h2>
+          <span class="user-count">{{ $t('users.userCount', { filtered: filteredUsers.length, total: users.length }) }}</span>
         </div>
-        <button class="create-user-btn" @click="openCreateModal">+ 新建用户</button>
+        <button class="create-user-btn" @click="openCreateModal">{{ $t('users.newUser') }}</button>
       </div>
 
       <!-- 搜索与状态筛选 -->
       <div class="filter-bar">
         <div class="search-box">
-          <input type="text" v-model="searchQuery" placeholder="🔍 搜索用户名 / 备注..." />
+          <input type="text" v-model="searchQuery" :placeholder="$t('users.filter.searchPlaceholder')" />
         </div>
         <div class="status-filters">
           <button
@@ -62,14 +62,14 @@
         <table class="premium-table">
           <thead>
             <tr>
-              <th>用户名</th>
-              <th>角色</th>
-              <th>在线状态</th>
-              <th>活跃设备</th>
-              <th>已分配(租约)</th>
-              <th>账号截止日</th>
-              <th>备注</th>
-              <th>操作</th>
+              <th>{{ $t('users.table.username') }}</th>
+              <th>{{ $t('users.table.role') }}</th>
+              <th>{{ $t('users.table.status') }}</th>
+              <th>{{ $t('users.table.active') }}</th>
+              <th>{{ $t('users.table.assigned') }}</th>
+              <th>{{ $t('users.table.expiresAt') }}</th>
+              <th>{{ $t('users.table.note') }}</th>
+              <th>{{ $t('users.table.actions') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -83,50 +83,50 @@
               <td class="username-cell">
                 <span class="avatar">{{ user.username[0].toUpperCase() }}</span>
                 <span class="name">{{ user.username }}</span>
-                <span v-if="user.username === authStore.username" class="self-tag">当前登录</span>
+                <span v-if="user.username === authStore.username" class="self-tag">{{ $t('users.table.self') }}</span>
               </td>
               <td>
                 <span :class="['role-badge', user.role]">
-                  {{ user.role === 'admin' ? '管理员' : '普通用户' }}
+                  {{ user.role === 'admin' ? $t('users.table.admin') : $t('users.table.standard') }}
                 </span>
                 <div v-if="lockSummary(user)" class="lock-summary">{{ lockSummary(user) }}</div>
               </td>
               <td>
                 <div class="online-status-wrapper">
                   <span :class="['status-dot', { online: user.online }]"></span>
-                  <span class="status-text">{{ user.online ? '在线' : '离线' }}</span>
+                  <span class="status-text">{{ user.online ? $t('users.table.online') : $t('users.table.offline') }}</span>
                 </div>
               </td>
               <td>
-                <span class="device-count">{{ user.active_devices ? user.active_devices.length : 0 }} 台</span>
+                <span class="device-count">{{ user.active_devices ? user.active_devices.length : 0 }} {{ $t('users.table.units') }}</span>
               </td>
               <td>
                 <template v-if="leaseSummaryOf(user.username).count > 0">
-                  <span class="device-count lease">{{ leaseSummaryOf(user.username).count }} 台</span>
+                  <span class="device-count lease">{{ leaseSummaryOf(user.username).count }} {{ $t('users.table.units') }}</span>
                   <div class="remain-cell" :class="{ warn: leaseSummaryOf(user.username).nearest && leaseSummaryOf(user.username).nearest.remaining_seconds <= 604800 }">
-                    {{ leaseSummaryOf(user.username).nearest ? '最近到期: ' + formatLeaseRemaining(leaseSummaryOf(user.username).nearest.remaining_seconds) : '永久' }}
+                    {{ leaseSummaryOf(user.username).nearest ? $t('users.table.nearestExpire', { time: formatLeaseRemaining(leaseSummaryOf(user.username).nearest.remaining_seconds) }) : $t('users.table.permanent') }}
                   </div>
                 </template>
-                <span v-else class="no-lease-text">未分配</span>
+                <span v-else class="no-lease-text">{{ $t('users.table.unassigned') }}</span>
               </td>
               <td>
                 <div class="expire-cell" :class="{ expired: isExpiredAt(user.expires_at) }">{{ formatExpire(user.expires_at) }}</div>
                 <div class="remain-cell">{{ formatRemain(user.expires_at) }}</div>
               </td>
               <td class="note-cell">
-                <span class="note-text" :title="user.note || '无备注'">{{ user.note || '-' }}</span>
+                <span class="note-text" :title="user.note || $t('users.drawer.noNote')">{{ user.note || '-' }}</span>
               </td>
               <td class="actions-cell" @click.stop>
-                <button class="action-btn-mini policy" @click="openDrawer(user, 'policy')" v-if="user.role !== 'admin'" title="权限与有效期配置">⚙️</button>
-                <button class="action-btn-mini note" @click="openEditNoteModal(user)" title="编辑备注">📝</button>
-                <button class="action-btn-mini rename" @click="openRenameModal(user)" title="重命名用户">🏷️</button>
-                <button class="action-btn-mini reset-pwd" @click="openResetPwdModal(user)" title="重置密码">🔒</button>
-                <button class="action-btn-mini share" @click="openShareModal(user)" title="分享账号（复制登录信息）">📤</button>
-                <button class="action-btn-mini delete" @click="confirmDelete(user)" v-if="user.username !== authStore.username" title="删除用户">🗑️</button>
+                <button class="action-btn-mini policy" @click="openDrawer(user, 'policy')" v-if="user.role !== 'admin'" :title="$t('users.actions.policy')">⚙️</button>
+                <button class="action-btn-mini note" @click="openEditNoteModal(user)" :title="$t('users.actions.editNote')">📝</button>
+                <button class="action-btn-mini rename" @click="openRenameModal(user)" :title="$t('users.actions.rename')">🏷️</button>
+                <button class="action-btn-mini reset-pwd" @click="openResetPwdModal(user)" :title="$t('users.actions.resetPwd')">🔒</button>
+                <button class="action-btn-mini share" @click="openShareModal(user)" :title="$t('users.actions.share')">📤</button>
+                <button class="action-btn-mini delete" @click="confirmDelete(user)" v-if="user.username !== authStore.username" :title="$t('users.actions.delete')">🗑️</button>
               </td>
             </tr>
             <tr v-if="filteredUsers.length === 0">
-              <td colspan="8" class="empty-row">没有匹配的用户</td>
+              <td colspan="8" class="empty-row">{{ $t('users.table.noMatching') }}</td>
             </tr>
           </tbody>
         </table>
@@ -148,15 +148,15 @@
               <div class="m-name-group">
                 <div class="m-username-row">
                   <span class="m-username">{{ user.username }}</span>
-                  <span v-if="user.username === authStore.username" class="self-tag">当前登录</span>
+                  <span v-if="user.username === authStore.username" class="self-tag">{{ $t('users.table.self') }}</span>
                 </div>
                 <div class="m-user-sub">
                   <span class="m-online-status" :class="{ online: user.online }">
                     <span class="status-dot" :class="{ online: user.online }"></span>
-                    {{ user.online ? '在线' : '离线' }}
+                    {{ user.online ? $t('users.table.online') : $t('users.table.offline') }}
                   </span>
                   <span :class="['role-badge', user.role]">
-                    {{ user.role === 'admin' ? '👑 管理员' : '普通用户' }}
+                    {{ user.role === 'admin' ? ('👑 ' + $t('users.table.admin')) : $t('users.table.standard') }}
                   </span>
                 </div>
               </div>
@@ -167,20 +167,20 @@
           <!-- 卡片核心指标格 -->
           <div class="m-card-grid">
             <div class="m-grid-item">
-              <span class="m-grid-label">已分配租约</span>
+              <span class="m-grid-label">{{ $t('users.table.assigned') }}</span>
               <div class="m-grid-val">
                 <template v-if="leaseSummaryOf(user.username).count > 0">
-                  <span class="device-count lease">{{ leaseSummaryOf(user.username).count }} 台</span>
+                  <span class="device-count lease">{{ leaseSummaryOf(user.username).count }} {{ $t('users.table.units') }}</span>
                   <span class="remain-mini warn" v-if="leaseSummaryOf(user.username).nearest && leaseSummaryOf(user.username).nearest.remaining_seconds <= 604800">
                     ({{ formatLeaseRemaining(leaseSummaryOf(user.username).nearest.remaining_seconds) }})
                   </span>
                 </template>
-                <span v-else class="no-lease-text">未分配</span>
+                <span v-else class="no-lease-text">{{ $t('users.table.unassigned') }}</span>
               </div>
             </div>
 
             <div class="m-grid-item">
-              <span class="m-grid-label">账号截止日</span>
+              <span class="m-grid-label">{{ $t('users.table.expiresAt') }}</span>
               <div class="m-grid-val">
                 <span class="expire-cell" :class="{ expired: isExpiredAt(user.expires_at) }">
                   {{ formatExpire(user.expires_at) }}
@@ -192,16 +192,16 @@
             </div>
 
             <div class="m-grid-item">
-              <span class="m-grid-label">活跃设备</span>
+              <span class="m-grid-label">{{ $t('users.table.active') }}</span>
               <div class="m-grid-val">
-                <span class="device-count">{{ user.active_devices ? user.active_devices.length : 0 }} 台直控</span>
+                <span class="device-count">{{ user.active_devices ? user.active_devices.length : 0 }} {{ $t('users.table.unitsDirect') }}</span>
               </div>
             </div>
 
             <div class="m-grid-item">
-              <span class="m-grid-label">备注说明</span>
+              <span class="m-grid-label">{{ $t('users.table.note') }}</span>
               <div class="m-grid-val m-note-val" :title="user.note">
-                {{ user.note || '无备注' }}
+                {{ user.note || $t('users.drawer.noNote') }}
               </div>
             </div>
           </div>
@@ -213,30 +213,30 @@
 
           <!-- 卡片底部快捷操作栏 (防冒泡) -->
           <div class="m-card-actions" @click.stop>
-            <button class="m-action-btn policy" @click="openDrawer(user, 'policy')" v-if="user.role !== 'admin'" title="权限配置">
-              ⚙️ 权限
+            <button class="m-action-btn policy" @click="openDrawer(user, 'policy')" v-if="user.role !== 'admin'" :title="$t('users.actions.policy')">
+              ⚙️ {{ $t('users.actions.policy') }}
             </button>
-            <button class="m-action-btn default" @click="openEditNoteModal(user)" title="编辑备注">
-              📝 备注
+            <button class="m-action-btn default" @click="openEditNoteModal(user)" :title="$t('users.actions.editNote')">
+              📝 {{ $t('users.actions.editNote') }}
             </button>
-            <button class="m-action-btn default" @click="openResetPwdModal(user)" title="重置密码">
-              🔒 改密
+            <button class="m-action-btn default" @click="openResetPwdModal(user)" :title="$t('users.actions.resetPwd')">
+              🔒 {{ $t('users.actions.resetPwd') }}
             </button>
-            <button class="m-action-btn default" @click="openShareModal(user)" title="分享账号">
-              📤 分享
+            <button class="m-action-btn default" @click="openShareModal(user)" :title="$t('users.actions.share')">
+              📤 {{ $t('users.actions.share') }}
             </button>
-            <button class="m-action-btn default" @click="openRenameModal(user)" title="重命名">
-              🏷️ 改名
+            <button class="m-action-btn default" @click="openRenameModal(user)" :title="$t('users.actions.rename')">
+              🏷️ {{ $t('users.actions.rename') }}
             </button>
-            <button class="m-action-btn danger" @click="confirmDelete(user)" v-if="user.username !== authStore.username" title="删除用户">
-              🗑️ 删除
+            <button class="m-action-btn danger" @click="confirmDelete(user)" v-if="user.username !== authStore.username" :title="$t('users.actions.delete')">
+              🗑️ {{ $t('users.actions.delete') }}
             </button>
           </div>
         </div>
 
         <div v-if="filteredUsers.length === 0" class="m-empty-card">
           <div class="m-empty-icon">👥</div>
-          <p>没有找到符合条件的用户</p>
+          <p>{{ $t('users.table.noMatching') }}</p>
         </div>
       </div>
     </div>
@@ -261,54 +261,54 @@
       <div class="modal-overlay" v-if="showCreateModal" @click.self="closeCreateModal">
         <div class="glass-modal">
           <div class="modal-header">
-            <h3>➕ 新建用户账户</h3>
+            <h3>➕ {{ $t('users.modals.createUser') }}</h3>
             <button class="close-modal" @click="closeCreateModal">✕</button>
           </div>
           <div class="modal-body" v-if="!createdCredentials">
             <div class="form-group">
-              <label>用户名</label>
-              <input type="text" v-model="createForm.username" placeholder="请输入用户名" />
+              <label>{{ $t('users.modals.username') }}</label>
+              <input type="text" v-model="createForm.username" :placeholder="$t('users.modals.usernamePlaceholder')" />
             </div>
             <div class="form-group">
-              <label>密码</label>
+              <label>{{ $t('users.modals.password') }}</label>
               <div class="pwd-input-row">
-                <input :type="showCreatePassword ? 'text' : 'password'" v-model="createForm.password" placeholder="请输入密码" />
-                <button type="button" class="pwd-tool-btn" @click="showCreatePassword = !showCreatePassword" :title="showCreatePassword ? '隐藏密码' : '显示密码'">{{ showCreatePassword ? '🙈' : '👁️' }}</button>
-                <button type="button" class="pwd-tool-btn gen" @click="genRandomPassword" title="生成 8 位随机密码">🎲 随机</button>
+                <input :type="showCreatePassword ? 'text' : 'password'" v-model="createForm.password" :placeholder="$t('users.modals.passwordPlaceholder')" />
+                <button type="button" class="pwd-tool-btn" @click="showCreatePassword = !showCreatePassword" :title="showCreatePassword ? $t('users.modals.hidePwd') : $t('users.modals.showPwd')">{{ showCreatePassword ? '🙈' : '👁️' }}</button>
+                <button type="button" class="pwd-tool-btn gen" @click="genRandomPassword" :title="$t('users.modals.randomPwdTitle')">🎲 {{ $t('users.modals.random') }}</button>
               </div>
             </div>
             <div class="form-group">
-              <label>角色</label>
+              <label>{{ $t('users.modals.role') }}</label>
               <select v-model="createForm.role">
-                <option value="user">普通用户</option>
-                <option value="admin">管理员</option>
+                <option value="user">{{ $t('users.modals.roleUser') }}</option>
+                <option value="admin">{{ $t('users.modals.roleAdmin') }}</option>
               </select>
             </div>
             <div class="form-group">
-              <label>备注</label>
-              <input type="text" v-model="createForm.note" placeholder="例如：测试组A-王五" />
+              <label>{{ $t('users.modals.note') }}</label>
+              <input type="text" v-model="createForm.note" :placeholder="$t('users.modals.notePlaceholder')" />
             </div>
           </div>
           <!-- 创建成功：账密展示与一键复制分享 -->
           <div class="modal-body" v-else>
             <div class="create-success-box">
               <div class="create-success-icon">✅</div>
-              <p class="create-success-title">用户「{{ createdCredentials.username }}」创建成功</p>
-              <div class="cred-row"><span class="cred-label">登录地址</span><code class="cred-val">{{ loginOrigin }}</code></div>
-              <div class="cred-row"><span class="cred-label">账号</span><code class="cred-val">{{ createdCredentials.username }}</code></div>
-              <div class="cred-row"><span class="cred-label">密码</span><code class="cred-val">{{ createdCredentials.password }}</code></div>
-              <p class="create-success-tip">请立即复制并发送给租户，关闭本窗口后密码将无法再次查看。</p>
+              <p class="create-success-title">{{ $t('users.modals.createSuccessTitle', { username: createdCredentials.username }) }}</p>
+              <div class="cred-row"><span class="cred-label">{{ $t('users.modals.loginUrl') }}</span><code class="cred-val">{{ loginOrigin }}</code></div>
+              <div class="cred-row"><span class="cred-label">{{ $t('users.modals.account') }}</span><code class="cred-val">{{ createdCredentials.username }}</code></div>
+              <div class="cred-row"><span class="cred-label">{{ $t('users.modals.password') }}</span><code class="cred-val">{{ createdCredentials.password }}</code></div>
+              <p class="create-success-tip">{{ $t('users.modals.createSuccessTip') }}</p>
             </div>
           </div>
           <div class="modal-footer">
             <span v-if="modalError" class="modal-error">{{ modalError }}</span>
             <template v-if="!createdCredentials">
-              <button class="modal-btn cancel" @click="closeCreateModal">取消</button>
-              <button class="modal-btn submit" @click="submitCreateUser" :disabled="modalSubmitting">确认创建</button>
+              <button class="modal-btn cancel" @click="closeCreateModal">{{ $t('users.modals.cancel') }}</button>
+              <button class="modal-btn submit" @click="submitCreateUser" :disabled="modalSubmitting">{{ $t('users.modals.confirmCreate') }}</button>
             </template>
             <template v-else>
-              <button class="modal-btn submit" @click="copyCreatedCredentials">{{ credentialsCopied ? '✓ 已复制' : '📋 复制登录信息' }}</button>
-              <button class="modal-btn cancel" @click="closeCreateModal">完成</button>
+              <button class="modal-btn submit" @click="copyCreatedCredentials">{{ credentialsCopied ? ('✓ ' + $t('users.modals.copied')) : ('📋 ' + $t('users.modals.copyCreds')) }}</button>
+              <button class="modal-btn cancel" @click="closeCreateModal">{{ $t('users.modals.done') }}</button>
             </template>
           </div>
         </div>
@@ -320,39 +320,39 @@
       <div class="modal-overlay" v-if="showResetPwdModal" @click.self="closeResetPwdModal">
         <div class="glass-modal">
           <div class="modal-header">
-            <h3>🔒 重置密码：{{ editingUser?.username }}</h3>
+            <h3>🔒 {{ $t('users.modals.resetPwdTitle', { username: editingUser?.username }) }}</h3>
             <button class="close-modal" @click="closeResetPwdModal">✕</button>
           </div>
           <div class="modal-body" v-if="!resetCredentials">
             <div class="form-group">
-              <label>新密码</label>
+              <label>{{ $t('users.modals.newPassword') }}</label>
               <div class="pwd-input-row">
-                <input :type="showResetPassword ? 'text' : 'password'" v-model="resetPwdForm.password" placeholder="请输入新的登录密码" />
-                <button type="button" class="pwd-tool-btn" @click="showResetPassword = !showResetPassword" :title="showResetPassword ? '隐藏密码' : '显示密码'">{{ showResetPassword ? '🙈' : '👁️' }}</button>
-                <button type="button" class="pwd-tool-btn gen" @click="genResetPassword" title="生成 8 位随机密码">🎲 随机</button>
+                <input :type="showResetPassword ? 'text' : 'password'" v-model="resetPwdForm.password" :placeholder="$t('users.modals.newPasswordPlaceholder')" />
+                <button type="button" class="pwd-tool-btn" @click="showResetPassword = !showResetPassword" :title="showResetPassword ? $t('users.modals.hidePwd') : $t('users.modals.showPwd')">{{ showResetPassword ? '🙈' : '👁️' }}</button>
+                <button type="button" class="pwd-tool-btn gen" @click="genResetPassword" :title="$t('users.modals.randomPwdTitle')">🎲 {{ $t('users.modals.random') }}</button>
               </div>
             </div>
-            <p class="modal-tip">重置密码后，系统将强制断开该用户当前的活跃会话，迫使其重新登录。</p>
+            <p class="modal-tip">{{ $t('users.modals.resetPwdTip') }}</p>
           </div>
           <div class="modal-body" v-else>
             <div class="create-success-box">
               <div class="create-success-icon">✅</div>
-              <p class="create-success-title">用户「{{ resetCredentials.username }}」密码已重置</p>
-              <div class="cred-row"><span class="cred-label">登录地址</span><code class="cred-val">{{ loginOrigin }}</code></div>
-              <div class="cred-row"><span class="cred-label">账号</span><code class="cred-val">{{ resetCredentials.username }}</code></div>
-              <div class="cred-row"><span class="cred-label">新密码</span><code class="cred-val">{{ resetCredentials.password }}</code></div>
-              <p class="create-success-tip">请立即复制并发送给租户，关闭本窗口后新密码将无法再次查看。</p>
+              <p class="create-success-title">{{ $t('users.modals.resetSuccessTitle', { username: resetCredentials.username }) }}</p>
+              <div class="cred-row"><span class="cred-label">{{ $t('users.modals.loginUrl') }}</span><code class="cred-val">{{ loginOrigin }}</code></div>
+              <div class="cred-row"><span class="cred-label">{{ $t('users.modals.account') }}</span><code class="cred-val">{{ resetCredentials.username }}</code></div>
+              <div class="cred-row"><span class="cred-label">{{ $t('users.modals.newPassword') }}</span><code class="cred-val">{{ resetCredentials.password }}</code></div>
+              <p class="create-success-tip">{{ $t('users.modals.createSuccessTip') }}</p>
             </div>
           </div>
           <div class="modal-footer">
             <span v-if="modalError" class="modal-error">{{ modalError }}</span>
             <template v-if="!resetCredentials">
-              <button class="modal-btn cancel" @click="closeResetPwdModal">取消</button>
-              <button class="modal-btn submit warning" @click="submitResetPwd" :disabled="modalSubmitting">确认重置</button>
+              <button class="modal-btn cancel" @click="closeResetPwdModal">{{ $t('users.modals.cancel') }}</button>
+              <button class="modal-btn submit warning" @click="submitResetPwd" :disabled="modalSubmitting">{{ $t('users.modals.confirmReset') }}</button>
             </template>
             <template v-else>
-              <button class="modal-btn submit" @click="copyResetCredentials">{{ resetCopied ? '✓ 已复制' : '📋 复制登录信息' }}</button>
-              <button class="modal-btn cancel" @click="closeResetPwdModal">完成</button>
+              <button class="modal-btn submit" @click="copyResetCredentials">{{ resetCopied ? ('✓ ' + $t('users.modals.copied')) : ('📋 ' + $t('users.modals.copyCreds')) }}</button>
+              <button class="modal-btn cancel" @click="closeResetPwdModal">{{ $t('users.modals.done') }}</button>
             </template>
           </div>
         </div>
@@ -364,23 +364,23 @@
       <div class="modal-overlay" v-if="shareUser" @click.self="closeShareModal">
         <div class="glass-modal">
           <div class="modal-header">
-            <h3>📤 分享账号：{{ shareUser?.username }}</h3>
+            <h3>📤 {{ $t('users.modals.shareTitle', { username: shareUser?.username }) }}</h3>
             <button class="close-modal" @click="closeShareModal">✕</button>
           </div>
           <div class="modal-body">
             <div class="create-success-box">
-              <div class="cred-row"><span class="cred-label">登录地址</span><code class="cred-val">{{ loginOrigin }}</code></div>
-              <div class="cred-row"><span class="cred-label">账号</span><code class="cred-val">{{ shareUser?.username }}</code></div>
-              <div class="cred-row" v-if="shareNewPassword"><span class="cred-label">新密码</span><code class="cred-val">{{ shareNewPassword }}</code></div>
-              <p class="create-success-tip" v-if="!shareNewPassword">密码加密存储无法查看。如需完整账密，可重置为随机密码后复制（该用户会被强退）。</p>
-              <p class="create-success-tip" v-else>密码已重置并强退旧会话，请立即复制发送给租户。</p>
+              <div class="cred-row"><span class="cred-label">{{ $t('users.modals.loginUrl') }}</span><code class="cred-val">{{ loginOrigin }}</code></div>
+              <div class="cred-row"><span class="cred-label">{{ $t('users.modals.account') }}</span><code class="cred-val">{{ shareUser?.username }}</code></div>
+              <div class="cred-row" v-if="shareNewPassword"><span class="cred-label">{{ $t('users.modals.newPassword') }}</span><code class="cred-val">{{ shareNewPassword }}</code></div>
+              <p class="create-success-tip" v-if="!shareNewPassword">{{ $t('users.modals.shareEncryptedTip') }}</p>
+              <p class="create-success-tip" v-else>{{ $t('users.modals.shareResetTip') }}</p>
             </div>
           </div>
           <div class="modal-footer">
             <span v-if="modalError" class="modal-error">{{ modalError }}</span>
-            <button v-if="!shareNewPassword" class="modal-btn submit warning" @click="shareResetRandom" :disabled="modalSubmitting">🎲 重置为随机密码</button>
-            <button class="modal-btn submit" @click="copyShareInfo">{{ shareCopied ? '✓ 已复制' : (shareNewPassword ? '📋 复制登录信息' : '📋 复制账号信息') }}</button>
-            <button class="modal-btn cancel" @click="closeShareModal">关闭</button>
+            <button v-if="!shareNewPassword" class="modal-btn submit warning" @click="shareResetRandom" :disabled="modalSubmitting">{{ $t('users.modals.shareResetBtn') }}</button>
+            <button class="modal-btn submit" @click="copyShareInfo">{{ shareCopied ? ('✓ ' + $t('users.modals.copied')) : (shareNewPassword ? ('📋 ' + $t('users.modals.copyCreds')) : ('📋 ' + $t('users.modals.copyAccountInfo'))) }}</button>
+            <button class="modal-btn cancel" @click="closeShareModal">{{ $t('users.modals.close') }}</button>
           </div>
         </div>
       </div>
@@ -391,19 +391,19 @@
       <div class="modal-overlay" v-if="showEditNoteModal" @click.self="showEditNoteModal = false">
         <div class="glass-modal">
           <div class="modal-header">
-            <h3>📝 编辑用户备注：{{ editingUser?.username }}</h3>
+            <h3>📝 {{ $t('users.modals.editNoteTitle', { username: editingUser?.username }) }}</h3>
             <button class="close-modal" @click="showEditNoteModal = false">✕</button>
           </div>
           <div class="modal-body">
             <div class="form-group">
-              <label>备注信息</label>
-              <input type="text" v-model="editNoteForm.note" placeholder="例如：开发部-张三" />
+              <label>{{ $t('users.modals.noteInfo') }}</label>
+              <input type="text" v-model="editNoteForm.note" :placeholder="$t('users.modals.notePlaceholder')" />
             </div>
           </div>
           <div class="modal-footer">
             <span v-if="modalError" class="modal-error">{{ modalError }}</span>
-            <button class="modal-btn cancel" @click="showEditNoteModal = false">取消</button>
-            <button class="modal-btn submit" @click="submitEditNote" :disabled="modalSubmitting">保存备注</button>
+            <button class="modal-btn cancel" @click="showEditNoteModal = false">{{ $t('users.modals.cancel') }}</button>
+            <button class="modal-btn submit" @click="submitEditNote" :disabled="modalSubmitting">{{ $t('users.modals.saveNote') }}</button>
           </div>
         </div>
       </div>
@@ -414,22 +414,22 @@
       <div class="modal-overlay" v-if="showRenameModal" @click.self="showRenameModal = false">
         <div class="glass-modal">
           <div class="modal-header">
-            <h3>🏷️ 重命名用户：{{ editingUser?.username }}</h3>
+            <h3>🏷️ {{ $t('users.modals.renameTitle', { username: editingUser?.username }) }}</h3>
             <button class="close-modal" @click="showRenameModal = false">✕</button>
           </div>
           <div class="modal-body">
             <div class="form-group">
-              <label>新用户名</label>
-              <input type="text" v-model="renameForm.newUsername" placeholder="请输入新的用户名" />
+              <label>{{ $t('users.modals.newUsername') }}</label>
+              <input type="text" v-model="renameForm.newUsername" :placeholder="$t('users.modals.newUsernamePlaceholder')" />
             </div>
             <p class="modal-tip" v-if="editingUser?.username === authStore.username">
-              ⚠️ 注意：您正在重命名自己当前登录的管理员账户。改名成功后，系统将自动同步更新您的本地账户缓存，无需重新登录。
+              {{ $t('users.modals.renameSelfTip') }}
             </p>
           </div>
           <div class="modal-footer">
             <span v-if="modalError" class="modal-error">{{ modalError }}</span>
-            <button class="modal-btn cancel" @click="showRenameModal = false">取消</button>
-            <button class="modal-btn submit" @click="submitRename" :disabled="modalSubmitting">保存新名字</button>
+            <button class="modal-btn cancel" @click="showRenameModal = false">{{ $t('users.modals.cancel') }}</button>
+            <button class="modal-btn submit" @click="submitRename" :disabled="modalSubmitting">{{ $t('users.modals.saveRename') }}</button>
           </div>
         </div>
       </div>
@@ -440,11 +440,13 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'
 import { authHeaders, readError } from '@/utils/api'
 import { parseExpire, isExpiredAt, formatExpire, formatRemain, formatLeaseRemaining } from '@/utils/format'
 import UserDetailDrawer from '@/components/admin/UserDetailDrawer.vue'
 
+const { t } = useI18n()
 const authStore = useAuthStore()
 
 const users = ref([])
@@ -473,13 +475,13 @@ function leaseSummaryOf(username) {
   return { count: ls.length, nearest: timed.length > 0 ? timed[0] : null }
 }
 
-const statusOptions = [
-  { value: 'all', label: '全部' },
-  { value: 'online', label: '在线' },
-  { value: 'offline', label: '离线' },
-  { value: 'expired', label: '已停用(过截止日)' },
-  { value: 'expiring', label: '7天内到截止日' }
-]
+const statusOptions = computed(() => [
+  { value: 'all', label: t('users.filter.all') },
+  { value: 'online', label: t('users.filter.online') },
+  { value: 'offline', label: t('users.filter.offline') },
+  { value: 'expired', label: t('users.filter.expired') },
+  { value: 'expiring', label: t('users.filter.expiring') }
+])
 
 // 顶部统计卡片
 const onlineUsersCount = computed(() => users.value.filter(u => u.online).length)
@@ -530,7 +532,7 @@ const editNoteForm = ref({ note: '' })
 async function fetchUsers() {
   try {
     const res = await fetch('/api/admin/users', { headers: authHeaders() })
-    if (!res.ok) throw new Error('无权访问用户管理数据')
+    if (!res.ok) throw new Error(t('users.authError'))
     users.value = await res.json()
     // 抽屉打开时同步其中的用户数据（在线状态、备注等会轮询变化）
     if (drawerUser.value) {
@@ -606,7 +608,7 @@ function genRandomPassword() {
 
 // 复制账密分享文案（含 http 局域网 clipboard API 不可用的降级）
 async function copyCredentialsText(creds, copiedRef) {
-  const text = `云手机登录信息\n登录地址：${loginOrigin}\n账号：${creds.username}\n密码：${creds.password}`
+  const text = t('users.loginInfoTemplate', { origin: loginOrigin, username: creds.username, password: creds.password })
   try {
     await navigator.clipboard.writeText(text)
   } catch (e) {
@@ -675,7 +677,7 @@ async function shareResetRandom() {
       headers: authHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({ username: shareUser.value.username, password: newPwd })
     })
-    if (!res.ok) throw new Error(await readError(res, '重置失败'))
+    if (!res.ok) throw new Error(await readError(res, t('users.resetFailed')))
     shareNewPassword.value = newPwd
     fetchUsers()
   } catch (err) {
@@ -687,8 +689,12 @@ async function shareResetRandom() {
 
 async function copyShareInfo() {
   if (!shareUser.value) return
-  let text = `云手机登录信息\n登录地址：${loginOrigin}\n账号：${shareUser.value.username}`
-  if (shareNewPassword.value) text += `\n密码：${shareNewPassword.value}`
+  let text = ''
+  if (shareNewPassword.value) {
+    text = t('users.loginInfoTemplate', { origin: loginOrigin, username: shareUser.value.username, password: shareNewPassword.value })
+  } else {
+    text = t('users.loginInfoNoPassTemplate', { origin: loginOrigin, username: shareUser.value.username })
+  }
   try {
     await navigator.clipboard.writeText(text)
   } catch (e) {
@@ -709,13 +715,13 @@ async function copyShareInfo() {
 // 细粒度权限锁定摘要：有禁止项时显示如 “🔒 码率·音频”
 function lockSummary(user) {
   const parts = []
-  if (user.forbid_bitrate) parts.push('码率')
-  if (user.forbid_fps) parts.push('帧率')
-  if (user.forbid_resolution) parts.push('分辨率')
-  if (user.forbid_audio) parts.push('音频')
-  if (user.forbid_file_push) parts.push('文件')
-  if (user.forbid_terminal) parts.push('终端')
-  if (user.forbid_share) parts.push('分享')
+  if (user.forbid_bitrate) parts.push(t('settings.bitrate'))
+  if (user.forbid_fps) parts.push(t('settings.maxFps'))
+  if (user.forbid_resolution) parts.push(t('settings.maxSize'))
+  if (user.forbid_audio) parts.push(t('settings.audio'))
+  if (user.forbid_file_push) parts.push(t('files.title') || 'File')
+  if (user.forbid_terminal) parts.push(t('deviceClient.terminal') || 'Terminal')
+  if (user.forbid_share) parts.push(t('nav.share') || 'Share')
   return parts.length ? `🔒 ${parts.join('·')}` : ''
 }
 
@@ -723,7 +729,7 @@ function lockSummary(user) {
 async function submitCreateUser() {
   const form = createForm.value
   if (!form.username.trim() || !form.password.trim()) {
-    modalError.value = '用户名和密码不能为空'
+    modalError.value = t('users.emptyUserPass')
     return
   }
   modalSubmitting.value = true
@@ -743,7 +749,7 @@ async function submitCreateUser() {
       })
     })
     if (!res.ok) {
-      throw new Error(await readError(res, '创建用户失败'))
+      throw new Error(await readError(res, t('users.createFailed')))
     }
     // 创建成功：留在弹窗内展示账密供管理员复制分享
     createdCredentials.value = { username: form.username.trim(), password: form.password }
@@ -757,7 +763,7 @@ async function submitCreateUser() {
 
 // 删除用户
 async function confirmDelete(user) {
-  if (!confirm(`确定要删除用户 "${user.username}" 吗？该操作将强制切断其所有在线连接。`)) return
+  if (!confirm(t('users.modals.deleteConfirm', { username: user.username }))) return
   try {
     const res = await fetch('/api/admin/users/delete', {
       method: 'POST',
@@ -765,14 +771,14 @@ async function confirmDelete(user) {
       body: JSON.stringify({ username: user.username })
     })
     if (!res.ok) {
-      throw new Error(await readError(res, '删除失败'))
+      throw new Error(await readError(res, t('users.deleteFailed')))
     }
     if (drawerUser.value && drawerUser.value.username === user.username) {
       drawerUser.value = null
     }
     fetchUsers()
   } catch (err) {
-    alert('删除失败: ' + err.message)
+    alert(t('users.deleteFailedAlert') + err.message)
   }
 }
 
@@ -791,7 +797,7 @@ function openResetPwdModal(user) {
 async function submitResetPwd() {
   const form = resetPwdForm.value
   if (!form.password.trim()) {
-    modalError.value = '密码不能为空'
+    modalError.value = t('users.emptyPass')
     return
   }
   modalSubmitting.value = true
@@ -806,7 +812,7 @@ async function submitResetPwd() {
       })
     })
     if (!res.ok) {
-      throw new Error(await readError(res, '重置失败'))
+      throw new Error(await readError(res, t('users.resetFailed')))
     }
     // 重置成功：留在弹窗内展示新账密供管理员复制分享（会话已被后端强退）
     resetCredentials.value = { username: editingUser.value.username, password: form.password }
@@ -840,7 +846,7 @@ async function submitEditNote() {
       })
     })
     if (!res.ok) {
-      throw new Error(await readError(res, '保存失败'))
+      throw new Error(await readError(res, t('users.saveFailed')))
     }
     showEditNoteModal.value = false
     fetchUsers()
@@ -861,7 +867,7 @@ function openRenameModal(user) {
 async function submitRename() {
   const newName = renameForm.value.newUsername.trim()
   if (!newName) {
-    modalError.value = '用户名不能为空'
+    modalError.value = t('users.emptyUser')
     return
   }
   modalSubmitting.value = true
@@ -877,13 +883,13 @@ async function submitRename() {
     })
 
     if (!res.ok) {
-      throw new Error(await readError(res, '重命名失败'))
+      throw new Error(await readError(res, t('users.renameFailed')))
     }
 
     // 如果修改的是自己登录的管理员账户：后端已吊销旧 token 并踢断会话，直接跳转重新登录
     if (editingUser.value.username === authStore.username) {
       showRenameModal.value = false
-      alert('用户名已修改，请使用新用户名重新登录')
+      alert(t('users.renamedRelogin'))
       authStore.logout()
       return
     }
@@ -909,7 +915,7 @@ async function confirmKick({ username, deviceId }) {
       })
     })
     if (!res.ok) {
-      throw new Error(await readError(res, '强断失败'))
+      throw new Error(await readError(res, t('users.kickFailed')))
     }
 
     // 延迟半秒重新获取最新用户在线状态
@@ -917,7 +923,7 @@ async function confirmKick({ username, deviceId }) {
       fetchUsers()
     }, 500)
   } catch (err) {
-    alert('操作失败: ' + err.message)
+    alert(t('users.actionFailed') + err.message)
   }
 }
 
@@ -1150,6 +1156,7 @@ onUnmounted(() => {
   font-size: 13px;
   padding: 12px 10px;
   border-bottom: 1px solid #30363d;
+  white-space: nowrap;
 }
 
 .premium-table td {
@@ -1279,6 +1286,10 @@ onUnmounted(() => {
 .actions-cell {
   display: flex;
   gap: 6px;
+  min-width: 190px;
+  width: 190px;
+  white-space: nowrap;
+  align-items: center;
 }
 
 .action-btn-mini {
@@ -1856,7 +1867,7 @@ onUnmounted(() => {
 
   .m-card-actions {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
     gap: 6px;
   }
 
@@ -1873,6 +1884,8 @@ onUnmounted(() => {
     border: 1px solid;
     padding: 0 4px;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .m-action-btn.policy {

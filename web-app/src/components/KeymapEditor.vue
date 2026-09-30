@@ -7,27 +7,27 @@
           <select v-model="keymapStore.config.activeProfileId" @change="onProfileChange" class="profile-select">
             <option v-for="p in keymapStore.config.profiles" :key="p.id" :value="p.id">{{ p.name }}</option>
           </select>
-          <button class="icon-btn" title="重命名配置" @click="renameCurrentProfile"><svg class="icon" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
-          <button class="icon-btn" title="新建配置" @click="createNewProfile"><svg class="icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
+          <button class="icon-btn" :title="$t('keymap.renameProfile')" @click="renameCurrentProfile"><svg class="icon" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
+          <button class="icon-btn" :title="$t('keymap.newProfile')" @click="createNewProfile"><svg class="icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
           <div class="divider-v"></div>
-          <button class="icon-btn" title="导出配置" @click="exportProfile"><svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg></button>
-          <button class="icon-btn" title="导入配置" @click="importProfile"><svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg></button>
-          <button class="icon-btn danger" title="删除配置" @click="deleteCurrentProfile" v-if="keymapStore.config.profiles.length > 1"><svg class="icon" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
+          <button class="icon-btn" :title="$t('keymap.exportProfile')" @click="exportProfile"><svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg></button>
+          <button class="icon-btn" :title="$t('keymap.importProfile')" @click="importProfile"><svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg></button>
+          <button class="icon-btn danger" :title="$t('keymap.deleteProfile')" @click="deleteCurrentProfile" v-if="keymapStore.config.profiles.length > 1"><svg class="icon" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
         </div>
         <label class="hint-toggle">
-          <input type="checkbox" v-model="keymapStore.showKeyHints" /> 显示提示
+          <input type="checkbox" v-model="keymapStore.showKeyHints" /> {{ $t('keymap.showKeyHints') }}
         </label>
       </div>
       <div class="toolbar-body">
         <div class="toolbar-tools">
-          <button class="tool-btn" @click="addTap"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle></svg>点击键</button>
-          <button class="tool-btn" @click="addSwipe"><svg class="icon" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>滑动键</button>
-          <button class="tool-btn" @click="addJoystick"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v8M8 12h8"></path></svg>虚拟摇杆</button>
-          <button class="tool-btn" @click="addWheel"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>滚轮键</button>
+          <button class="tool-btn" @click="addTap"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle></svg>{{ $t('keymap.addTap') }}</button>
+          <button class="tool-btn" @click="addSwipe"><svg class="icon" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>{{ $t('keymap.addSwipe') }}</button>
+          <button class="tool-btn" @click="addJoystick"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v8M8 12h8"></path></svg>{{ $t('keymap.addJoystick') }}</button>
+          <button class="tool-btn" @click="addWheel"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>{{ $t('keymap.addWheel') }}</button>
         </div>
         <div class="toolbar-actions">
-          <button class="action-btn cancel" @click="cancelEdit">取消</button>
-          <button class="action-btn save" @click="saveEdit">保存配置</button>
+          <button class="action-btn cancel" @click="cancelEdit">{{ $t('common.cancel') }}</button>
+          <button class="action-btn save" @click="saveEdit">{{ $t('keymap.save') }}</button>
         </div>
       </div>
     </div>
@@ -87,7 +87,7 @@
              :style="getNodeStyle(map, 'end')"
              @mousedown.stop.prevent="keymapStore.isEditMode && onNodeMouseDown($event, map, 'end')"
              @touchstart.stop.prevent="keymapStore.isEditMode && onNodeTouchStart($event, map, 'end')">
-             <div class="swipe-end-label">终</div>
+             <div class="swipe-end-label">{{ $t('keymap.swipeEnd') }}</div>
         </div>
       </template>
     </div>
@@ -95,38 +95,41 @@
     <!-- 节点设置面板 (仅编辑模式) -->
     <div v-if="keymapStore.isEditMode && selectedNode" class="node-settings" @mousedown.stop @touchstart.stop>
       <div class="settings-header">
-        <h4>{{ selectedNode.type === 'joystick' ? '摇杆设置' : (selectedNode.type === 'swipe' ? '滑动设置' : (selectedNode.type === 'wheel' ? '滚轮设置' : '按键设置')) }}</h4>
+        <h4>{{ selectedNode.type === 'joystick' ? $t('keymap.joystickSettings') : (selectedNode.type === 'swipe' ? $t('keymap.swipeSettings') : (selectedNode.type === 'wheel' ? $t('keymap.wheelSettings') : $t('keymap.keySettings'))) }}</h4>
         <button class="close-settings-btn" @click="selectedId = null">✕</button>
       </div>
       <div class="setting-item" v-if="selectedNode.type === 'tap' || selectedNode.type === 'swipe'">
-        <label>绑定按键:</label>
-        <input type="text" class="key-input" :value="selectedNode.key" @keydown.prevent="onKeyBind" placeholder="请按键" readonly />
+        <label>{{ $t('keymap.bindKey') }}</label>
+        <input type="text" class="key-input" :value="selectedNode.key" @keydown.prevent="onKeyBind" :placeholder="$t('keymap.pressKeyPlaceholder')" readonly />
       </div>
       <div class="setting-item" v-if="selectedNode.type === 'swipe'">
-        <label>滑动耗时:</label>
+        <label>{{ $t('keymap.swipeDuration') }}</label>
         <input type="number" class="key-input" v-model.number="selectedNode.duration" min="50" max="2000" step="50" @input="updateNode" style="max-width: 60px;" />
         <span style="color:#aaa; font-size:12px;">ms</span>
       </div>
       <div class="setting-item" v-if="selectedNode.type === 'joystick'">
-        <label>摇杆大小:</label>
+        <label>{{ $t('keymap.joystickSize') }}</label>
         <input type="range" v-model.number="selectedNode.radius" min="0.05" max="0.3" step="0.01" @input="updateNode" />
       </div>
       <div class="setting-item" v-if="selectedNode.type === 'wheel'">
-        <label>滚轮动作:</label>
+        <label>{{ $t('keymap.wheelAction') }}</label>
         <select v-model="selectedNode.action" @change="updateNode" class="profile-select" style="max-width: 100px;">
-          <option value="scroll">上下滑动</option>
-          <option value="zoom">双指缩放</option>
+          <option value="scroll">{{ $t('keymap.wheelScroll') }}</option>
+          <option value="zoom">{{ $t('keymap.wheelZoom') }}</option>
         </select>
       </div>
-      <p class="setting-tip" v-if="selectedNode.type === 'tap' || selectedNode.type === 'swipe'">选中上方输入框后，按键盘任意键进行绑定</p>
-      <p class="setting-tip" v-if="selectedNode.type === 'wheel'">在游戏内滚动鼠标滚轮将触发对应动作</p>
+      <p class="setting-tip" v-if="selectedNode.type === 'tap' || selectedNode.type === 'swipe'">{{ $t('keymap.keyBindTip') }}</p>
+      <p class="setting-tip" v-if="selectedNode.type === 'wheel'">{{ $t('keymap.wheelTip') }}</p>
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useKeymapStore } from '@/stores/keymap'
+
+const { t } = useI18n()
 
 const props = defineProps({
   videoElement: {
@@ -319,7 +322,7 @@ function renameCurrentProfile() {
 
 function deleteCurrentProfile() {
   if (keymapStore.config.profiles.length <= 1) return
-  if (confirm('确定要删除当前配置吗？此操作无法撤销。')) {
+  if (confirm(t('keymap.confirmDelete'))) {
     keymapStore.deleteProfile(keymapStore.activeProfile.id)
     onProfileChange()
   }
@@ -353,12 +356,12 @@ function importProfile() {
           importedProfile.id = 'p_' + Date.now()
           keymapStore.importProfile(importedProfile)
           onProfileChange()
-          alert('导入成功！')
+          alert(t('keymap.importSuccess'))
         } else {
-          alert('无效的配置文件格式！')
+          alert(t('keymap.invalidFormat'))
         }
       } catch (err) {
-        alert('读取配置文件失败！')
+        alert(t('keymap.readFileFailed'))
       }
     }
     reader.readAsText(file)
@@ -390,7 +393,7 @@ function addSwipe() {
 
 function addJoystick() {
   if (editableMappings.value.find(m => m.type === 'joystick')) {
-    alert('目前仅支持一个摇杆')
+    alert(t('keymap.singleJoystickOnly'))
     return
   }
   editableMappings.value.push({

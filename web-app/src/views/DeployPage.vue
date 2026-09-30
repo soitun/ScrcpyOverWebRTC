@@ -3,68 +3,68 @@
     <div class="deploy-layout">
       <!-- 左侧: 参数表单 -->
       <section class="form-section">
-        <h2 class="section-title">网页一键 USB 部署</h2>
+        <h2 class="section-title">{{ $t('deploy.title') }}</h2>
 
         <div class="webusb-warning">
-          ⚠️ <b>使用须知</b>：本网页 USB 部署基于 WebUSB 协议，<b>不支持无线或网络 ADB 调试模式</b>，物理手机必须使用数据线直接连接当前电脑的 USB 端口。<br>
-          💡 <b>防坑提醒</b>：若连接时提示 <i>"already in use" (设备被占用)</i>，通常是电脑后台运行了本地 ADB 或手机助手，只需在电脑终端中执行 <code>adb kill-server</code> 释放占用即可。
+          ⚠️ <b>{{ $t('deploy.warningTitle') }}</b>：{{ $t('deploy.warningNotice') }}<br>
+          💡 <b>{{ $t('deploy.warningTipTitle') }}</b>：{{ $t('deploy.warningTip') }}
         </div>
 
         <div class="form-group">
-          <label class="form-label">Signaling 地址 <span class="required">*</span></label>
+          <label class="form-label">{{ $t('deploy.form.signalingUrl') }} <span class="required">*</span></label>
           <input
             v-model="form.signalingUrl"
             class="form-input"
-            placeholder="例如: wss://cloudphone.example.com:8443 或 wss://192.168.1.2:8443"
+            :placeholder="$t('deploy.form.signalingPlaceholder')"
           >
-          <div class="form-hint">需填写信令服务器地址（支持域名或 IP，支持自动补全协议），例如：<br>域名加密: <code>wss://cloudphone.example.com:8443</code> 或 <code>wss://cloudphone.example.com</code><br>局域网 IP: <code>ws://192.168.1.2:8443</code> 或 <code>192.168.1.2:8443</code></div>
+          <div class="form-hint">{{ $t('deploy.form.signalingHint') }}</div>
         </div>
 
         <div class="form-group">
-          <label class="form-label">ICE Servers 地址</label>
+          <label class="form-label">{{ $t('deploy.form.iceServers') }}</label>
           <input
             v-model="form.iceServers"
             class="form-input"
-            placeholder="stun:stun.l.google.com:19302"
+            :placeholder="$t('deploy.form.iceServersPlaceholder')"
           >
-          <div class="form-hint">自定义 ICE 服务器，多个以英文逗号分隔，如：stun:stun.l.google.com:19302,turn:user:pass@host:port</div>
+          <div class="form-hint">{{ $t('deploy.form.iceServersHint') }}</div>
         </div>
 
         <div class="form-group">
-          <label class="form-label">Device ID</label>
+          <label class="form-label">{{ $t('deploy.form.deviceId') }}</label>
           <input
             v-model="form.deviceId"
             class="form-input"
-            placeholder="留空自动生成"
+            :placeholder="$t('deploy.form.deviceIdPlaceholder')"
           >
         </div>
 
         <div class="form-group">
-          <label class="form-label">编码参数</label>
+          <label class="form-label">{{ $t('deploy.form.videoCodecOptions') }}</label>
           <input
             v-model="form.videoCodecOptions"
             class="form-input"
-            placeholder="留空使用默认值"
+            :placeholder="$t('deploy.form.videoCodecOptionsPlaceholder')"
           >
-          <div class="form-hint">默认: intra-refresh-period=30,i-frame-interval=2,vendor.rtc-ext-enc-low-latency=1</div>
+          <div class="form-hint">{{ $t('deploy.form.videoCodecOptionsHint') }}</div>
         </div>
 
         <div class="form-group">
-          <label class="form-label">External Addr</label>
+          <label class="form-label">{{ $t('deploy.form.externalAddr') }}</label>
           <input
             v-model="form.externalAddr"
             class="form-input"
-            placeholder="留空不设置"
+            :placeholder="$t('deploy.form.externalAddrPlaceholder')"
           >
-          <div class="form-hint">非直连环境需填写转发端口的宿主机ip，如redroid环境，需填写redroid宿主机ip。</div>
+          <div class="form-hint">{{ $t('deploy.form.externalAddrHint') }}</div>
         </div>
 
         <div class="form-group">
-          <label class="form-label">WebRTC Port</label>
+          <label class="form-label">{{ $t('deploy.form.webrtcPort') }}</label>
           <input
             v-model="form.webrtcPort"
             class="form-input"
-            placeholder="留空不设置，默认 50000端口"
+            :placeholder="$t('deploy.form.webrtcPortPlaceholder')"
           >
         </div>
 
@@ -73,7 +73,7 @@
           :disabled="isDeploying || !form.signalingUrl"
           @click="startDeploy"
         >
-          {{ isDeploying ? '正在部署...' : '连接 USB 设备并部署' }}
+          {{ isDeploying ? $t('deploy.form.deployingBtn') : $t('deploy.form.deployBtn') }}
         </button>
       </section>
 
@@ -81,7 +81,7 @@
       <div class="right-column">
         <!-- 部署日志/进度 -->
         <section class="log-section">
-          <h2 class="section-title">USB 自动化部署进度</h2>
+          <h2 class="section-title">{{ $t('deploy.progress.title') }}</h2>
 
           <!-- 步骤列表 -->
           <div class="steps">
@@ -103,7 +103,7 @@
 
           <!-- 日志区域 -->
           <div class="log-area" ref="logArea">
-            <div v-if="deployLog.length === 0" class="log-empty">等待部署...</div>
+            <div v-if="deployLog.length === 0" class="log-empty">{{ $t('deploy.progress.waiting') }}</div>
             <div v-for="(line, i) in deployLog" :key="i" class="log-line">{{ line }}</div>
           </div>
         </section>
@@ -112,8 +112,8 @@
         <section class="manual-section">
           <div class="manual-header">
             <div class="manual-header-title-group">
-              <h2 class="section-title">独立部署与配置指导</h2>
-              <span class="manual-header-desc">适合离线运行、机房多机批量群控或长期开机自启部署</span>
+              <h2 class="section-title">{{ $t('deploy.manual.title') }}</h2>
+              <span class="manual-header-desc">{{ $t('deploy.manual.subtitle') }}</span>
             </div>
             <!-- 方式选择 Tab -->
             <div class="deploy-mode-tabs">
@@ -123,7 +123,7 @@
                 @click="manualMode = 'adb'"
               >
                 <span class="tab-icon">💻</span>
-                <span class="tab-text">电脑 ADB 一键部署 (无需 Root)</span>
+                <span class="tab-text">{{ $t('deploy.manual.tabs.adb') }}</span>
               </button>
               <button 
                 class="mode-tab-btn magisk-tab" 
@@ -131,7 +131,7 @@
                 @click="manualMode = 'magisk'"
               >
                 <span class="tab-icon">📱</span>
-                <span class="tab-text">Magisk / KSU 刷机模块 (Root 开机自启)</span>
+                <span class="tab-text">{{ $t('deploy.manual.tabs.magisk') }}</span>
               </button>
             </div>
           </div>
@@ -140,10 +140,10 @@
           <div v-if="manualMode === 'adb'" class="manual-mode-block">
             <!-- 部署前准备 -->
             <div class="manual-prereqs">
-              <div class="qs-prereq-title">📋 电脑 ADB 部署前准备：</div>
+              <div class="qs-prereq-title">{{ $t('deploy.manual.adbPrereqTitle') }}</div>
               <ul class="qs-prereq-list">
-                <li><b>手机端配置</b>：进入手机「设置 -> 开发者选项」开启<b>「USB 调试」</b>，并通过 USB 数据线连接电脑。</li>
-                <li><b>电脑端配置</b>：电脑已安装 <b>ADB 工具</b>（终端运行 <code>adb devices</code> 可识别设备且状态为 <code>device</code>）。</li>
+                <li v-html="$t('deploy.manual.adbPrereqPhone')"></li>
+                <li v-html="$t('deploy.manual.adbPrereqPc')"></li>
               </ul>
             </div>
             
@@ -152,25 +152,25 @@
               <!-- 第一步：下载部署包 -->
               <div class="flow-step-card download-step-card">
                 <div class="step-header">
-                  <span class="step-badge">第一步</span>
-                  <span class="step-title">获取 ADB 部署包</span>
+                  <span class="step-badge">{{ $t('deploy.manual.step1') }}</span>
+                  <span class="step-title">{{ $t('deploy.manual.getAdbPkg') }}</span>
                 </div>
                 <div class="download-action-banner gold-banner">
                   <div class="banner-left">
                     <div class="banner-icon">⚡</div>
                     <div class="banner-info">
-                      <div class="banner-title">ADB 一键部署资源包 (ZIP)</div>
-                      <div class="banner-desc">包含全平台 Agent 原生二进制、核心投屏库、单机与多机批量一键启动脚本，解压即可通过 ADB 运行。</div>
+                      <div class="banner-title">{{ $t('deploy.manual.adbPkgTitle') }}</div>
+                      <div class="banner-desc">{{ $t('deploy.manual.adbPkgDesc') }}</div>
                       <div class="banner-tags">
-                        <span class="tag-pill">内置 run.sh / run.bat</span>
-                        <span class="tag-pill">内置 batch_start 批量群控</span>
-                        <span class="tag-pill">全架构: arm64 / v7a / x86_64</span>
+                        <span class="tag-pill">{{ $t('deploy.manual.tagRunScript') }}</span>
+                        <span class="tag-pill">{{ $t('deploy.manual.tagBatchStart') }}</span>
+                        <span class="tag-pill">{{ $t('deploy.manual.tagArch') }}</span>
                       </div>
                     </div>
                   </div>
                   <a href="/agent/agent-deploy.pkg" download="agent-deploy.zip" class="banner-download-btn gold-btn">
                     <span class="btn-icon">📥</span>
-                    <span class="btn-text">立即下载 (ZIP)</span>
+                    <span class="btn-text">{{ $t('deploy.manual.downloadZip') }}</span>
                   </a>
                 </div>
               </div>
@@ -178,32 +178,32 @@
               <!-- 第二步：本地终端运行一键脚本 -->
               <div class="flow-step-card guide-step-card">
                 <div class="step-header">
-                  <span class="step-badge">第二步</span>
-                  <span class="step-title">本地终端运行一键脚本</span>
+                  <span class="step-badge">{{ $t('deploy.manual.step2') }}</span>
+                  <span class="step-title">{{ $t('deploy.manual.runScriptTitle') }}</span>
                 </div>
-                <p class="step-desc">解压下载的 <code>agent-deploy.zip</code> 并进入解压后的目录，然后执行下方对应系统的部署脚本命令：</p>
+                <p class="step-desc" v-html="$t('deploy.manual.runScriptDesc')"></p>
 
                 <!-- 单台设备命令网格 -->
                 <div class="command-grid">
                   <div class="command-card">
                     <div class="script-box-title">
                       <span class="os-tag unix">Linux / macOS</span>
-                      <span>单机 ADB 部署</span>
+                      <span>{{ $t('deploy.manual.singleDeploy') }}</span>
                     </div>
                     <div class="code-container">
                       <pre class="code-block wrap">chmod +x run.sh && {{ shCommand }}</pre>
-                      <button class="copy-code-btn" @click="copyCommand(`chmod +x run.sh && ${shCommand}`)">复制</button>
+                      <button class="copy-code-btn" @click="copyCommand(`chmod +x run.sh && ${shCommand}`)">{{ $t('deploy.manual.copyCmd') }}</button>
                     </div>
                   </div>
 
                   <div class="command-card">
                     <div class="script-box-title">
                       <span class="os-tag win">Windows CMD</span>
-                      <span>单机 ADB 部署</span>
+                      <span>{{ $t('deploy.manual.singleDeploy') }}</span>
                     </div>
                     <div class="code-container">
                       <pre class="code-block wrap">{{ batCommand }}</pre>
-                      <button class="copy-code-btn" @click="copyCommand(batCommand)">复制</button>
+                      <button class="copy-code-btn" @click="copyCommand(batCommand)">{{ $t('deploy.manual.copyCmd') }}</button>
                     </div>
                   </div>
                 </div>
@@ -211,33 +211,33 @@
                 <!-- 多机批量群控启动提示卡片 -->
                 <div class="batch-deploy-banner">
                   <div class="batch-banner-header">
-                    <span class="batch-tag">多机群控</span>
-                    <span class="batch-title">🔥 批量拉起所有已连接设备 (自动遍历 adb devices)</span>
+                    <span class="batch-tag">{{ $t('deploy.manual.batchTag') }}</span>
+                    <span class="batch-title">{{ $t('deploy.manual.batchTitle') }}</span>
                   </div>
                   <p class="batch-desc">
-                    部署包内已内置批量启动脚本，自动遍历并并发拉起所有连接正常的 Android 设备：
+                    {{ $t('deploy.manual.batchDesc') }}
                   </p>
                   
                   <div class="command-grid batch-command-grid">
                     <div class="command-card">
                       <div class="script-box-title">
                         <span class="os-tag unix">Linux / macOS</span>
-                        <span>多机批量启动</span>
+                        <span>{{ $t('deploy.manual.batchStart') }}</span>
                       </div>
                       <div class="code-container">
                         <pre class="code-block wrap">chmod +x batch_start.sh && {{ batchShCommand }}</pre>
-                        <button class="copy-code-btn" @click="copyCommand(`chmod +x batch_start.sh && ${batchShCommand}`)">复制</button>
+                        <button class="copy-code-btn" @click="copyCommand(`chmod +x batch_start.sh && ${batchShCommand}`)">{{ $t('deploy.manual.copyCmd') }}</button>
                       </div>
                     </div>
 
                     <div class="command-card">
                       <div class="script-box-title">
                         <span class="os-tag win">Windows CMD</span>
-                        <span>批量启动 (或双击 batch_start.bat)</span>
+                        <span>{{ $t('deploy.manual.batchStartWin') }}</span>
                       </div>
                       <div class="code-container">
                         <pre class="code-block wrap">{{ batchBatCommand }}</pre>
-                        <button class="copy-code-btn" @click="copyCommand(batchBatCommand)">复制</button>
+                        <button class="copy-code-btn" @click="copyCommand(batchBatCommand)">{{ $t('deploy.manual.copyCmd') }}</button>
                       </div>
                     </div>
                   </div>
@@ -247,16 +247,16 @@
               <!-- 第三步：验证在线状态 -->
               <div class="flow-step-card verify-step-card">
                 <div class="step-header">
-                  <span class="step-badge">第三步</span>
-                  <span class="step-title">验证 Agent 在线状态与运行日志</span>
+                  <span class="step-badge">{{ $t('deploy.manual.step3') }}</span>
+                  <span class="step-title">{{ $t('deploy.manual.verifyStatusTitle') }}</span>
                 </div>
                 <div class="code-container">
-                  <pre class="code-block wrap"># 验证 Agent 后台进程是否在线 (有进程输出即正常)
+                  <pre class="code-block wrap"># Check if Agent process is running:
 adb shell "ps -A | grep cloudphone-agent"
 
-# 查看 Agent 实时运行日志
+# View Agent realtime logs:
 adb shell "cat /data/local/tmp/cloudphone-agent.log"</pre>
-                  <button class="copy-code-btn" @click="copyCommand(checkAgentCmd)">复制命令</button>
+                  <button class="copy-code-btn" @click="copyCommand(checkAgentCmd)">{{ $t('deploy.manual.copyCmd') }}</button>
                 </div>
               </div>
             </div>
@@ -265,10 +265,10 @@ adb shell "cat /data/local/tmp/cloudphone-agent.log"</pre>
           <!-- 途径二：Magisk / KernelSU / APatch 刷机模块 -->
           <div v-else-if="manualMode === 'magisk'" class="manual-mode-block">
             <div class="manual-prereqs magisk-prereqs">
-              <div class="qs-prereq-title magisk-title">📋 Magisk 模块部署前准备：</div>
+              <div class="qs-prereq-title magisk-title">{{ $t('deploy.manual.magiskPrereqTitle') }}</div>
               <ul class="qs-prereq-list">
-                <li><b>设备权限要求</b>：物理手机需<b>已 Root</b>，并已安装 Magisk、KernelSU 或 APatch 模块管理器。</li>
-                <li><b>服务优势</b>：刷入后作为系统后台服务自动运行，设备重启后无需电脑连接即可<b>自动开机自启并保活</b>。</li>
+                <li v-html="$t('deploy.manual.magiskPrereqRoot')"></li>
+                <li v-html="$t('deploy.manual.magiskPrereqAdv')"></li>
               </ul>
             </div>
             
@@ -276,30 +276,30 @@ adb shell "cat /data/local/tmp/cloudphone-agent.log"</pre>
               <!-- 第一步：下载 Magisk 模块包 -->
               <div class="flow-step-card download-step-card">
                 <div class="step-header">
-                  <span class="step-badge magisk-badge">第一步</span>
-                  <span class="step-title">获取 Magisk 模块刷机包</span>
+                  <span class="step-badge magisk-badge">{{ $t('deploy.manual.step1') }}</span>
+                  <span class="step-title">{{ $t('deploy.manual.getMagiskPkg') }}</span>
                 </div>
                 <div class="download-action-banner magisk-banner">
                   <div class="banner-left">
                     <div class="banner-icon">📱</div>
                     <div class="banner-info">
-                      <div class="banner-title">Magisk / KSU 刷机模块 (ZIP)</div>
-                      <div class="banner-desc">专属模块压缩包，内置全架构自适应二进制、开机自启看门狗以及 cpctl 运维控制台工具。</div>
+                      <div class="banner-title">{{ $t('deploy.manual.magiskPkgTitle') }}</div>
+                      <div class="banner-desc">{{ $t('deploy.manual.magiskPkgDesc') }}</div>
                       <div class="banner-tags">
-                        <span class="tag-pill magisk-pill">自动探测架构</span>
-                        <span class="tag-pill magisk-pill">开机自启看门狗</span>
-                        <span class="tag-pill magisk-pill">支持离线预设配置</span>
+                        <span class="tag-pill magisk-pill">{{ $t('deploy.manual.tagAutoArch') }}</span>
+                        <span class="tag-pill magisk-pill">{{ $t('deploy.manual.tagWatchdog') }}</span>
+                        <span class="tag-pill magisk-pill">{{ $t('deploy.manual.tagOfflineConfig') }}</span>
                       </div>
                     </div>
                   </div>
                   <div class="banner-action-group">
                     <a href="/agent/cloudphone-agent-magisk.pkg" download="cloudphone-agent-magisk.zip" class="banner-download-btn magisk-btn">
                       <span class="btn-icon">📥</span>
-                      <span class="btn-text">下载刷机包 (ZIP)</span>
+                      <span class="btn-text">{{ $t('deploy.manual.downloadMagiskZip') }}</span>
                     </a>
-                    <a href="/agent/magisk-config-tools.pkg" download="magisk-config-tools.zip" class="banner-download-btn magisk-tool-btn" title="包含 Windows 拖拽即用批处理与 Mac/Linux 离线配置脚本">
+                    <a href="/agent/magisk-config-tools.pkg" download="magisk-config-tools.zip" class="banner-download-btn magisk-tool-btn" :title="$t('deploy.manual.offlineConfigToolsHint')">
                       <span class="btn-icon">🛠️</span>
-                      <span class="btn-text">离线配置工具 (ZIP)</span>
+                      <span class="btn-text">{{ $t('deploy.manual.offlineConfigTools') }}</span>
                     </a>
                   </div>
                 </div>
@@ -308,49 +308,49 @@ adb shell "cat /data/local/tmp/cloudphone-agent.log"</pre>
               <!-- 第二步：刷入模块与参数配置 -->
               <div class="flow-step-card guide-step-card">
                 <div class="step-header">
-                  <span class="step-badge magisk-badge">第二步</span>
-                  <span class="step-title">刷入模块与参数配置</span>
+                  <span class="step-badge magisk-badge">{{ $t('deploy.manual.step2') }}</span>
+                  <span class="step-title">{{ $t('deploy.manual.flashModuleTitle') }}</span>
                 </div>
-                <p class="step-desc">打开手机上的 Magisk / KernelSU 管理器，选择“从本地安装”并选中 <code>cloudphone-agent-magisk.zip</code>，刷入成功后<b>重启手机</b>。首次使用可通过以下任一方式配置信令：</p>
+                <p class="step-desc" v-html="$t('deploy.manual.flashModuleDesc')"></p>
 
                 <!-- 配置方式卡片网格 -->
                 <div class="magisk-methods-container">
                   <!-- 方式 A -->
                   <div class="magisk-method-card active-method">
                     <div class="method-header">
-                      <span class="method-tag">推荐首选</span>
-                      <span class="method-title">方式 A：命令行一键配置 (手机终端 / ADB shell)</span>
+                      <span class="method-tag">{{ $t('deploy.manual.recommendTag') }}</span>
+                      <span class="method-title">{{ $t('deploy.manual.methodATitle') }}</span>
                     </div>
                     <div class="code-container">
                       <pre class="code-block wrap">{{ magiskCommand }}</pre>
-                      <button class="copy-code-btn" @click="copyCommand(magiskCommand)">复制</button>
+                      <button class="copy-code-btn" @click="copyCommand(magiskCommand)">{{ $t('deploy.manual.copyCmd') }}</button>
                     </div>
                   </div>
 
                   <!-- 方式 B & 方式 C -->
                   <div class="magisk-method-subgrid">
                     <div class="magisk-submethod-card">
-                      <div class="submethod-title">🎮 方式 B：交互式控制台菜单 (cpctl)</div>
-                      <p class="submethod-desc">在手机终端 (如 Termux) 执行 <code>su</code> 然后输入 <code>cpctl</code> 打开交互控制台，按 <code>4</code> 即可视化修改信令地址、ICE Servers、设备 ID 与视频码率。</p>
+                      <div class="submethod-title">{{ $t('deploy.manual.methodBTitle') }}</div>
+                      <p class="submethod-desc" v-html="$t('deploy.manual.methodBDesc')"></p>
                     </div>
                     <div class="magisk-submethod-card config-tool-card">
                       <div class="submethod-header-row">
-                        <div class="submethod-title">🛠️ 方式 C：电脑离线预设定制 (推荐批量刷机)</div>
-                        <a href="/agent/magisk-config-tools.pkg" download="magisk-config-tools.zip" class="tool-download-btn" title="点击下载轻量配置工具包 (约 15KB)">
-                          <span>📥 下载配置工具包</span>
+                        <div class="submethod-title">{{ $t('deploy.manual.methodCTitle') }}</div>
+                        <a href="/agent/magisk-config-tools.pkg" download="magisk-config-tools.zip" class="tool-download-btn" :title="$t('deploy.manual.downloadConfigToolHint')">
+                          <span>{{ $t('deploy.manual.downloadConfigTool') }}</span>
                         </a>
                       </div>
                       <p class="submethod-desc">
-                        解压工具包与 <code>cloudphone-agent-magisk.zip</code> 置于同目录，预先写入信令地址再刷入手机，开机自动上线：
+                        <span v-html="$t('deploy.manual.methodCDesc')"></span>
                       </p>
                       <div class="tool-usage-tips">
                         <div class="tip-item">
                           <span class="tip-os win">Windows</span>
-                          <span class="tip-text">免装环境，直接将 <code>.zip</code> 拖拽到 <code>configure_magisk.bat</code> 上即可</span>
+                          <span class="tip-text" v-html="$t('deploy.manual.methodCWinTip')"></span>
                         </div>
                         <div class="tip-item">
                           <span class="tip-os unix">macOS / Linux</span>
-                          <span class="tip-text">终端执行 <code>{{ magiskToolShCommand }}</code>（或直接运行向导）</span>
+                          <span class="tip-text" v-html="$t('deploy.manual.methodCUnixTip', { cmd: magiskToolShCommand })"></span>
                         </div>
                       </div>
                     </div>
@@ -361,16 +361,16 @@ adb shell "cat /data/local/tmp/cloudphone-agent.log"</pre>
               <!-- 第三步：验证状态 -->
               <div class="flow-step-card verify-step-card">
                 <div class="step-header">
-                  <span class="step-badge magisk-badge">第三步</span>
-                  <span class="step-title">验证 Magisk 模块服务状态</span>
+                  <span class="step-badge magisk-badge">{{ $t('deploy.manual.step3') }}</span>
+                  <span class="step-title">{{ $t('deploy.manual.verifyMagiskTitle') }}</span>
                 </div>
                 <div class="code-container">
-                  <pre class="code-block wrap"># 查看控制台状态 (显示 RUNNING 即正常在线)
-adb shell "su -c cpctl status"   # 手机终端执行: su -> cpctl status
+                  <pre class="code-block wrap"># Check cpctl status (RUNNING indicates active):
+adb shell "su -c cpctl status"   # Phone terminal: su -> cpctl status
 
-# 实时滚动查看服务运行日志
+# View service logs in real time:
 adb shell "su -c cpctl log"</pre>
-                  <button class="copy-code-btn" @click="copyCommand(checkMagiskCmd)">复制命令</button>
+                  <button class="copy-code-btn" @click="copyCommand(checkMagiskCmd)">{{ $t('deploy.manual.copyCmd') }}</button>
                 </div>
               </div>
             </div>
@@ -383,8 +383,10 @@ adb shell "su -c cpctl log"</pre>
 
 <script setup>
 import { ref, reactive, watch, nextTick, onMounted, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useDeploy } from '@/composables/useDeploy'
 
+const { t } = useI18n()
 const { isDeploying, deployStatus, deployProgress, deployError, deployLog, deployAgent } = useDeploy()
 
 const logArea = ref(null)
@@ -400,7 +402,13 @@ const form = reactive({
   iceServers: '',
 })
 
-const steps = ['连接 USB 设备', 'ADB 认证', '探测架构', '推送文件', '启动服务']
+const steps = computed(() => [
+  t('deploy.steps.connect'),
+  t('deploy.steps.auth'),
+  t('deploy.steps.detect'),
+  t('deploy.steps.push'),
+  t('deploy.steps.start')
+])
 
 function currentStep() {
   if (deployProgress.value >= 100) return 5
@@ -562,10 +570,9 @@ const checkMagiskCmd = 'adb shell "su -c cpctl status"'
 // 一键复制命令到剪贴板
 function copyCommand(text) {
   navigator.clipboard.writeText(text).then(() => {
-    alert('命令已成功复制到剪贴板！')
+    alert(t('deploy.manual.cmdCopied'))
   }).catch(err => {
     console.error('复制失败:', err)
-    alert('复制失败，请手动选择复制。')
   })
 }
 
@@ -1377,6 +1384,7 @@ onMounted(async () => {
   color: var(--text-secondary);
   cursor: pointer;
   transition: all 0.2s ease;
+  white-space: nowrap;
   z-index: 2;
 }
 

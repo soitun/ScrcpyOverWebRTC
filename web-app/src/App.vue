@@ -7,29 +7,29 @@
       <div class="license-block-card">
         <div class="license-block-header">
           <div class="license-alert-icon">⚠️</div>
-          <h2>系统授权已过期</h2>
-          <p class="license-block-subtitle">当前版本已不受支持，请更新或激活</p>
+          <h2>{{ $t('license.expiredTitle') }}</h2>
+          <p class="license-block-subtitle">{{ $t('license.expiredDesc') }}</p>
         </div>
         
         <div class="license-block-body">
           <p class="license-error-tip">{{ deviceStore.licenseErrorMsg }}</p>
           
           <div class="license-info-row">
-            <span class="info-label">服务器机器码:</span>
+            <span class="info-label">{{ $t('license.machineId') }}:</span>
             <div class="machine-id-container">
-              <code class="machine-id-code">{{ deviceStore.globalMachineID || '正在获取...' }}</code>
+              <code class="machine-id-code">{{ deviceStore.globalMachineID || '...' }}</code>
               <button class="copy-code-btn" @click="copyMachineID" :disabled="!deviceStore.globalMachineID">
-                {{ copySuccess ? '已复制' : '复制' }}
+                {{ copySuccess ? $t('common.copied') : $t('common.copy') }}
               </button>
             </div>
           </div>
           
           <div class="license-input-group">
-            <label for="license-input">请输入授权激活码:</label>
+            <label for="license-input">{{ $t('license.enterKey') }}:</label>
             <textarea 
               id="license-input" 
               v-model="activationKey" 
-              placeholder="请粘贴购买后获得的激活码..."
+              :placeholder="$t('license.placeholder')"
               rows="4"
             ></textarea>
           </div>
@@ -40,17 +40,16 @@
           
           <div class="license-action-buttons">
             <button class="activate-btn" :disabled="isActivating || !activationKey.trim()" @click="submitActivation">
-              {{ isActivating ? '正在激活...' : '立即激活解锁' }}
+              {{ isActivating ? $t('license.activating') : $t('license.activateBtn') }}
             </button>
           </div>
         </div>
         
         <div class="license-block-footer">
-          <p>没有激活码？前往官网购买「穿云投屏授权码服务」：</p>
           <div class="contact-links">
-            <a href="https://webrtc-phone.com/buy.html" target="_blank" rel="noopener" class="footer-purchase-link">🛒 购买激活码</a>
+            <a href="https://webrtc-phone.com/buy.html" target="_blank" rel="noopener" class="footer-purchase-link">{{ $t('license.buyLink') }}</a>
             <span class="footer-divider">|</span>
-            <a href="mailto:cloudphone@qq.com" class="footer-email">📧 联系邮箱: cloudphone@qq.com</a>
+            <a href="mailto:cloudphone@qq.com" class="footer-email">{{ $t('license.contactEmail') }}</a>
           </div>
         </div>
       </div>
@@ -58,11 +57,11 @@
 
     <!-- 1. 全局侧边导航 (仅PC显示) -->
     <nav class="side-nav" :class="{ expanded: isNavExpanded }" v-if="!isMobile">
-      <button class="nav-brand" @click="isNavExpanded = !isNavExpanded" :title="isNavExpanded ? '收起侧边栏' : '展开侧边栏'">
+      <button class="nav-brand" @click="isNavExpanded = !isNavExpanded" :title="isNavExpanded ? $t('nav.collapse') : $t('nav.expand')">
         <svg class="nav-brand-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
         </svg>
-        <span class="nav-brand-text">云虚机</span>
+        <span class="nav-brand-text">{{ $t('nav.brand') }}</span>
         <span class="nav-brand-collapse-arrow">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="11 17 6 12 11 7"></polyline>
@@ -76,7 +75,7 @@
             <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
             <line x1="12" y1="18" x2="12.01" y2="18"></line>
           </svg>
-          <span class="nav-item-text">虚机</span>
+          <span class="nav-item-text">{{ $t('nav.devices') }}</span>
         </router-link>
         <router-link to="/monitor" class="nav-item" exact-active-class="active" v-if="authStore.isAdmin">
           <svg class="nav-item-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -84,13 +83,13 @@
             <line x1="12" y1="20" x2="12" y2="4"></line>
             <line x1="6" y1="20" x2="6" y2="14"></line>
           </svg>
-          <span class="nav-item-text">大盘</span>
+          <span class="nav-item-text">{{ $t('nav.dashboard') }}</span>
         </router-link>
         <router-link to="/files" class="nav-item" exact-active-class="active">
           <svg class="nav-item-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
           </svg>
-          <span class="nav-item-text">文件</span>
+          <span class="nav-item-text">{{ $t('nav.files') }}</span>
         </router-link>
         <router-link to="/deploy" class="nav-item" exact-active-class="active" v-if="authStore.isAdmin">
           <svg class="nav-item-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -100,14 +99,14 @@
             <path d="M6 9h12v5a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V9z"></path>
             <path d="M12 16v6"></path>
           </svg>
-          <span class="nav-item-text">部署</span>
+          <span class="nav-item-text">{{ $t('nav.deploy') }}</span>
         </router-link>
-        <a href="javascript:void(0)" @click="deviceStore.toggleGlobalConsole()" class="nav-item" title="终端控制台" v-if="authStore.isAdmin">
+        <a href="javascript:void(0)" @click="deviceStore.toggleGlobalConsole()" class="nav-item" :title="$t('nav.terminal')" v-if="authStore.isAdmin">
           <svg class="nav-item-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="4 17 10 11 4 5"></polyline>
             <line x1="12" y1="19" x2="20" y2="19"></line>
           </svg>
-          <span class="nav-item-text">终端</span>
+          <span class="nav-item-text">{{ $t('nav.terminal') }}</span>
         </a>
         <router-link to="/advanced" class="nav-item" exact-active-class="active" v-if="authStore.isAdmin">
           <svg class="nav-item-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -122,7 +121,7 @@
             <line x1="1" y1="9" x2="4" y2="9"></line>
             <line x1="1" y1="14" x2="4" y2="14"></line>
           </svg>
-          <span class="nav-item-text">外设</span>
+          <span class="nav-item-text">{{ $t('nav.peripherals') }}</span>
         </router-link>
         <router-link to="/admin/users" class="nav-item" exact-active-class="active" v-if="authStore.isAdmin">
           <svg class="nav-item-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -131,54 +130,48 @@
             <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
             <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
           </svg>
-          <span class="nav-item-text">用户管理</span>
+          <span class="nav-item-text">{{ $t('nav.users') }}</span>
         </router-link>
-        <router-link to="/admin/devices" class="nav-item" exact-active-class="active" title="设备租约运营" v-if="authStore.isAdmin">
+        <router-link to="/admin/devices" class="nav-item" exact-active-class="active" :title="$t('nav.deviceOps')" v-if="authStore.isAdmin">
           <svg class="nav-item-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="3" y="5" width="11" height="17" rx="2"></rect>
             <path d="M7 5V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2h-5"></path>
             <line x1="8.5" y1="18.5" x2="8.51" y2="18.5"></line>
           </svg>
-          <span class="nav-item-text">设备运营</span>
+          <span class="nav-item-text">{{ $t('nav.deviceOps') }}</span>
         </router-link>
-        <router-link to="/admin/shares" class="nav-item" exact-active-class="active" title="分享与卡密管理" v-if="authStore.isAdmin">
+        <router-link to="/admin/shares" class="nav-item" exact-active-class="active" :title="$t('nav.shares')" v-if="authStore.isAdmin">
           <svg class="nav-item-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle>
             <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
           </svg>
-          <span class="nav-item-text">分享</span>
+          <span class="nav-item-text">{{ $t('nav.shares') }}</span>
         </router-link>
-        <router-link to="/admin/audit" class="nav-item" exact-active-class="active" title="审计日志" v-if="authStore.isAdmin">
+        <router-link to="/admin/audit" class="nav-item" exact-active-class="active" :title="$t('nav.audit')" v-if="authStore.isAdmin">
           <svg class="nav-item-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
             <polyline points="14 2 14 8 20 8"></polyline>
             <line x1="16" y1="13" x2="8" y2="13"></line>
             <line x1="16" y1="17" x2="8" y2="17"></line>
           </svg>
-          <span class="nav-item-text">审计</span>
+          <span class="nav-item-text">{{ $t('nav.audit') }}</span>
         </router-link>
-        <router-link to="/admin/settings" class="nav-item" exact-active-class="active" title="平台设置" v-if="authStore.isAdmin">
-          <svg class="nav-item-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="3"></circle>
-            <path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.4-2.4 1a7 7 0 0 0-2-1.2L14.2 3h-4.4l-.3 2.7a7 7 0 0 0-2 1.2l-2.4-1-2 3.4 2 1.5A7 7 0 0 0 5 12c0 .4 0 .8.1 1.2l-2 1.5 2 3.4 2.4-1a7 7 0 0 0 2 1.2l.3 2.7h4.4l.3-2.7a7 7 0 0 0 2-1.2l2.4 1 2-3.4-2-1.5c.1-.4.1-.8.1-1.2z"></path>
-          </svg>
-          <span class="nav-item-text">设置</span>
-        </router-link>
-        <a href="javascript:void(0)" @click="handleLogout" class="nav-item logout-nav-item" title="退出登录">
+        <a href="javascript:void(0)" @click="handleLogout" class="nav-item logout-nav-item" :title="$t('nav.logout')">
           <svg class="nav-item-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
             <polyline points="16 17 21 12 16 7"></polyline>
             <line x1="21" y1="12" x2="9" y2="12"></line>
           </svg>
-          <span class="nav-item-text">退出</span>
+          <span class="nav-item-text">{{ $t('nav.logout') }}</span>
         </a>
       </div>
+
       <div class="nav-tag-group" v-if="isMainMatrixPage && authStore.isAdmin">
         <div class="nav-tag-group-title">
-          <span>标签</span>
+          <span>{{ $t('nav.tags') }}</span>
           <button class="nav-tag-manage-btn" @click="openTagManager">
             <span class="manage-plus">+</span>
-            <span class="manage-text">管理</span>
+            <span class="manage-text">{{ $t('nav.manageTags') }}</span>
           </button>
         </div>
         <div class="nav-tag-list">
@@ -186,10 +179,10 @@
             class="nav-tag-item"
             :class="{ active: tagStore.selectedTagIds.length === 0 && !deviceStore.showOfflineOnly && !deviceStore.showRecentOnly }"
             @click="selectAllDevices"
-            title="全部设备"
+            :title="$t('nav.allDevices')"
           >
             <span class="nav-tag-dot all"></span>
-            <span class="nav-tag-name">全部设备</span>
+            <span class="nav-tag-name">{{ $t('nav.allDevices') }}</span>
             <span class="nav-tag-count">{{ deviceStore.devices.length }}</span>
           </button>
           <button
@@ -208,29 +201,29 @@
           <button
             class="nav-tag-item recent-tag-item"
             :class="{ active: deviceStore.showRecentOnly }"
-            title="最近 30 分钟内新增的设备"
+            :title="$t('nav.recentDevicesTip')"
             @click="toggleRecentView"
           >
             <span class="nav-tag-dot recent"></span>
-            <span class="nav-tag-name">最近新增</span>
+            <span class="nav-tag-name">{{ $t('nav.recentDevices') }}</span>
             <span class="nav-tag-count">{{ deviceStore.recentDevices.length }}</span>
           </button>
           <!-- 离线设备筛选（数据来自服务端离线记录） -->
           <button
             class="nav-tag-item offline-tag-item"
             :class="{ active: deviceStore.showOfflineOnly }"
-            title="离线设备"
+            :title="$t('nav.offlineDevicesTip')"
             @click="toggleOfflineView"
           >
             <span class="nav-tag-dot offline"></span>
-            <span class="nav-tag-name">离线设备</span>
+            <span class="nav-tag-name">{{ $t('nav.offlineDevices') }}</span>
             <span class="nav-tag-count">{{ deviceStore.offlineDevices.length }}</span>
           </button>
         </div>
       </div>
       <!-- 4. 版本号显示 -->
       <div class="nav-version" :title="systemVersion">
-        {{ isNavExpanded ? '版本 ' + systemVersion : systemVersion.split('-')[0] }}
+        {{ isNavExpanded ? $t('nav.version') + ' ' + systemVersion : systemVersion.split('-')[0] }}
       </div>
     </nav>
 
@@ -243,9 +236,9 @@
           
           <!-- 当处于主页面“云虚机矩阵”时展示在线状态徽标与授权徽标 -->
           <div class="top-device-stats" v-if="isMainMatrixPage">
-            <span class="device-stat-chip online" title="当前在线虚机数量">
+            <span class="device-stat-chip online" :title="$t('topBar.onlineTooltip')">
               <span class="stat-dot"></span>
-              {{ deviceStore.onlineDevices.length }} 台在线
+              {{ $t('topBar.onlineDevices', { count: deviceStore.onlineDevices.length }) }}
             </span>
             <button
               v-if="authStore.isAdmin"
@@ -270,14 +263,14 @@
               ref="topSearchInputRef"
               v-model="deviceStore.searchQuery"
               type="text"
-              placeholder="搜索虚机名称、IP、ID或标签... (⌘K)"
+              :placeholder="$t('topBar.searchPlaceholder')"
               @keydown.esc="deviceStore.searchQuery = ''"
             />
             <button 
               v-if="deviceStore.searchQuery" 
               class="clear-search-btn" 
               @click="deviceStore.searchQuery = ''" 
-              title="清空搜索"
+              :title="$t('topBar.clearSearch')"
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
@@ -296,34 +289,34 @@
                 class="top-action-btn display-btn" 
                 :class="{ active: showDisplayMenu }" 
                 @click.stop="showDisplayMenu = !showDisplayMenu"
-                title="视图与画面预览设置"
+                :title="$t('topBar.displaySettings')"
               >
                 <svg class="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
                   <circle cx="12" cy="12" r="3"></circle>
                 </svg>
-                <span class="btn-text">显示选项 ▾</span>
+                <span class="btn-text">{{ $t('topBar.displayOptions') }} ▾</span>
               </button>
               
               <transition name="pop">
                 <div class="display-dropdown-panel" v-if="showDisplayMenu" @click.stop>
-                  <div class="dropdown-panel-title">画面与预览设置</div>
+                  <div class="dropdown-panel-title">{{ $t('topBar.displaySettings') }}</div>
                   
                   <div class="dropdown-item-switch">
-                    <label class="switch-row" title="开启后，可视区域内的虚机将使用 WebCodecs 硬件加速播放实时预览">
-                      <span class="switch-title">高频实时预览</span>
+                    <label class="switch-row" :title="$t('topBar.realTimePreviewTip')">
+                      <span class="switch-title">{{ $t('topBar.realTimePreview') }}</span>
                       <input type="checkbox" v-model="deviceStore.globalPreviewMode" class="switch-input" />
                     </label>
                   </div>
 
                   <div class="dropdown-item-scope" v-if="deviceStore.globalPreviewMode">
                     <div class="scope-row-header">
-                      <span class="scope-title">推流范围</span>
+                      <span class="scope-title">{{ $t('topBar.previewScope') }}</span>
                       <span class="scope-curr-desc">
                         {{ 
-                          deviceStore.previewScopeMode === 'visible' ? '屏幕可视' : 
-                          deviceStore.previewScopeMode === 'all' ? '全部在线' : 
-                          deviceStore.previewScopeMode === 'selected' ? '仅勾选' : '标签匹配' 
+                          deviceStore.previewScopeMode === 'visible' ? $t('topBar.scopeVisible') : 
+                          deviceStore.previewScopeMode === 'all' ? $t('topBar.scopeAll') : 
+                          deviceStore.previewScopeMode === 'selected' ? $t('topBar.scopeSelected') : $t('topBar.scopeTag') 
                         }}
                       </span>
                     </div>
@@ -332,46 +325,46 @@
                         class="scope-pill-btn" 
                         :class="{ active: deviceStore.previewScopeMode === 'visible' }"
                         @click="deviceStore.setPreviewScopeMode('visible')"
-                        title="仅推流滚动视口内的设备（推荐，省资源）"
-                      >屏幕可视</button>
+                        :title="$t('topBar.scopeVisibleTip')"
+                      >{{ $t('topBar.scopeVisible') }}</button>
                       <button 
                         class="scope-pill-btn" 
                         :class="{ active: deviceStore.previewScopeMode === 'all' }"
                         @click="deviceStore.setPreviewScopeMode('all')"
-                        title="全量所有在线设备持续推流"
-                      >全部在线</button>
+                        :title="$t('topBar.scopeAllTip')"
+                      >{{ $t('topBar.scopeAll') }}</button>
                       <button 
                         class="scope-pill-btn" 
                         :class="{ active: deviceStore.previewScopeMode === 'selected' }"
                         @click="deviceStore.setPreviewScopeMode('selected')"
-                        title="仅推流手动勾选的设备（卡片右上角勾选）"
-                      >勾选设备</button>
+                        :title="$t('topBar.scopeSelectedTip')"
+                      >{{ $t('topBar.scopeSelected') }}</button>
                       <button 
                         class="scope-pill-btn" 
                         :class="{ active: deviceStore.previewScopeMode === 'tag' }"
                         @click="deviceStore.setPreviewScopeMode('tag')"
-                        title="仅推流匹配指定标签的设备"
-                      >标签匹配</button>
+                        :title="$t('topBar.scopeTagTip')"
+                      >{{ $t('topBar.scopeTag') }}</button>
                     </div>
 
                     <!-- 勾选模式子操作栏 -->
                     <div v-if="deviceStore.previewScopeMode === 'selected'" class="scope-sub-row">
-                      <span class="scope-sub-hint">已勾选 {{ groupControlStore.selectedSlaveIds.length }} 台</span>
+                      <span class="scope-sub-hint">{{ $t('topBar.selectedCount', { count: groupControlStore.selectedSlaveIds.length }) }}</span>
                       <div class="scope-sub-actions">
-                        <button class="scope-mini-btn" @click.stop="selectAllForPreview">全选在线</button>
-                        <button class="scope-mini-btn" @click.stop="groupControlStore.clearSlaves()">清空</button>
+                        <button class="scope-mini-btn" @click.stop="selectAllForPreview">{{ $t('topBar.selectAllOnline') }}</button>
+                        <button class="scope-mini-btn" @click.stop="groupControlStore.clearSlaves()">{{ $t('common.clear') }}</button>
                       </div>
                     </div>
 
                     <!-- 标签匹配子选择区 -->
                     <div v-if="deviceStore.previewScopeMode === 'tag'" class="scope-tag-panel">
                       <div class="scope-tag-header">
-                        <span class="scope-tag-title">可选推流标签:</span>
+                        <span class="scope-tag-title">{{ $t('topBar.scopeTag') }}:</span>
                         <button 
                           v-if="deviceStore.previewSelectedTagIds.length > 0" 
                           class="scope-mini-btn" 
                           @click.stop="deviceStore.clearPreviewTags()"
-                        >清空</button>
+                        >{{ $t('common.clear') }}</button>
                       </div>
                       <div class="scope-tag-chips">
                         <button 
@@ -385,14 +378,14 @@
                           <span class="scope-tag-dot" :style="{ backgroundColor: tag.color }"></span>
                           <span class="scope-tag-text">{{ tag.name }}</span>
                         </button>
-                        <div v-if="tagStore.tags.length === 0" class="scope-tag-empty">暂无可用标签</div>
+                        <div v-if="tagStore.tags.length === 0" class="scope-tag-empty">{{ $t('common.none') }}</div>
                       </div>
                     </div>
                   </div>
 
                   <div class="dropdown-item-switch">
-                    <label class="switch-row" :class="{ disabled: !deviceStore.globalPreviewMode }" title="开启后可直接在卡片上触控操作 (需先开启高频预览)">
-                      <span class="switch-title">预览直接触控</span>
+                    <label class="switch-row" :class="{ disabled: !deviceStore.globalPreviewMode }" :title="$t('topBar.directTouchTip')">
+                      <span class="switch-title">{{ $t('topBar.directTouch') }}</span>
                       <input type="checkbox" v-model="deviceStore.globalInteractiveMode" :disabled="!deviceStore.globalPreviewMode" class="switch-input" />
                     </label>
                   </div>
@@ -401,13 +394,13 @@
 
                   <div class="dropdown-slider-row" v-if="deviceStore.viewMode === 'grid'">
                     <div class="slider-header">
-                      <span>卡片大小</span>
+                      <span>{{ $t('topBar.cardSize') }}</span>
                       <span class="slider-val">{{ deviceStore.cardSize }}px</span>
                     </div>
                     <div class="preset-density-row">
-                      <button class="preset-density-btn" :class="{ active: deviceStore.cardSize <= 170 }" @click="deviceStore.setCardSize(160)">紧凑 (160px)</button>
-                      <button class="preset-density-btn" :class="{ active: deviceStore.cardSize > 170 && deviceStore.cardSize <= 260 }" @click="deviceStore.setCardSize(220)">标准 (220px)</button>
-                      <button class="preset-density-btn" :class="{ active: deviceStore.cardSize > 260 }" @click="deviceStore.setCardSize(320)">舒适 (320px)</button>
+                      <button class="preset-density-btn" :class="{ active: deviceStore.cardSize <= 170 }" @click="deviceStore.setCardSize(160)">{{ $t('topBar.densityCompact') }}</button>
+                      <button class="preset-density-btn" :class="{ active: deviceStore.cardSize > 170 && deviceStore.cardSize <= 260 }" @click="deviceStore.setCardSize(220)">{{ $t('topBar.densityStandard') }}</button>
+                      <button class="preset-density-btn" :class="{ active: deviceStore.cardSize > 260 }" @click="deviceStore.setCardSize(320)">{{ $t('topBar.densityRelaxed') }}</button>
                     </div>
                     <input 
                       type="range" 
@@ -427,7 +420,7 @@
                       @click="deviceStore.setViewMode('grid')"
                     >
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-                      卡片宫格
+                      {{ $t('topBar.viewGrid') }}
                     </button>
                     <button 
                       class="view-toggle-opt" 
@@ -435,7 +428,7 @@
                       @click="deviceStore.setViewMode('table')"
                     >
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
-                      高密列表
+                      {{ $t('topBar.viewTable') }}
                     </button>
                   </div>
 
@@ -443,31 +436,31 @@
 
                   <!-- 直控工作台模式 (单机模式 vs 多机直连) -->
                   <div class="dropdown-control-mode-group">
-                    <div class="dropdown-panel-title">直控工作台模式</div>
+                    <div class="dropdown-panel-title">{{ $t('topBar.controlMode') }}</div>
                     <div class="dropdown-view-toggle">
                       <button 
                         class="view-toggle-opt" 
                         :class="{ active: deviceStore.directControlMode === 'single' }" 
                         @click="deviceStore.setDirectControlMode('single')"
-                        title="单机深度直控，支持悬浮窗口与横竖屏自适应"
+                        :title="$t('topBar.modeSingleTip')"
                       >
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                           <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
                           <line x1="12" y1="18" x2="12.01" y2="18"></line>
                         </svg>
-                        单机模式
+                        {{ $t('topBar.modeSingle') }}
                       </button>
                       <button 
                         class="view-toggle-opt" 
                         :class="{ active: deviceStore.directControlMode === 'multi' }" 
                         @click="deviceStore.setDirectControlMode('multi')"
-                        title="多虚机同时直连，支持平铺、标签与浮窗"
+                        :title="$t('topBar.modeMultiTip')"
                       >
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                           <rect x="2" y="3" width="8" height="18" rx="2"></rect>
                           <rect x="14" y="3" width="8" height="18" rx="2"></rect>
                         </svg>
-                        多机直连
+                        {{ $t('topBar.modeMulti') }}
                       </button>
                     </div>
                   </div>
@@ -480,25 +473,25 @@
               v-if="deviceStore.directControlMode === 'multi' && deviceStore.activeDeviceIds.length > 0"
               class="top-action-btn primary-action-btn active" 
               @click.stop="deviceStore.closeAllDevices()" 
-              title="点击关闭全部多机直连"
+              :title="$t('topBar.multiConnectedTip')"
             >
               <svg class="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="2" y="3" width="8" height="18" rx="2"></rect>
                 <rect x="14" y="3" width="8" height="18" rx="2"></rect>
               </svg>
-              <span class="btn-text">多机直连 ({{ deviceStore.activeDeviceIds.length }}) ✕</span>
+              <span class="btn-text">{{ $t('topBar.multiConnected', { count: deviceStore.activeDeviceIds.length }) }}</span>
             </button>
             <button 
               v-else-if="deviceStore.directControlMode === 'single' && !!deviceStore.activeDeviceId"
               class="top-action-btn primary-action-btn active" 
               @click.stop="deviceStore.clearActiveDevice()" 
-              title="点击退出当前设备直控"
+              :title="$t('topBar.controllingTip')"
             >
               <svg class="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
                 <line x1="12" y1="18" x2="12.01" y2="18"></line>
               </svg>
-              <span class="btn-text">直控中 ({{ activeDevice?.info?.model || deviceStore.activeDeviceId }}) ✕</span>
+              <span class="btn-text">{{ $t('topBar.controlling', { name: activeDevice?.info?.model || deviceStore.activeDeviceId }) }}</span>
             </button>
 
             <!-- 群控模式开关按钮 (管理员 或 拥有2台以上设备的用户) -->
@@ -507,7 +500,7 @@
               class="top-action-btn group-control-btn" 
               :class="{ active: groupControlStore.isGroupControlActive }" 
               @click.stop="toggleGroupControl"
-              :title="groupControlStore.isGroupControlActive ? '退出群控模式' : '进入群控模式 (支持全选与按标签勾选从机)'"
+              :title="groupControlStore.isGroupControlActive ? $t('topBar.exitGroupControl') : $t('topBar.groupControlTip')"
             >
               <svg class="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
@@ -515,33 +508,74 @@
                 <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
                 <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
               </svg>
-              <span class="btn-text">{{ groupControlStore.isGroupControlActive ? '退出群控' : '群控' }}</span>
+              <span class="btn-text">{{ groupControlStore.isGroupControlActive ? $t('topBar.exitGroupControl') : $t('topBar.groupControl') }}</span>
             </button>
 
             <!-- 标签管理按钮 (管理员) -->
-            <button class="top-action-btn" @click="dispatchTopAction('tag-manager')" title="设备标签管理" v-if="authStore.isAdmin">
+            <button class="top-action-btn" @click="dispatchTopAction('tag-manager')" :title="$t('topBar.tagManager')" v-if="authStore.isAdmin">
               <svg class="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M20 12v7a1 1 0 0 1-1 1h-7L4 12V5a1 1 0 0 1 1-1h7l8 8z"></path>
                 <circle cx="8.5" cy="8.5" r="1.4"></circle>
               </svg>
-              <span class="btn-text">标签</span>
+              <span class="btn-text">{{ $t('topBar.tagManager') }}</span>
             </button>
 
             <!-- 全局设置按钮 (管理员) -->
-            <button class="top-action-btn" @click="dispatchTopAction('global-settings')" title="全局默认设置" v-if="authStore.isAdmin">
+            <button class="top-action-btn" @click="dispatchTopAction('global-settings')" :title="$t('topBar.globalSettings')" v-if="authStore.isAdmin">
               <svg class="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="12" r="3"></circle>
                 <path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.4-2.4 1a7 7 0 0 0-2-1.2L14.2 3h-4.4l-.3 2.7a7 7 0 0 0-2 1.2l-2.4-1-2 3.4 2 1.5A7 7 0 0 0 5 12c0 .4 0 .8.1 1.2l-2 1.5 2 3.4 2.4-1a7 7 0 0 0 2 1.2l.3 2.7h4.4l.3-2.7a7 7 0 0 0 2-1.2l2.4 1 2-3.4-2-1.5c.1-.4.1-.8.1-1.2z"></path>
               </svg>
-              <span class="btn-text">设置</span>
+              <span class="btn-text">{{ $t('topBar.globalSettings') }}</span>
             </button>
           </div>
 
           <div class="top-bar-divider" v-if="isMainMatrixPage"></div>
 
+          <!-- 版本更新提示微光胶囊 -->
+          <button 
+            v-if="updateInfo && updateInfo.has_update" 
+            class="top-update-badge glow-pulse" 
+            @click="openUpdateModal"
+            :title="`发现新版本 ${updateInfo.latest_version}，点击查看详情`"
+          >
+            <span class="update-icon">🚀</span>
+            <span class="update-text">{{ $t('update.newVersionBadge', { version: updateInfo.latest_version }) }}</span>
+            <span class="update-dot"></span>
+          </button>
+
+          <!-- 语言切换选择器 -->
+          <div class="header-lang-menu" @click.stop>
+            <button class="help-btn lang-btn" :class="{ active: showLangMenu }" @click.stop="showLangMenu = !showLangMenu" :title="$t('topBar.language')">
+              <svg class="help-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="2" y1="12" x2="22" y2="12"></line>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+              </svg>
+            </button>
+            <transition name="pop">
+              <div class="help-dropdown lang-dropdown" v-if="showLangMenu">
+                <div class="help-dropdown-header">{{ $t('topBar.language') }}</div>
+                <div class="help-dropdown-list">
+                  <button 
+                    v-for="loc in supportedLocales" 
+                    :key="loc.code" 
+                    class="lang-select-item" 
+                    :class="{ active: currentLocaleCode === loc.code }"
+                    @click="changeLocale(loc.code)"
+                  >
+                    <span class="lang-flag">{{ loc.flag }}</span>
+                    <span class="lang-name">{{ loc.name }}</span>
+                    <span v-if="currentLocaleCode === loc.code" class="lang-check">✓</span>
+                  </button>
+                </div>
+              </div>
+            </transition>
+          </div>
+
           <!-- 帮助与支持下拉菜单 -->
           <div class="header-help-menu" @click.stop v-if="!authStore.noAuthMode">
-            <button class="help-btn" :class="{ active: showHelpMenu }" @click.stop="showHelpMenu = !showHelpMenu" title="帮助与支持">
+            <button class="help-btn" :class="{ active: showHelpMenu }" @click.stop="showHelpMenu = !showHelpMenu" :title="$t('topBar.helpSupport')">
               <svg class="help-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="10"></circle>
                 <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
@@ -550,15 +584,15 @@
             </button>
             <transition name="pop">
               <div class="help-dropdown" v-if="showHelpMenu">
-                <div class="help-dropdown-header">帮助与支持</div>
+                <div class="help-dropdown-header">{{ $t('topBar.helpSupport') }}</div>
                 <div class="help-dropdown-list">
                   <a href="https://github.com/hqw700/ScrcpyOverWebRTC" target="_blank" class="help-dropdown-item">
                     <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                       <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
                     </svg>
                     <div class="item-text">
-                      <div class="item-title">GitHub 仓库</div>
-                      <div class="item-desc">获取源码、反馈 Issue、Star 支持</div>
+                      <div class="item-title">{{ $t('topBar.githubRepo') }}</div>
+                      <div class="item-desc">{{ $t('topBar.githubDesc') }}</div>
                     </div>
                   </a>
                   <a href="https://webrtc-phone.com/docs/" target="_blank" class="help-dropdown-item">
@@ -567,8 +601,8 @@
                       <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
                     </svg>
                     <div class="item-text">
-                      <div class="item-title">官方文档</div>
-                      <div class="item-desc">详细部署指南及高级参数配置</div>
+                      <div class="item-title">{{ $t('topBar.officialDocs') }}</div>
+                      <div class="item-desc">{{ $t('topBar.docsDesc') }}</div>
                     </div>
                   </a>
                   <a href="https://space.bilibili.com/525503471" target="_blank" class="help-dropdown-item">
@@ -579,8 +613,8 @@
                       <line x1="16" y1="14" x2="16" y2="14.01"></line>
                     </svg>
                     <div class="item-text">
-                      <div class="item-title">B站视频教程</div>
-                      <div class="item-desc">云虚机搭建、直连教程及实机演示</div>
+                      <div class="item-title">{{ $t('topBar.videoTutorials') }}</div>
+                      <div class="item-desc">{{ $t('topBar.videoDesc') }}</div>
                     </div>
                   </a>
                   <a v-if="authStore.isAdmin" href="javascript:void(0)" @click="showLicensePanel = true; showHelpMenu = false" class="help-dropdown-item">
@@ -589,8 +623,17 @@
                       <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                     </svg>
                     <div class="item-text">
-                      <div class="item-title">授权管理</div>
-                      <div class="item-desc">查看授权状态、用量、机器码与激活</div>
+                      <div class="item-title">{{ $t('topBar.licenseMgmt') }}</div>
+                      <div class="item-desc">{{ $t('topBar.licenseDesc') }}</div>
+                    </div>
+                  </a>
+                  <a href="javascript:void(0)" @click="showFeedbackModal = true; showHelpMenu = false" class="help-dropdown-item">
+                    <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    <div class="item-text">
+                      <div class="item-title">{{ $t('topBar.feedbackTitle') }}</div>
+                      <div class="item-desc">{{ $t('topBar.feedbackDesc') }}</div>
                     </div>
                   </a>
                   <a href="mailto:cloudphone@qq.com" @click="showHelpMenu = false" class="help-dropdown-item">
@@ -599,8 +642,20 @@
                       <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
                     </svg>
                     <div class="item-text">
-                      <div class="item-title">联系作者</div>
-                      <div class="item-desc">邮箱：cloudphone@qq.com</div>
+                      <div class="item-title">{{ $t('topBar.contactAuthor') }}</div>
+                      <div class="item-desc">{{ $t('topBar.contactDesc') }}</div>
+                    </div>
+                  </a>
+                  <a href="javascript:void(0)" @click="openUpdateModal(); showHelpMenu = false" class="help-dropdown-item update-item" :class="{ 'has-badge': updateInfo && updateInfo.has_update }">
+                    <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                    </svg>
+                    <div class="item-text">
+                      <div class="item-title" style="display:flex; align-items:center; gap:6px;">
+                        <span>{{ $t('update.title') }}</span>
+                        <span v-if="updateInfo && updateInfo.has_update" class="new-dot">NEW</span>
+                      </div>
+                      <div class="item-desc">{{ updateInfo && updateInfo.has_update ? updateInfo.latest_version : systemVersion }}</div>
                     </div>
                   </a>
                 </div>
@@ -608,12 +663,12 @@
             </transition>
           </div>
           <div class="header-user-card">
-            <div class="user-avatar" :title="authStore.username + ' (' + (authStore.role === 'admin' ? '管理员' : '普通用户') + ')'">
+            <div class="user-avatar" :title="authStore.username + ' (' + (authStore.role === 'admin' ? $t('topBar.roleAdmin') : $t('topBar.roleUser')) + ')'">
               {{ authStore.username ? authStore.username.substring(0, 1).toUpperCase() : 'U' }}
             </div>
             <span class="user-name" :title="authStore.username">{{ authStore.username }}</span>
             <span class="user-role-badge" :class="authStore.role">
-              {{ authStore.role === 'admin' ? '管理员' : '普通用户' }}
+              {{ authStore.role === 'admin' ? $t('topBar.roleAdmin') : $t('topBar.roleUser') }}
             </span>
           </div>
         </div>
@@ -665,14 +720,14 @@
             </div>
             <div class="panel-tools" @mousedown.stop>
               <!-- 快捷切为多机模式 -->
-              <button class="tool-btn" @click="deviceStore.setDirectControlMode('multi')" title="切换为多机直连模式">
+              <button class="tool-btn" @click="deviceStore.setDirectControlMode('multi')" :title="$t('multi.switchToMultiTitle')">
                 <svg class="tool-btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <rect x="2" y="3" width="8" height="18" rx="2"></rect>
                   <rect x="14" y="3" width="8" height="18" rx="2"></rect>
                 </svg>
               </button>
               <!-- 靠边固定 / 悬浮窗口 -->
-              <button class="tool-btn" @click="toggleFloating" :title="isFloating ? '靠边固定' : '悬浮窗口'">
+              <button class="tool-btn" @click="toggleFloating" :title="isFloating ? $t('multi.pinToSide') : $t('multi.floatWindow')">
                 <svg v-if="isFloating" class="tool-btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <rect x="3" y="3" width="18" height="18" rx="2"></rect>
                   <line x1="9" y1="3" x2="9" y2="21"></line>
@@ -683,7 +738,7 @@
                 </svg>
               </button>
               <!-- 关闭按钮 -->
-              <button class="tool-btn close" @click="closePanel" title="关闭控制">
+              <button class="tool-btn close" @click="closePanel" :title="$t('deviceClient.closeConn')">
                 <svg class="tool-btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                   <line x1="18" y1="6" x2="6" y2="18"></line>
                   <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -722,7 +777,7 @@
             <line x1="12" y1="18" x2="12.01" y2="18"></line>
           </svg>
         </div>
-        <p>在左侧选择虚机<br/>开启远程控制</p>
+        <p>{{ $t('deviceClient.selectDeviceToControl') }}<br/>{{ $t('deviceClient.startRemoteControl') }}</p>
       </div>
     </aside>
 
@@ -733,7 +788,7 @@
           <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
           <line x1="12" y1="18" x2="12.01" y2="18"></line>
         </svg>
-        <span class="mobile-nav-text">虚机</span>
+        <span class="mobile-nav-text">{{ $t('nav.devices') }}</span>
       </router-link>
       <router-link to="/monitor" class="mobile-nav-item" exact-active-class="active" v-if="authStore.isAdmin">
         <svg class="mobile-nav-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -741,20 +796,20 @@
           <line x1="12" y1="20" x2="12" y2="4"></line>
           <line x1="6" y1="20" x2="6" y2="14"></line>
         </svg>
-        <span class="mobile-nav-text">大盘</span>
+        <span class="mobile-nav-text">{{ $t('nav.dashboard') }}</span>
       </router-link>
       <router-link to="/files" class="mobile-nav-item" exact-active-class="active">
         <svg class="mobile-nav-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
         </svg>
-        <span class="mobile-nav-text">文件</span>
+        <span class="mobile-nav-text">{{ $t('nav.files') }}</span>
       </router-link>
       <a href="javascript:void(0)" @click="deviceStore.toggleGlobalConsole()" class="mobile-nav-item" v-if="authStore.isAdmin">
         <svg class="mobile-nav-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="4 17 10 11 4 5"></polyline>
           <line x1="12" y1="19" x2="20" y2="19"></line>
         </svg>
-        <span class="mobile-nav-text">终端</span>
+        <span class="mobile-nav-text">{{ $t('nav.terminal') }}</span>
       </a>
       <router-link to="/admin/users" class="mobile-nav-item" exact-active-class="active" v-if="authStore.isAdmin">
         <svg class="mobile-nav-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -763,7 +818,7 @@
           <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
           <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
         </svg>
-        <span class="mobile-nav-text">管理</span>
+        <span class="mobile-nav-text">{{ $t('nav.users') }}</span>
       </router-link>
     </nav>
     
@@ -774,7 +829,7 @@
         class="mobile-console-backdrop" 
         @click="deviceStore.closeGlobalConsole()"
         @touchmove.prevent
-        title="点击收起终端"
+        :title="$t('console.collapse')"
       ></div>
     </transition>
 
@@ -803,25 +858,58 @@
 
     <!-- 系统授权管理面板 -->
     <LicensePanel :visible="showLicensePanel" @close="showLicensePanel = false" />
+
+    <!-- 全局系统版本升级提示弹窗 -->
+    <UpdateModal
+      :visible="showUpdateModal"
+      :updateInfo="updateInfo"
+      :currentVersion="systemVersion"
+      @close="showUpdateModal = false"
+      @dismiss="onUpdateDismissed"
+    />
+
+    <!-- 用户意见与 Bug 反馈弹窗 -->
+    <FeedbackModal
+      :visible="showFeedbackModal"
+      :systemVersion="systemVersion"
+      @close="showFeedbackModal = false"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+import { SUPPORTED_LOCALES, setLanguage, getCurrentLanguage } from '@/locales'
 import { useDeviceStore } from '@/stores/devices'
 import { useTagStore } from '@/stores/tags'
 import { useAuthStore } from '@/stores/auth'
 import DeviceConsole from '@/components/DeviceConsole.vue'
 import LicensePanel from '@/components/LicensePanel.vue'
+import UpdateModal from '@/components/UpdateModal.vue'
+import FeedbackModal from '@/components/FeedbackModal.vue'
 import MultiDeviceContainer from '@/components/multi/MultiDeviceContainer.vue'
 import DeviceClient from '@/views/DeviceClient.vue'
 import { useGroupControlStore } from '@/stores/groupControl'
 
+const { t, locale } = useI18n()
 const deviceStore = useDeviceStore()
 const tagStore = useTagStore()
 const authStore = useAuthStore()
 const groupControlStore = useGroupControlStore()
+
+const showLangMenu = ref(false)
+const supportedLocales = SUPPORTED_LOCALES
+const currentLocaleCode = computed(() => locale.value)
+const currentLocaleMeta = computed(() => 
+  supportedLocales.find(l => l.code === locale.value) || supportedLocales[0]
+)
+
+function changeLocale(code) {
+  setLanguage(code)
+  showLangMenu.value = false
+}
 
 const activeDevice = computed(() => 
   deviceStore.devices.find(d => d.id === deviceStore.activeDeviceId) ||
@@ -854,16 +942,70 @@ function getPreviewTagChipStyle(tag) {
   }
 }
 
-const systemVersion = ref('v0.1.9')
+const systemVersion = ref('v0.4.0')
+const showUpdateModal = ref(false)
+const showFeedbackModal = ref(false)
+const updateInfo = ref(null)
+
+function openUpdateModal() {
+  showUpdateModal.value = true
+}
+
+function onUpdateDismissed() {
+  showUpdateModal.value = false
+}
+
+function isUpdateDismissed(latestVer) {
+  try {
+    const saved = localStorage.getItem('cloudphone_dismissed_update')
+    if (!saved) return false
+    const parsed = JSON.parse(saved)
+    if (parsed.version === latestVer && parsed.until && Date.now() < parsed.until) {
+      return true
+    }
+  } catch (e) {}
+  return false
+}
+
+async function checkOnlineUpdateFallback(currentVer) {
+  try {
+    const res = await fetch(`https://license.webrtc-phone.com/api/version/latest?version=${encodeURIComponent(currentVer)}`)
+    const json = await res.json()
+    if (json && json.success) {
+      updateInfo.value = json
+      if (json.has_update && (!isUpdateDismissed(json.latest_version) || json.force)) {
+        setTimeout(() => {
+          showUpdateModal.value = true
+        }, 1500)
+      }
+    }
+  } catch (e) {
+    // 离线/内网环境静默忽略
+  }
+}
+
 const fetchVersion = () => {
   fetch('/api/version')
     .then(res => res.json())
     .then(data => {
-      if (data && data.version) {
-        systemVersion.value = `${data.version} (${data.git_commit || ''})`
+      const ver = data && data.version ? data.version : 'v0.4.0'
+      systemVersion.value = `${ver}${data?.git_commit ? ` (${data.git_commit})` : ''}`
+      if (data && data.update && data.update.has_update) {
+        updateInfo.value = data.update
+        if (!isUpdateDismissed(data.update.latest_version) || data.update.force) {
+          setTimeout(() => {
+            showUpdateModal.value = true
+          }, 1500)
+        }
+      } else {
+        // 信令端尚未感知到新版本时，前端直接向公网最新版本接口拉取
+        checkOnlineUpdateFallback(ver)
       }
     })
-    .catch(err => console.warn('Failed to fetch system version:', err))
+    .catch(err => {
+      console.warn('Failed to fetch system version:', err)
+      checkOnlineUpdateFallback('v0.4.0')
+    })
 }
 
 const isMobile = ref(window.innerWidth <= 1024)
@@ -880,9 +1022,29 @@ const showLicensePanel = ref(false)
 const showDisplayMenu = ref(false)
 const topSearchInputRef = ref(null)
 
-// 页面切换由 vue-router 接管：以下派生状态全部基于当前路由
-const pageTitle = computed(() => route.meta.title || '云虚机矩阵')
+const routeTitleMap = {
+  Login: 'login.secureLogin',
+  DeviceList: 'nav.devices',
+  Files: 'files.title',
+  Deploy: 'deploy.title',
+  Monitor: 'dashboard.title',
+  Advanced: 'nav.peripherals',
+  UserAdmin: 'nav.users',
+  DevicesAdmin: 'nav.deviceOps',
+  AuditLog: 'nav.audit',
+  SettingsAdmin: 'nav.settings',
+  SharesAdmin: 'nav.shares'
+}
+
+// 页面切换由 vue-router 接管：以下派生状态全部基于当前路由与 i18n
+const pageTitle = computed(() => {
+  if (route.name && routeTitleMap[route.name]) {
+    return t(routeTitleMap[route.name])
+  }
+  return route.meta?.title || t('nav.brand')
+})
 const isMainMatrixPage = computed(() => route.path === '/')
+
 // 部署 / 大盘页面隐藏右侧控制面板（保持原有行为）
 const isPanelHiddenPage = computed(() => route.path === '/deploy' || route.path === '/monitor')
 
@@ -929,7 +1091,7 @@ async function submitActivation() {
   isActivating.value = false
   if (res.success) {
     activationKey.value = ''
-    alert('系统激活成功！授权已实时重载并应用。')
+    alert(t('license.activateSuccess'))
   } else {
     activationError.value = res.error
   }
@@ -1117,6 +1279,7 @@ const closeHelpMenu = () => {
 const onWindowClick = () => {
   showHelpMenu.value = false
   showDisplayMenu.value = false
+  showLangMenu.value = false
 }
 
 // 兼容各页面派发的历史跳转事件：翻译为路由跳转（或全局控制台操作）
@@ -1156,6 +1319,7 @@ onMounted(async () => {
 watch(isBarePage, (newBare) => {
   if (!newBare && authStore.isLoggedIn) {
     initApp()
+    fetchVersion()
   }
 })
 
@@ -1166,6 +1330,7 @@ watch(() => authStore.isLoggedIn, async (newVal) => {
       await router.push('/')
     }
     initApp()
+    fetchVersion()
   }
 })
 onUnmounted(() => {
@@ -1413,6 +1578,61 @@ body { margin: 0; background: var(--bg-primary); color: #c9d1d9; font-family: -a
   gap: 16px;
 }
 
+.top-update-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.4);
+  color: #a5b4fc;
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.top-update-badge:hover {
+  background: rgba(99, 102, 241, 0.25);
+  border-color: rgba(99, 102, 241, 0.7);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.glow-pulse {
+  animation: glowPulse 2.4s infinite;
+}
+
+@keyframes glowPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.45);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(99, 102, 241, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+  }
+}
+
+.update-dot {
+  width: 6px;
+  height: 6px;
+  background: #f87171;
+  border-radius: 50%;
+}
+
+.new-dot {
+  background: #ef4444;
+  color: #ffffff;
+  font-size: 9px;
+  padding: 1px 4px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
 .header-help-menu {
   position: relative;
   display: flex;
@@ -1470,6 +1690,55 @@ body { margin: 0; background: var(--bg-primary); color: #c9d1d9; font-family: -a
 .help-dropdown-list {
   display: flex;
   flex-direction: column;
+}
+
+.header-lang-menu {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.lang-dropdown {
+  width: 180px;
+}
+
+.lang-select-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  color: #c9d1d9;
+  font-size: 13px;
+  transition: all 0.15s ease;
+}
+
+.lang-select-item:hover {
+  background: rgba(88, 166, 255, 0.1);
+  color: #58a6ff;
+}
+
+.lang-select-item.active {
+  background: rgba(88, 166, 255, 0.15);
+  color: #58a6ff;
+  font-weight: 600;
+}
+
+.lang-select-item .lang-flag {
+  font-size: 16px;
+}
+
+.lang-select-item .lang-name {
+  flex: 1;
+}
+
+.lang-select-item .lang-check {
+  color: #58a6ff;
+  font-weight: 700;
 }
 
 .help-dropdown-item {

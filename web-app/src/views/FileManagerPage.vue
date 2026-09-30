@@ -8,14 +8,14 @@
           </svg>
         </div>
         <div>
-          <h2>文件中心</h2>
-          <p>{{ selectedDeviceId || '选择在线设备后开始管理文件' }}</p>
+          <h2>{{ $t('files.centerTitle') }}</h2>
+          <p>{{ selectedDeviceId || $t('files.subtitleDefault') }}</p>
         </div>
       </div>
 
       <div class="fm-device-panel">
-        <select v-model="selectedDeviceId" class="device-select" aria-label="选择设备">
-          <option value="" disabled>选择在线设备</option>
+        <select v-model="selectedDeviceId" class="device-select" :aria-label="$t('files.selectDeviceAria')">
+          <option value="" disabled>{{ $t('files.selectDeviceOption') }}</option>
           <option v-for="d in deviceStore.onlineDevices" :key="d.id" :value="d.id">
             {{ d.name || d.id }}
           </option>
@@ -33,14 +33,14 @@
           <path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"></path>
           <path d="M8 13h8"></path>
         </svg>
-        <h3>未选择设备</h3>
-        <p>选择一个在线云手机后，会自动建立文件通道。</p>
+        <h3>{{ $t('files.noDeviceTitle') }}</h3>
+        <p>{{ $t('files.noDeviceDesc') }}</p>
       </section>
 
       <section v-else-if="isConnecting" class="empty-state">
         <div class="spinner"></div>
-        <h3>正在建立文件通道</h3>
-        <p>WebRTC 数据通道连接中。</p>
+        <h3>{{ $t('files.connectingTitle') }}</h3>
+        <p>{{ $t('files.connectingDesc') }}</p>
       </section>
 
       <section v-else-if="webrtcError" class="empty-state error">
@@ -49,29 +49,29 @@
           <path d="m15 9-6 6"></path>
           <path d="m9 9 6 6"></path>
         </svg>
-        <h3>连接失败</h3>
+        <h3>{{ $t('files.connectFailedTitle') }}</h3>
         <p>{{ webrtcError }}</p>
-        <button class="primary-btn" @click="reconnectDevice">重试</button>
+        <button class="primary-btn" @click="reconnectDevice">{{ $t('files.retry') }}</button>
       </section>
 
       <section v-else class="fm-shell">
         <div class="toolbar">
-          <button class="icon-btn" @click="goUpFolder" :disabled="currentPath === '/'" title="返回上级">
+          <button class="icon-btn" @click="goUpFolder" :disabled="currentPath === '/'" :title="$t('files.goUpFolder')">
             <svg viewBox="0 0 24 24"><path d="M19 12H5"></path><path d="m12 19-7-7 7-7"></path></svg>
           </button>
           <div class="path-box">
-            <span>路径</span>
+            <span>{{ $t('files.pathLabel') }}</span>
             <input v-model="pathDraft" @keyup.enter="applyPath" @blur="pathDraft = currentPath" />
           </div>
-          <button class="icon-btn" @click="refreshFileList" title="刷新">
+          <button class="icon-btn" @click="refreshFileList" :title="$t('files.refreshHint')">
             <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.64-6.36"></path><path d="M21 3v6h-6"></path></svg>
           </button>
-          <button class="icon-btn" @click="showNewFolderPrompt" title="新建文件夹">
+          <button class="icon-btn" @click="showNewFolderPrompt" :title="$t('files.newFolderHint')">
             <svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"></path><path d="M12 11v6"></path><path d="M9 14h6"></path></svg>
           </button>
-          <label v-if="!forbidFilePush" class="upload-btn" :class="{ disabled: hasActiveUpload }" title="上传文件">
+          <label v-if="!forbidFilePush" class="upload-btn" :class="{ disabled: hasActiveUpload }" :title="$t('files.uploadHint')">
             <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="m17 8-5-5-5 5"></path><path d="M12 3v12"></path></svg>
-            <span>上传</span>
+            <span>{{ $t('files.uploadBtn') }}</span>
             <input type="file" :disabled="hasActiveUpload" @change="onFileSelected" />
           </label>
         </div>
@@ -79,17 +79,17 @@
         <div class="selection-bar" :class="{ visible: selectedFiles.length > 0 }">
           <div class="selection-summary">
             <strong>{{ selectedFiles.length }}</strong>
-            <span>个项目已选择</span>
+            <span>{{ $t('files.itemsSelected') }}</span>
           </div>
           <div class="selection-actions">
-            <button class="secondary-btn" @click="clearSelection">取消选择</button>
+            <button class="secondary-btn" @click="clearSelection">{{ $t('files.clearSelection') }}</button>
             <button class="secondary-btn" :disabled="selectedDownloadableFiles.length === 0" @click="downloadSelected">
-              下载
+              {{ $t('files.download') }}
             </button>
             <button class="secondary-btn" :disabled="selectedInstallableFiles.length === 0" @click="installSelectedApks">
-              安装 APK
+              {{ $t('files.installApk') }}
             </button>
-            <button class="danger-btn" @click="deleteSelected">删除</button>
+            <button class="danger-btn" @click="deleteSelected">{{ $t('files.delete') }}</button>
           </div>
         </div>
 
@@ -101,24 +101,24 @@
           @drop.prevent="onFileDropped"
         >
           <div v-if="dragOver && !forbidFilePush" class="drag-overlay">
-            <div>释放后上传到当前目录</div>
+            <div>{{ $t('files.dropToUpload') }}</div>
           </div>
 
           <div class="list-head">
             <label class="check-cell">
               <input type="checkbox" :checked="allVisibleSelected" @change="toggleSelectAll($event.target.checked)" />
             </label>
-            <button class="head-name" @click="setSort('name')">名称 {{ sortMark('name') }}</button>
-            <button class="head-meta" @click="setSort('size')">大小 {{ sortMark('size') }}</button>
-            <button class="head-meta" @click="setSort('mod_time')">修改时间 {{ sortMark('mod_time') }}</button>
+            <button class="head-name" @click="setSort('name')">{{ $t('files.sortName') }} {{ sortMark('name') }}</button>
+            <button class="head-meta" @click="setSort('size')">{{ $t('files.sortSize') }} {{ sortMark('size') }}</button>
+            <button class="head-meta" @click="setSort('mod_time')">{{ $t('files.sortModTime') }} {{ sortMark('mod_time') }}</button>
           </div>
 
           <div v-if="filesLoading" class="list-state">
             <div class="spinner small"></div>
-            <span>正在读取文件列表</span>
+            <span>{{ $t('files.readingFiles') }}</span>
           </div>
           <div v-else-if="sortedFiles.length === 0" class="list-state">
-            <span>空目录或无权限</span>
+            <span>{{ $t('files.emptyFolderOrNoPerm') }}</span>
           </div>
           <div v-else class="file-list">
             <div
@@ -143,7 +143,7 @@
                   <span class="file-path">{{ file.path }}</span>
                 </div>
               </div>
-              <div class="file-size">{{ file.is_dir ? '文件夹' : formatFileSize(file.size) }}</div>
+              <div class="file-size">{{ file.is_dir ? $t('files.folderType') : formatFileSize(file.size) }}</div>
               <div class="file-date">{{ formatTime(file.mod_time) }}</div>
             </div>
           </div>
@@ -151,8 +151,8 @@
 
         <aside v-if="activeTransfers.length > 0" class="transfer-dock">
           <div class="dock-head">
-            <span>传输任务</span>
-            <button @click="clearFinishedTransfers">清理完成</button>
+            <span>{{ $t('files.transferTasks') }}</span>
+            <button @click="clearFinishedTransfers">{{ $t('files.clearFinished') }}</button>
           </div>
           <div class="transfer-list">
             <div v-for="t in activeTransfers" :key="t.id" class="transfer-item" :class="t.status">
@@ -174,10 +174,13 @@
 
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useDeviceStore } from '@/stores/devices'
 import { useAuthStore } from '@/stores/auth'
 import { useWebRTC } from '@/composables/useWebRTC'
 import { hashFileIncremental } from '@/utils/sha256'
+
+const { t } = useI18n()
 
 const deviceStore = useDeviceStore()
 const authStore = useAuthStore()
@@ -216,10 +219,10 @@ const installQueue = []
 const isConnecting = computed(() => ['connecting', 'signaling', 'waiting_offer', 'connecting_webrtc'].includes(webrtcStatus.value))
 
 const connectionText = computed(() => {
-  if (!selectedDeviceId.value) return '未连接'
-  if (isFileChannelReady.value) return '文件通道已连接'
-  if (webrtcError.value) return '连接错误'
-  if (isConnecting.value) return '连接中'
+  if (!selectedDeviceId.value) return t('files.notConnected')
+  if (isFileChannelReady.value) return t('files.channelConnected')
+  if (webrtcError.value) return t('files.connError')
+  if (isConnecting.value) return t('files.connecting')
   return '未连接'
 })
 
@@ -349,19 +352,19 @@ watch(() => deviceStore.activeDeviceId, (newActiveId) => {
 watch(isFileChannelReady, (ready) => {
   if (ready) return
   Object.values(uploadSessions).forEach(session => {
-    updateTransfer(session.id, { status: 'failed', progress: 100, message: '文件通道已断开' })
+    updateTransfer(session.id, { status: 'failed', progress: 100, message: t('files.channelDisconnected') })
     delete uploadSessions[session.destPath]
   })
   if (activeDownloadSession) {
-    failDownloadSession(activeDownloadSession, '文件通道已断开')
+    failDownloadSession(activeDownloadSession, t('files.channelDisconnected'))
   }
   while (downloadQueue.length > 0) {
     const session = downloadQueue.shift()
-    updateTransfer(session.id, { status: 'failed', progress: 100, message: '文件通道已断开' })
+    updateTransfer(session.id, { status: 'failed', progress: 100, message: t('files.channelDisconnected') })
     delete downloadSessions[session.path]
   }
   if (activeInstallSession) {
-    failInstallSession(activeInstallSession, '文件通道已断开')
+    failInstallSession(activeInstallSession, t('files.channelDisconnected'))
   }
 })
 
@@ -446,7 +449,7 @@ function onRowDblClick(file) {
 
 function showNewFolderPrompt() {
   if (!webrtc) return
-  const name = prompt('新建文件夹名称')
+  const name = prompt(t('files.newFolderPrompt'))
   const trimmed = name?.trim()
   if (!trimmed) return
   webrtc.sendFileChannelCmd({ type: 'mkdir', path: joinPath(currentPath.value, trimmed) })
@@ -499,7 +502,7 @@ function installSelectedApks() {
 
 function deleteSelected() {
   if (!webrtc || selectedFiles.value.length === 0) return
-  if (!confirm(`确认删除选中的 ${selectedFiles.value.length} 个项目？删除后无法恢复。`)) return
+  if (!confirm(t('files.confirmDeleteSelected', { count: selectedFiles.value.length }))) return
   selectedFiles.value.forEach(file => {
     webrtc.sendFileChannelCmd({ type: 'delete', path: file.path })
   })
@@ -586,7 +589,7 @@ function startNextDownload() {
     request_id: String(session.id)
   })
   if (!sent) {
-    failDownloadSession(session, '文件通道不可用')
+    failDownloadSession(session, t('files.channelUnavailable'))
   }
 }
 
@@ -604,7 +607,7 @@ function startNextInstall() {
     request_id: String(session.id)
   })
   if (!sent) {
-    failInstallSession(session, '文件通道不可用')
+    failInstallSession(session, t('files.channelUnavailable'))
   }
 }
 
@@ -628,15 +631,15 @@ async function calculateFileSHA256(file) {
 
 async function startUploadFile(file) {
   if (!isFileChannelReady.value || !webrtc) {
-    alert('文件通道尚未建立，无法上传。')
+    alert(t('files.channelNotReadyUpload'))
     return
   }
   if (hasActiveUpload.value) {
-    alert('已有上传任务正在进行，请完成后再上传。')
+    alert(t('files.uploadInProgress'))
     return
   }
 
-  const installOnFinish = isApk(file) && confirm(`上传完成后安装 "${file.name}"？`)
+  const installOnFinish = isApk(file) && confirm(t('files.installOnFinishPrompt', { name: file.name }))
   const destPath = joinPath(currentPath.value, file.name)
   const id = ++transferIdSeq
   activeTransfers.value.push({
@@ -735,7 +738,7 @@ async function sendNextChunks(session) {
 
   // 文件通道中途断开导致循环提前退出时，标记任务失败，避免一直停留在“传输中”空转
   if (session.offset < file.size && uploadSessions[session.destPath]) {
-    updateTransfer(session.id, { status: 'failed', progress: 100, message: '文件通道已断开' })
+    updateTransfer(session.id, { status: 'failed', progress: 100, message: t('files.channelDisconnected') })
     delete uploadSessions[session.destPath]
   }
 }
@@ -772,14 +775,14 @@ function handleFileChannelMessage(data) {
           fileList.value = msg.files || []
           selectedPaths.value = new Set([...selectedPaths.value].filter(path => fileList.value.some(file => file.path === path)))
         } else {
-          alert('读取文件列表失败: ' + msg.error)
+          alert(t('files.readDirFailed') + msg.error)
         }
         break
       case 'mkdir_reply':
-        msg.success ? refreshFileList() : alert('创建目录失败: ' + msg.error)
+        msg.success ? refreshFileList() : alert(t('files.createDirFailed') + msg.error)
         break
       case 'delete_reply':
-        msg.success ? refreshFileList() : alert('删除失败: ' + msg.error)
+        msg.success ? refreshFileList() : alert(t('files.deleteFailed') + msg.error)
         break
       case 'upload_reply':
         handleUploadReply(msg)
@@ -806,7 +809,7 @@ function handleUploadReply(msg) {
       updateTransfer(session.id, { status: 'failed', progress: 100, message: msg.error })
       delete uploadSessions[session.destPath]
     }
-    alert('开始上传文件失败: ' + msg.error)
+    alert(t('files.uploadFailed') + msg.error)
     return
   }
   const session = msg.path ? uploadSessions[msg.path] : Object.values(uploadSessions).find(s => s.offset === 0)
@@ -825,7 +828,7 @@ function handleUploadAck(msg) {
       message: msg.error || '校验失败'
     })
     delete uploadSessions[session.destPath]
-    alert('上传文件完整性校验失败: ' + msg.error)
+    alert(t('files.verifyFailed') + msg.error)
     return
   }
 
@@ -851,7 +854,7 @@ function handleDownloadReply(msg) {
 
   if (!msg.success) {
     failDownloadSession(session, msg.error || '未知错误')
-    alert('开始下载文件失败: ' + msg.error)
+    alert(t('files.downloadFailed') + msg.error)
     return
   }
 
@@ -974,10 +977,10 @@ function transferLabel(t) {
     download: '下载',
     install: '安装'
   }
-  if (t.status === 'queued') return '排队中'
-  if (t.status === 'checking') return '校验中'
-  if (t.status === 'success') return '完成'
-  if (t.status === 'failed') return '失败'
+  if (t.status === 'queued') return t('files.statusQueued')
+  if (t.status === 'checking') return t('files.statusChecking')
+  if (t.status === 'success') return t('files.statusCompleted')
+  if (t.status === 'failed') return t('files.statusFailed')
   const speedStr = t.speed ? ` (${t.speed})` : ''
   return `${map[t.type] || '任务'} ${t.progress}%${speedStr}`
 }

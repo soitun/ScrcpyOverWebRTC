@@ -11,9 +11,9 @@
           @click="currentTab = id; deviceStore.focusDevice(id)"
         >
           <span class="tab-status-dot" :class="{ online: isOnline(id) }"></span>
-          <span class="tab-crown" v-if="deviceStore.masterDeviceId === id" title="主控机">👑</span>
+          <span class="tab-crown" v-if="deviceStore.masterDeviceId === id" :title="$t('multi.masterDevice')">👑</span>
           <span class="tab-title" :title="id">{{ id }}</span>
-          <button class="tab-close-btn" @click.stop="closeTab(id)" title="关闭标签页">
+          <button class="tab-close-btn" @click.stop="closeTab(id)" :title="$t('multi.closeTab')">
             ✕
           </button>
         </div>
@@ -24,7 +24,7 @@
           class="tab-action-btn" 
           :class="{ active: isSplitMode }" 
           @click="isSplitMode = !isSplitMode"
-          :title="isSplitMode ? '关闭双栏分屏' : '向右拆分分屏 (双Tab同时查看)'"
+          :title="isSplitMode ? $t('multi.closeSplit') : $t('multi.openSplit')"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="3" y="3" width="18" height="18" rx="2"></rect>
@@ -53,7 +53,7 @@
       <!-- 拆分副窗格 (Secondary Pane) -->
       <div class="pane-secondary" v-if="isSplitMode && secondaryTabId">
         <div class="secondary-header">
-          <span class="split-label">分屏副视窗:</span>
+          <span class="split-label">{{ $t('multi.splitSubWindow') }}</span>
           <select v-model="secondaryTabId" class="split-select">
             <option 
               v-for="id in activeDeviceIds" 
@@ -61,7 +61,7 @@
               :value="id"
               :disabled="id === currentTab"
             >
-              {{ id }} {{ id === currentTab ? '(主窗已打开)' : '' }}
+              {{ id }} {{ id === currentTab ? $t('multi.mainTabOpened') : '' }}
             </option>
           </select>
         </div>

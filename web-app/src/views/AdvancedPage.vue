@@ -3,15 +3,15 @@
     <!-- 左侧设备选择与群控设置 -->
     <div class="sidebar-panel">
       <div class="panel-header">
-        <h3>外设控制中心</h3>
-        <span class="sub-text">选择设备进行外设及 GPS 注入</span>
+        <h3>{{ $t('advanced.peripheralTitle') }}</h3>
+        <span class="sub-text">{{ $t('advanced.peripheralSubtitle') }}</span>
       </div>
       
       <!-- 主控设备选择 -->
-      <div class="section-title">选择当前设备</div>
+      <div class="section-title">{{ $t('advanced.selectDeviceTitle') }}</div>
       <div class="device-list-container">
         <div v-if="onlineDevices.length === 0" class="no-devices">
-          暂无在线的定制版云手机
+          {{ $t('advanced.noOnlineCustomDevices') }}
         </div>
         <div 
           v-for="dev in onlineDevices" 
@@ -30,7 +30,7 @@
             <span class="device-name">{{ dev.name || dev.id }}</span>
             <span class="device-status">
               <span class="status-indicator online"></span>
-              {{ dev.ip || '在线' }}
+              {{ dev.ip || $t('advanced.online') }}
             </span>
           </div>
         </div>
@@ -38,13 +38,13 @@
 
       <!-- 群控支持状态 -->
       <div class="batch-control-status">
-        <div class="status-title">群控模式 (支持多路广播)</div>
+        <div class="status-title">{{ $t('advanced.groupControlTitle') }}</div>
         <div class="batch-sw-row">
           <label class="switch-label">
             <input type="checkbox" v-model="batchEnabled" />
             <span class="switch-slider"></span>
           </label>
-          <span class="batch-lbl-text">{{ batchEnabled ? '已开启批量广播' : '仅对当前选中设备下发' }}</span>
+          <span class="batch-lbl-text">{{ batchEnabled ? $t('advanced.batchEnabledText') : $t('advanced.batchDisabledText') }}</span>
         </div>
         <div v-if="batchEnabled" class="batch-checklist">
           <div 
@@ -73,7 +73,7 @@
             <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"></path>
             <circle cx="12" cy="10" r="3"></circle>
           </svg>
-          GPS 定位模拟
+          {{ $t('advanced.tabGps') }}
         </button>
         <button 
           class="tab-btn" 
@@ -84,7 +84,7 @@
             <circle cx="12" cy="12" r="10"></circle>
             <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
           </svg>
-          传感器模拟
+          {{ $t('advanced.tabSensors') }}
         </button>
       </div>
 
@@ -101,43 +101,43 @@
                   <div class="radar-line"></div>
                 </div>
                 <div class="fallback-tips">
-                  <p>未检测到网络地图依赖 (CDN 加载失败)</p>
-                  <p>已自动降级为雷达网，您可手动指定坐标输入</p>
+                  <p>{{ $t('advanced.mapFailed') }}</p>
+                  <p>{{ $t('advanced.mapFallback') }}</p>
                 </div>
               </div>
             </div>
 
             <!-- 控制卡片 -->
             <div class="gps-controls-card">
-              <div class="section-title">坐标控制</div>
+              <div class="section-title">{{ $t('advanced.coordControl') }}</div>
               <div class="form-grid">
                 <div class="form-group">
-                  <label>当前纬度 (Lat)</label>
+                  <label>{{ $t('advanced.lat') }}</label>
                   <input type="number" v-model.number="gpsData.lat" step="0.0001" @input="updateMarker" />
                 </div>
                 <div class="form-group">
-                  <label>当前经度 (Lon)</label>
+                  <label>{{ $t('advanced.lon') }}</label>
                   <input type="number" v-model.number="gpsData.lon" step="0.0001" @input="updateMarker" />
                 </div>
                 <div class="form-group">
-                  <label>高度 (Alt / m)</label>
+                  <label>{{ $t('advanced.alt') }}</label>
                   <input type="number" v-model.number="gpsData.alt" step="1" />
                 </div>
                 <div class="form-group">
-                  <label>速度 (Spd / m/s)</label>
+                  <label>{{ $t('advanced.spd') }}</label>
                   <input type="number" v-model.number="gpsData.spd" step="0.1" />
                 </div>
               </div>
               
               <div class="btn-group">
                 <button class="primary-btn" @click="sendSingleGps" :disabled="!hasTargets">
-                  瞬间传送
+                  {{ $t('advanced.teleport') }}
                 </button>
               </div>
 
               <div class="divider"></div>
 
-              <div class="section-title">出行路径模拟</div>
+              <div class="section-title">{{ $t('advanced.routeSim') }}</div>
               <div class="path-settings">
                 <div class="mode-select">
                   <button 
@@ -152,11 +152,11 @@
                 </div>
 
                 <div class="dest-info" v-if="destination">
-                  <span class="dest-lbl">终点设定: </span>
+                  <span class="dest-lbl">{{ $t('advanced.destSetting') }}</span>
                   <span class="dest-val">{{ destination.lat.toFixed(4) }}, {{ destination.lon.toFixed(4) }}</span>
                 </div>
                 <div class="dest-info" v-else>
-                  <span class="dest-lbl-hint">提示：在地图上双击或右键以设定出行终点。</span>
+                  <span class="dest-lbl-hint">{{ $t('advanced.destHint') }}</span>
                 </div>
 
                 <div class="btn-group" style="margin-top: 15px;">
@@ -166,10 +166,10 @@
                     @click="startSimulation" 
                     :disabled="!hasTargets || !destination"
                   >
-                    开始模拟移动
+                    {{ $t('advanced.startMove') }}
                   </button>
                   <button v-else class="danger-btn" @click="stopSimulation">
-                    停止模拟移动
+                    {{ $t('advanced.stopMove') }}
                   </button>
                 </div>
               </div>
@@ -182,7 +182,7 @@
           <div class="sensor-cols">
             <!-- 手机 3D 展示与三轴调节 -->
             <div class="sensor-3d-panel">
-              <div class="section-title">3D 重力/陀螺仪方向</div>
+              <div class="section-title">{{ $t('advanced.gyro3d') }}</div>
               <div class="phone-3d-container">
                 <div class="phone-3d-card" :style="phone3DStyle">
                   <div class="phone-3d-screen">
@@ -198,73 +198,73 @@
               </div>
               
               <div class="preset-actions-row">
-                <button class="preset-btn" @click="triggerShake" :disabled="!hasTargets">摇一摇 (Shake)</button>
+                <button class="preset-btn" @click="triggerShake" :disabled="!hasTargets">{{ $t('advanced.shake') }}</button>
                 <button class="preset-btn" :class="{ active: drivingBumpActive }" @click="toggleDrivingBump" :disabled="!hasTargets">
-                  颠簸路况 {{ drivingBumpActive ? 'ON' : 'OFF' }}
+                  {{ $t('advanced.bumpyRoad') }} {{ drivingBumpActive ? 'ON' : 'OFF' }}
                 </button>
-                <button class="preset-btn" @click="triggerFlip" :disabled="!hasTargets">360° 翻转</button>
+                <button class="preset-btn" @click="triggerFlip" :disabled="!hasTargets">{{ $t('advanced.flip360') }}</button>
               </div>
             </div>
 
             <!-- 参数滑块大区 -->
             <div class="sensor-sliders-panel">
               <div class="slider-group-box">
-                <div class="box-title">加速度计 (Accel / m/s²)</div>
+                <div class="box-title">{{ $t('advanced.accelTitle') }}</div>
                 <div class="slider-row">
-                  <label>X 轴</label>
+                  <label>{{ $t('advanced.axisX') }}</label>
                   <input type="range" min="-20" max="20" step="0.1" v-model.number="sensorData.accel.x" @input="sendAccel" :disabled="!hasTargets" />
                   <span class="val-display">{{ sensorData.accel.x.toFixed(1) }}</span>
                 </div>
                 <div class="slider-row">
-                  <label>Y 轴</label>
+                  <label>{{ $t('advanced.axisY') }}</label>
                   <input type="range" min="-20" max="20" step="0.1" v-model.number="sensorData.accel.y" @input="sendAccel" :disabled="!hasTargets" />
                   <span class="val-display">{{ sensorData.accel.y.toFixed(1) }}</span>
                 </div>
                 <div class="slider-row">
-                  <label>Z 轴</label>
+                  <label>{{ $t('advanced.axisZ') }}</label>
                   <input type="range" min="-20" max="20" step="0.1" v-model.number="sensorData.accel.z" @input="sendAccel" :disabled="!hasTargets" />
                   <span class="val-display">{{ sensorData.accel.z.toFixed(1) }}</span>
                 </div>
               </div>
 
               <div class="slider-group-box">
-                <div class="box-title">陀螺仪 (Gyro / rad/s)</div>
+                <div class="box-title">{{ $t('advanced.gyroTitle') }}</div>
                 <div class="slider-row">
-                  <label>X 轴</label>
+                  <label>{{ $t('advanced.axisX') }}</label>
                   <input type="range" min="-10" max="10" step="0.1" v-model.number="sensorData.gyro.x" @input="sendGyro" :disabled="!hasTargets" />
                   <span class="val-display">{{ sensorData.gyro.x.toFixed(1) }}</span>
                 </div>
                 <div class="slider-row">
-                  <label>Y 轴</label>
+                  <label>{{ $t('advanced.axisY') }}</label>
                   <input type="range" min="-10" max="10" step="0.1" v-model.number="sensorData.gyro.y" @input="sendGyro" :disabled="!hasTargets" />
                   <span class="val-display">{{ sensorData.gyro.y.toFixed(1) }}</span>
                 </div>
                 <div class="slider-row">
-                  <label>Z 轴</label>
+                  <label>{{ $t('advanced.axisZ') }}</label>
                   <input type="range" min="-10" max="10" step="0.1" v-model.number="sensorData.gyro.z" @input="sendGyro" :disabled="!hasTargets" />
                   <span class="val-display">{{ sensorData.gyro.z.toFixed(1) }}</span>
                 </div>
               </div>
 
               <div class="slider-group-box">
-                <div class="box-title">单值环境传感器</div>
+                <div class="box-title">{{ $t('advanced.envSensorsTitle') }}</div>
                 <div class="slider-row">
-                  <label>折叠角度</label>
+                  <label>{{ $t('advanced.hingeAngle') }}</label>
                   <input type="range" min="0" max="180" step="1" v-model.number="sensorData.hinge_angle" @input="sendSingleSensor('hinge_angle')" :disabled="!hasTargets" />
                   <span class="val-display">{{ sensorData.hinge_angle }}°</span>
                 </div>
                 <div class="slider-row">
-                  <label>环境光强</label>
+                  <label>{{ $t('advanced.lightLux') }}</label>
                   <input type="range" min="0" max="10000" step="10" v-model.number="sensorData.light" @input="sendSingleSensor('light')" :disabled="!hasTargets" />
                   <span class="val-display">{{ sensorData.light }} lx</span>
                 </div>
                 <div class="slider-row">
-                  <label>环境温度</label>
+                  <label>{{ $t('advanced.temperature') }}</label>
                   <input type="range" min="-20" max="50" step="1" v-model.number="sensorData.temp" @input="sendSingleSensor('temp')" :disabled="!hasTargets" />
                   <span class="val-display">{{ sensorData.temp }} ℃</span>
                 </div>
                 <div class="slider-row">
-                  <label>距离感应</label>
+                  <label>{{ $t('advanced.proximity') }}</label>
                   <input type="range" min="0" max="5" step="1" v-model.number="sensorData.proximity" @input="sendSingleSensor('proximity')" :disabled="!hasTargets" />
                   <span class="val-display">{{ sensorData.proximity }} cm</span>
                 </div>

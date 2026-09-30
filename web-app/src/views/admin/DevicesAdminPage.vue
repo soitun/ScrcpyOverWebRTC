@@ -3,10 +3,10 @@
     <div class="admin-card devices-panel">
       <div class="panel-header">
         <div class="header-left">
-          <h2>📦 设备租约运营</h2>
-          <span class="user-count">共 {{ filteredDevices.length }} / {{ allDevices.length }} 台设备</span>
+          <h2>{{ $t('devicesAdmin.pageTitle') }}</h2>
+          <span class="user-count">{{ $t('devicesAdmin.deviceCountStat', { filtered: filteredDevices.length, total: allDevices.length }) }}</span>
         </div>
-        <button class="refresh-btn" @click="refresh" :disabled="deviceStore.loading">⟳ 刷新</button>
+        <button class="refresh-btn" @click="refresh" :disabled="deviceStore.loading">{{ $t('devicesAdmin.refreshBtn') }}</button>
       </div>
 
       <!-- 状态统计条 -->
@@ -25,10 +25,10 @@
       <!-- 筛选条 -->
       <div class="filter-bar">
         <div class="search-box">
-          <input type="text" v-model="searchQuery" placeholder="🔍 搜索设备 ID / 型号..." />
+          <input type="text" v-model="searchQuery" :placeholder="$t('devicesAdmin.searchPlaceholder')" />
         </div>
         <select v-model="tagFilter" class="tag-select">
-          <option value="">全部标签</option>
+          <option value="">{{ $t('devicesAdmin.allTags') }}</option>
           <option v-for="tag in tagStore.tags" :key="tag.id" :value="tag.id">{{ tag.name }}</option>
         </select>
       </div>
@@ -37,13 +37,13 @@
         <table class="premium-table">
           <thead>
             <tr>
-              <th>租约状态</th>
-              <th>设备 ID</th>
-              <th>型号</th>
-              <th>在线</th>
-              <th>当前租户</th>
-              <th>剩余时长</th>
-              <th>操作</th>
+              <th>{{ $t('devicesAdmin.thLeaseStatus') }}</th>
+              <th>{{ $t('devicesAdmin.thDeviceId') }}</th>
+              <th>{{ $t('devicesAdmin.thModel') }}</th>
+              <th>{{ $t('devicesAdmin.thOnline') }}</th>
+              <th>{{ $t('devicesAdmin.thTenant') }}</th>
+              <th>{{ $t('devicesAdmin.thRemaining') }}</th>
+              <th>{{ $t('devicesAdmin.thActions') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -58,12 +58,12 @@
               <td>
                 <div class="online-status-wrapper">
                   <span :class="['status-dot', { online: dev.status === 'online' }]"></span>
-                  <span class="status-text">{{ dev.status === 'online' ? '在线' : '离线' }}</span>
+                  <span class="status-text">{{ dev.status === 'online' ? $t('devicesAdmin.statusOnline') : $t('devicesAdmin.statusOffline') }}</span>
                 </div>
               </td>
               <td>
                 <span class="tenant-name" v-if="dev.lease">{{ dev.lease.username }}</span>
-                <span class="free-text" v-else-if="dev.status === 'online'">空闲</span>
+                <span class="free-text" v-else-if="dev.status === 'online'">{{ $t('devicesAdmin.statusFree') }}</span>
                 <span class="free-text" v-else>-</span>
                 <div class="lease-note" v-if="dev.lease?.note" :title="dev.lease.note">{{ dev.lease.note }}</div>
               </td>
@@ -74,16 +74,16 @@
               </td>
               <td class="actions-cell">
                 <template v-if="!dev.lease">
-                  <button class="op-btn primary" @click="openCreateModal(dev)">开租约</button>
+                  <button class="op-btn primary" @click="openCreateModal(dev)">{{ $t('devicesAdmin.btnCreateLease') }}</button>
                 </template>
                 <template v-else>
-                  <button class="op-btn" @click="openExtendModal(dev)">续期</button>
-                  <button class="op-btn danger" @click="confirmRevoke(dev)">收回</button>
+                  <button class="op-btn" @click="openExtendModal(dev)">{{ $t('devicesAdmin.btnExtendLease') }}</button>
+                  <button class="op-btn danger" @click="confirmRevoke(dev)">{{ $t('devicesAdmin.btnRevokeLease') }}</button>
                 </template>
               </td>
             </tr>
             <tr v-if="filteredDevices.length === 0">
-              <td colspan="7" class="empty-row">没有匹配的设备</td>
+              <td colspan="7" class="empty-row">{{ $t('devicesAdmin.noMatchedDevices') }}</td>
             </tr>
           </tbody>
         </table>
@@ -95,47 +95,47 @@
       <div class="modal-overlay" v-if="createTarget" @click.self="createTarget = null">
         <div class="glass-modal">
           <div class="modal-header">
-            <h3>🔑 开租约：{{ createTarget.id }}</h3>
+            <h3>{{ $t('devicesAdmin.createModalTitle', { id: createTarget.id }) }}</h3>
             <button class="close-modal" @click="createTarget = null">✕</button>
           </div>
           <div class="modal-body">
             <div class="form-group">
-              <label>租户（用户）</label>
+              <label>{{ $t('devicesAdmin.tenantLabel') }}</label>
               <select v-model="createForm.username">
-                <option value="" disabled>请选择用户</option>
+                <option value="" disabled>{{ $t('devicesAdmin.selectUserPlaceholder') }}</option>
                 <option v-for="u in tenantUsers" :key="u.username" :value="u.username">
-                  {{ u.username }}{{ u.role === 'admin' ? '（管理员）' : '' }}{{ u.note ? ' - ' + u.note : '' }}
+                  {{ u.username }}{{ u.role === 'admin' ? $t('devicesAdmin.adminRoleSuffix') : '' }}{{ u.note ? ' - ' + u.note : '' }}
                 </option>
               </select>
             </div>
             <div class="form-group">
-              <label>租期时长</label>
+              <label>{{ $t('devicesAdmin.durationLabel') }}</label>
               <select v-model="createForm.duration">
-                <option :value="86400">1 天</option>
-                <option :value="604800">7 天</option>
-                <option :value="2592000">30 天</option>
-                <option :value="7776000">90 天</option>
-                <option :value="0">♾️ 永久</option>
-                <option value="custom">⚙️ 自定义天数</option>
+                <option :value="86400">{{ $t('devicesAdmin.day1') }}</option>
+                <option :value="604800">{{ $t('devicesAdmin.days7') }}</option>
+                <option :value="2592000">{{ $t('devicesAdmin.days30') }}</option>
+                <option :value="7776000">{{ $t('devicesAdmin.days90') }}</option>
+                <option :value="0">{{ $t('devicesAdmin.permanent') }}</option>
+                <option value="custom">{{ $t('devicesAdmin.customDays') }}</option>
               </select>
               <input
                 v-if="createForm.duration === 'custom'"
                 v-model.number="createForm.customDays"
                 type="number"
                 min="1"
-                placeholder="输入天数..."
+                :placeholder="$t('devicesAdmin.enterDaysPlaceholder')"
                 style="margin-top: 8px"
               />
             </div>
             <div class="form-group">
-              <label>备注（订单号 / 渠道等，可选）</label>
-              <input type="text" v-model="createForm.note" placeholder="例如：闲鱼订单 #123456" />
+              <label>{{ $t('devicesAdmin.noteLabel') }}</label>
+              <input type="text" v-model="createForm.note" :placeholder="$t('devicesAdmin.notePlaceholder')" />
             </div>
           </div>
           <div class="modal-footer">
             <span v-if="modalError" class="modal-error">{{ modalError }}</span>
-            <button class="modal-btn cancel" @click="createTarget = null">取消</button>
-            <button class="modal-btn submit" @click="submitCreate" :disabled="modalSubmitting || !createForm.username">确认开租</button>
+            <button class="modal-btn cancel" @click="createTarget = null">{{ $t('common.cancel') }}</button>
+            <button class="modal-btn submit" @click="submitCreate" :disabled="modalSubmitting || !createForm.username">{{ $t('devicesAdmin.confirmCreate') }}</button>
           </div>
         </div>
       </div>
@@ -146,37 +146,37 @@
       <div class="modal-overlay" v-if="extendTarget" @click.self="extendTarget = null">
         <div class="glass-modal">
           <div class="modal-header">
-            <h3>⏳ 续期：{{ extendTarget.id }}</h3>
+            <h3>{{ $t('devicesAdmin.extendModalTitle', { id: extendTarget.id }) }}</h3>
             <button class="close-modal" @click="extendTarget = null">✕</button>
           </div>
           <div class="modal-body">
             <p class="modal-info">
-              当前租户：<b>{{ extendTarget.lease?.username }}</b>，
+              {{ $t('devicesAdmin.currentTenantDesc', { username: extendTarget.lease?.username }) }}
               {{ formatLeaseRemaining(extendTarget.lease?.remaining_seconds) }}
             </p>
             <div class="form-group">
-              <label>追加时长（在当前到期时间上累加）</label>
+              <label>{{ $t('devicesAdmin.appendDurationLabel') }}</label>
               <select v-model="extendForm.duration">
-                <option :value="86400">+1 天</option>
-                <option :value="604800">+7 天</option>
-                <option :value="2592000">+30 天</option>
-                <option :value="7776000">+90 天</option>
-                <option value="custom">⚙️ 自定义天数</option>
+                <option :value="86400">+{{ $t('devicesAdmin.day1') }}</option>
+                <option :value="604800">+{{ $t('devicesAdmin.days7') }}</option>
+                <option :value="2592000">+{{ $t('devicesAdmin.days30') }}</option>
+                <option :value="7776000">+{{ $t('devicesAdmin.days90') }}</option>
+                <option value="custom">{{ $t('devicesAdmin.customDays') }}</option>
               </select>
               <input
                 v-if="extendForm.duration === 'custom'"
                 v-model.number="extendForm.customDays"
                 type="number"
                 min="1"
-                placeholder="输入天数..."
+                :placeholder="$t('devicesAdmin.enterDaysPlaceholder')"
                 style="margin-top: 8px"
               />
             </div>
           </div>
           <div class="modal-footer">
             <span v-if="modalError" class="modal-error">{{ modalError }}</span>
-            <button class="modal-btn cancel" @click="extendTarget = null">取消</button>
-            <button class="modal-btn submit" @click="submitExtend" :disabled="modalSubmitting">确认续期</button>
+            <button class="modal-btn cancel" @click="extendTarget = null">{{ $t('common.cancel') }}</button>
+            <button class="modal-btn submit" @click="submitExtend" :disabled="modalSubmitting">{{ $t('devicesAdmin.confirmExtend') }}</button>
           </div>
         </div>
       </div>
@@ -186,10 +186,13 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useDeviceStore } from '@/stores/devices'
 import { useTagStore } from '@/stores/tags'
 import { authHeaders, readError } from '@/utils/api'
 import { formatLeaseRemaining } from '@/utils/format'
+
+const { t } = useI18n()
 
 const deviceStore = useDeviceStore()
 const tagStore = useTagStore()
@@ -210,20 +213,27 @@ function leaseStatus(dev) {
   return 'rented'
 }
 
-const STATUS_LABELS = { free: '空闲', rented: '出租中', expiring: '即将到期', expired: '已逾期', offline: '离线' }
 function leaseStatusLabel(dev) {
-  return STATUS_LABELS[leaseStatus(dev)]
+  const status = leaseStatus(dev)
+  const map = {
+    free: t('devicesAdmin.statusFree'),
+    rented: t('devicesAdmin.statusRented'),
+    expiring: t('devicesAdmin.statusExpiring'),
+    expired: t('devicesAdmin.statusExpired'),
+    offline: t('devicesAdmin.statusOffline')
+  }
+  return map[status] || status
 }
 
 const statusSummary = computed(() => {
   const counts = { free: 0, rented: 0, expiring: 0, expired: 0, offline: 0 }
   for (const dev of allDevices.value) counts[leaseStatus(dev)]++
   return [
-    { value: 'free', label: '空闲', count: counts.free },
-    { value: 'rented', label: '出租中', count: counts.rented },
-    { value: 'expiring', label: '即将到期', count: counts.expiring },
-    { value: 'expired', label: '已逾期', count: counts.expired },
-    { value: 'offline', label: '离线', count: counts.offline }
+    { value: 'free', label: t('devicesAdmin.statusFree'), count: counts.free },
+    { value: 'rented', label: t('devicesAdmin.statusRented'), count: counts.rented },
+    { value: 'expiring', label: t('devicesAdmin.statusExpiring'), count: counts.expiring },
+    { value: 'expired', label: t('devicesAdmin.statusExpired'), count: counts.expired },
+    { value: 'offline', label: t('devicesAdmin.statusOffline'), count: counts.offline }
   ]
 })
 
@@ -290,16 +300,19 @@ async function submitCreate() {
     })
     if (res.status === 409) {
       // 设备已有活跃租约：提示现有租户
-      let msg = '该设备已有活跃租约'
+      let msg = t('devicesAdmin.hasActiveLease')
       try {
         const data = await res.json()
         if (data.existing_lease) {
-          msg = `该设备已出租给「${data.existing_lease.username}」（${formatLeaseRemaining(data.existing_lease.remaining_seconds)}），请先收回原租约`
+          msg = t('devicesAdmin.alreadyRentedTo', {
+            user: data.existing_lease.username,
+            remain: formatLeaseRemaining(data.existing_lease.remaining_seconds)
+          })
         }
       } catch (e) { /* ignore */ }
       throw new Error(msg)
     }
-    if (!res.ok) throw new Error(await readError(res, '开租失败'))
+    if (!res.ok) throw new Error(await readError(res, t('devicesAdmin.btnCreateLease')))
     createTarget.value = null
     refresh()
   } catch (err) {
@@ -332,7 +345,7 @@ async function submitExtend() {
       headers: authHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({ lease_id: dev.lease.lease_id, duration_seconds: duration })
     })
-    if (!res.ok) throw new Error(await readError(res, '续期失败'))
+    if (!res.ok) throw new Error(await readError(res, t('devicesAdmin.btnExtendLease')))
     extendTarget.value = null
     refresh()
   } catch (err) {
@@ -346,17 +359,17 @@ async function submitExtend() {
 async function confirmRevoke(dev) {
   const lease = dev.lease
   if (!lease) return
-  if (!confirm(`确定要收回「${lease.username}」对设备 "${dev.id}" 的租约吗？其在该设备上的会话将被踢断。`)) return
+  if (!confirm(t('devicesAdmin.confirmRevoke', { username: lease.username, id: dev.id }))) return
   try {
     const res = await fetch('/api/admin/leases/revoke', {
       method: 'POST',
       headers: authHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({ lease_id: lease.lease_id })
     })
-    if (!res.ok) throw new Error(await readError(res, '收回失败'))
+    if (!res.ok) throw new Error(await readError(res, t('devicesAdmin.btnRevokeLease')))
     refresh()
   } catch (err) {
-    alert('收回失败: ' + err.message)
+    alert(t('devicesAdmin.revokeFailed') + err.message)
   }
 }
 

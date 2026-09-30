@@ -3,20 +3,20 @@
     <div class="admin-card audit-panel">
       <div class="panel-header">
         <div class="header-left">
-          <h2>📜 审计日志</h2>
-          <span class="user-count">共 {{ total }} 条记录</span>
+          <h2>{{ $t('audit.pageTitle') }}</h2>
+          <span class="user-count">{{ $t('audit.totalRecords', { count: total }) }}</span>
         </div>
-        <button class="refresh-btn" @click="reload" :disabled="loading">⟳ 刷新</button>
+        <button class="refresh-btn" @click="reload" :disabled="loading">{{ $t('audit.refreshBtn') }}</button>
       </div>
 
       <!-- 筛选条 -->
       <div class="filter-bar">
         <div class="search-box">
-          <input type="text" v-model="adminQuery" placeholder="🔍 按操作人搜索..." />
+          <input type="text" v-model="adminQuery" :placeholder="$t('audit.searchPlaceholder')" />
         </div>
         <select v-model="actionFilter" class="action-select">
-          <option value="">全部动作</option>
-          <option v-for="(label, key) in ACTION_LABELS" :key="key" :value="key">{{ label }}</option>
+          <option value="">{{ $t('audit.allActions') }}</option>
+          <option v-for="key in ACTION_KEYS" :key="key" :value="key">{{ actionLabel(key) }}</option>
         </select>
       </div>
 
@@ -24,11 +24,11 @@
         <table class="premium-table">
           <thead>
             <tr>
-              <th>时间</th>
-              <th>操作人</th>
-              <th>动作</th>
-              <th>目标</th>
-              <th>详情</th>
+              <th>{{ $t('audit.thTime') }}</th>
+              <th>{{ $t('audit.thOperator') }}</th>
+              <th>{{ $t('audit.thAction') }}</th>
+              <th>{{ $t('audit.thTarget') }}</th>
+              <th>{{ $t('audit.thDetails') }}</th>
               <th>IP</th>
             </tr>
           </thead>
@@ -44,7 +44,7 @@
               <td class="ip-cell">{{ entry.ip || '-' }}</td>
             </tr>
             <tr v-if="filteredEntries.length === 0 && !loading">
-              <td colspan="6" class="empty-row">{{ entries.length === 0 ? '暂无审计日志' : '没有匹配的记录' }}</td>
+              <td colspan="6" class="empty-row">{{ entries.length === 0 ? $t('audit.noLogs') : $t('audit.noMatchedRecords') }}</td>
             </tr>
           </tbody>
         </table>
@@ -52,7 +52,7 @@
 
       <div class="load-more-bar" v-if="entries.length < total">
         <button class="load-more-btn" @click="loadMore" :disabled="loading">
-          {{ loading ? '加载中...' : `加载更多（已显示 ${entries.length} / ${total}）` }}
+          {{ loading ? $t('common.loading') : $t('audit.loadMore', { shown: entries.length, total: total }) }}
         </button>
       </div>
     </div>
@@ -61,34 +61,39 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { authHeaders, readError } from '@/utils/api'
+
+const { t, te, locale } = useI18n()
 
 const PAGE_SIZE = 50
 
-// action 英文标识 → 中文标签映射
-const ACTION_LABELS = {
-  user_create: '创建用户',
-  user_delete: '删除用户',
-  user_rename: '重命名用户',
-  user_reset_password: '重置密码',
-  user_kick: '踢断连接',
-  user_update: '更新用户策略',
-  user_update_note: '更新备注',
-  assign_devices: '分配设备',
-  share_create: '创建分享',
-  share_revoke: '撤销分享',
-  share_extend: '续期分享',
-  share_update: '更新分享',
-  update_default_settings: '更新全局设置',
-  create_batch_task: '创建批量任务',
-  lease_create: '开租约',
-  lease_extend: '续期租约',
-  lease_revoke: '收回租约',
-  lease_update: '更新租约'
-}
+// action 英文标识列表
+const ACTION_KEYS = [
+  'user_create',
+  'user_delete',
+  'user_rename',
+  'user_reset_password',
+  'user_kick',
+  'user_update',
+  'user_update_note',
+  'assign_devices',
+  'share_create',
+  'share_revoke',
+  'share_extend',
+  'share_update',
+  'update_default_settings',
+  'create_batch_task',
+  'lease_create',
+  'lease_extend',
+  'lease_revoke',
+  'lease_update'
+]
 
 function actionLabel(action) {
-  return ACTION_LABELS[action] || action
+  if (!action) return '-'
+  const i18nKey = `audit.actions.${action}`
+  return te(i18nKey) ? t(i18nKey) : action
 }
 
 // 动作分类着色：user 用户类 / share 分享类 / lease 租约类 / system 其他
@@ -116,9 +121,9 @@ const filteredEntries = computed(() => {
 })
 
 function formatTime(iso) {
-  const t = new Date(iso)
-  if (Number.isNaN(t.getTime())) return iso || '-'
-  return t.toLocaleString('zh-CN', { hour12: false })
+  const date = new Date(iso)
+  if (Number.isNaN(date.getTime())) return iso || '-'
+  return date.toLocaleString(locale.value === 'en-US' ? 'en-US' : 'zh-CN', { hour12: false })
 }
 
 async function fetchPage(offset) {
@@ -136,7 +141,7 @@ async function fetchPage(offset) {
       entries.value = [...entries.value, ...(data.entries || [])]
     }
   } catch (err) {
-    alert('加载审计日志失败: ' + err.message)
+    alert(t('audit.loadFailed') + err.message)
   } finally {
     loading.value = false
   }

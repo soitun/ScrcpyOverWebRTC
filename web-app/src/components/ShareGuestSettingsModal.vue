@@ -2,39 +2,39 @@
   <div class="guest-config-overlay" @click.self="$emit('close')">
     <div class="guest-config-modal">
       <div class="gc-header">
-        <span>⚙️ 访客设置 — {{ share.device_id }}</span>
+        <span>{{ $t('share.guestSettingsTitle', { deviceId: share.device_id }) }}</span>
         <button class="gc-close" @click="$emit('close')">×</button>
       </div>
 
       <div class="gc-body">
-        <div class="gc-section-title">访客可修改项</div>
+        <div class="gc-section-title">{{ $t('share.guestModifiable') }}</div>
         <label class="gc-toggle-row" v-for="dim in dims" :key="dim.key">
           <input type="checkbox" v-model="dim.allow.value" />
           <span>{{ dim.label }}</span>
         </label>
-        <div class="gc-hint">取消勾选的项：访客端设置面板置灰锁定，且服务端在信令层强制使用下方配置值，访客无法绕过。</div>
+        <div class="gc-hint">{{ $t('share.guestLockedHint') }}</div>
 
-        <div class="gc-section-title">访客设置值</div>
+        <div class="gc-section-title">{{ $t('share.guestValues') }}</div>
         <div class="gc-summary">
           <template v-if="draftSettings">
-            <span>码率 {{ bitrateText }} · 帧率 {{ draftSettings.fps || '不限' }} · 分辨率 {{ draftSettings.size || '不限' }} · 音频 {{ draftSettings.audio ? '开' : '关' }}</span>
+            <span>{{ $t('settings.bitrate') }} {{ bitrateText }} · {{ $t('settings.maxFps') }} {{ draftSettings.fps || $t('common.none') }} · {{ $t('settings.maxSize') }} {{ draftSettings.size || $t('common.none') }} · {{ $t('settings.audio') }} {{ draftSettings.audio ? $t('common.on') : $t('common.off') }}</span>
           </template>
           <template v-else>
-            <span class="gc-none">未配置（被禁项回落设备默认值）</span>
+            <span class="gc-none">{{ $t('share.notConfigured') }}</span>
           </template>
         </div>
         <div class="gc-actions-row">
-          <button class="gc-btn" @click="openEditor">编辑设置值…</button>
-          <button v-if="draftSettings" class="gc-btn gc-btn-danger" @click="draftSettings = null">清除配置</button>
+          <button class="gc-btn" @click="openEditor">{{ $t('share.editValues') }}</button>
+          <button v-if="draftSettings" class="gc-btn gc-btn-danger" @click="draftSettings = null">{{ $t('share.clearConfig') }}</button>
         </div>
       </div>
 
       <div class="gc-footer">
         <span v-if="error" class="gc-error">{{ error }}</span>
         <div style="flex: 1"></div>
-        <button class="gc-btn" @click="$emit('close')">取消</button>
+        <button class="gc-btn" @click="$emit('close')">{{ $t('common.cancel') }}</button>
         <button class="gc-btn gc-btn-primary" :disabled="saving" @click="save">
-          {{ saving ? '保存中...' : '保存' }}
+          {{ saving ? $t('common.loading') : $t('common.save') }}
         </button>
       </div>
     </div>
@@ -54,8 +54,11 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import SettingsModal from '@/components/SettingsModal.vue'
 import { getDeviceSettings } from '@/utils/settings'
+
+const { t } = useI18n()
 
 const props = defineProps({
   share: { type: Object, required: true }

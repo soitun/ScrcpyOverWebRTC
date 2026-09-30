@@ -1,14 +1,14 @@
 <template>
   <div class="share-admin-page">
     <div class="page-header">
-      <h2>🔗 分享与卡密管理</h2>
+      <h2>{{ $t('share.adminPageTitle') }}</h2>
       <div class="header-actions">
-        <button class="btn-card-connect" @click="showCardModal = true">🔑 卡密连接</button>
-        <select v-model="selectedAddress" class="addr-select" title="复制链接时使用的服务器地址">
+        <button class="btn-card-connect" @click="showCardModal = true">{{ $t('share.cardConnectBtn') }}</button>
+        <select v-model="selectedAddress" class="addr-select" :title="$t('share.serverAddrTitle')">
           <option v-for="addr in serverAddresses" :key="addr" :value="addr">{{ addr }}</option>
         </select>
         <button class="btn-refresh" :disabled="loading" @click="fetchShares">
-          {{ loading ? '刷新中...' : '🔄 刷新' }}
+          {{ loading ? $t('share.refreshing') : $t('share.refresh') }}
         </button>
       </div>
     </div>
@@ -16,7 +16,6 @@
     <!-- 卡密直连弹窗（原侧边栏“卡密”入口，并入本页） -->
     <CardConnectModal :visible="showCardModal" @close="showCardModal = false" />
 
-    <!-- 访客细粒度权限与设置值配置弹窗 -->
     <ShareGuestSettingsModal
       v-if="guestConfigFor"
       :share="guestConfigFor"
@@ -27,38 +26,38 @@
     <!-- 使用提示 -->
     <div class="tips-card">
       <div class="tips-header" @click="tipsCollapsed = !tipsCollapsed">
-        <span>💡 使用说明</span>
-        <span class="tips-toggle">{{ tipsCollapsed ? '展开 ▾' : '收起 ▴' }}</span>
+        <span>{{ $t('share.instructionsTitle') }}</span>
+        <span class="tips-toggle">{{ tipsCollapsed ? $t('share.expandTips') : $t('share.collapseTips') }}</span>
       </div>
       <ul v-show="!tipsCollapsed" class="tips-list">
-        <li><b>两种发放方式</b>：分享链接（直接打开）和卡密提取码（点本页右上角「卡密连接」，或在登录页输入后兑换），两者等价，卡密只是链接的短码形式。</li>
-        <li><b>访客免登录</b>：访客打开链接即进入单设备页面，无需账号，也看不到后台其他设备。</li>
-        <li><b>权限模式</b>：<span class="tag-full">⚡ 完整控制</span> 允许触控/按键注入；<span class="tag-view">👁️ 仅观看</span> 只能看画面和听声音，所有控制指令在服务端直接丢弃。</li>
-        <li><b>细粒度权限</b>：每行「⚙️ 配置」可禁止访客修改码率/帧率/分辨率/音频，并配置访客端使用的设置值（默认以该虚机当前单独配置为底）；被禁项在访客设置面板置灰，服务端在信令层强制覆盖，访客无法绕过，下次连接生效。</li>
-        <li><b>访问密码</b>：设置 PIN 后，链接和卡密渠道都需要输入密码才能进入。</li>
-        <li><b>有效期与撤销</b>：到期自动失效（服务端每 5 分钟清理并踢断在线访客）；"延时"可在原到期时间上顺延（已过期的从当前时间起算）；"撤销"立即断开该分享的所有在线访客。</li>
-        <li><b>服务器地址</b>：右上角可选择生成链接使用的地址，访客跨网访问时请选对应网段的 IP（支持 IPv6）。</li>
-        <li><b>重启恢复</b>：有效期内的分享持久化在服务端，服务器重启后仍有效；已过期的不会恢复。</li>
+          <li v-html="$t('share.tip1')"></li>
+          <li v-html="$t('share.tip2')"></li>
+          <li v-html="$t('share.tip3')"></li>
+          <li v-html="$t('share.tip4')"></li>
+          <li v-html="$t('share.tip5')"></li>
+          <li v-html="$t('share.tip6')"></li>
+          <li v-html="$t('share.tip7')"></li>
+          <li v-html="$t('share.tip8')"></li>
       </ul>
     </div>
 
     <!-- 列表 -->
-    <div v-if="loading && shares.length === 0" class="state-block">加载分享记录中...</div>
+    <div v-if="loading && shares.length === 0" class="state-block">{{ $t('share.loadingRecords') }}</div>
     <div v-else-if="shares.length === 0" class="state-block">
-      📭 暂无活跃的分享。到设备卡片的菜单里选择「分享设备 / 卡密」即可创建。
+      {{ $t('share.noSharesHint') }}
     </div>
     <div v-else class="table-wrapper">
       <table class="share-table">
         <thead>
           <tr>
-            <th>卡密提取码</th>
-            <th>目标设备</th>
-            <th>权限模式</th>
-            <th>连接状态</th>
-            <th>到期时间</th>
-            <th>备注</th>
-            <th>创建者</th>
-            <th>操作</th>
+            <th>{{ $t('share.thCardCode') }}</th>
+            <th>{{ $t('share.thTargetDevice') }}</th>
+            <th>{{ $t('share.thMode') }}</th>
+            <th>{{ $t('share.thConnStatus') }}</th>
+            <th>{{ $t('share.thExpire') }}</th>
+            <th>{{ $t('share.thNote') }}</th>
+            <th>{{ $t('share.thCreator') }}</th>
+            <th>{{ $t('share.thActions') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -67,15 +66,15 @@
             <td class="device-cell">{{ item.device_id }}</td>
             <td>
               <span :class="['mode-badge', item.access_mode]">
-                {{ item.access_mode === 'full' ? '⚡ 完整控制' : '👁️ 仅观看' }}
+                {{ item.access_mode === 'full' ? $t('share.modeFull') : $t('share.modeViewOnly') }}
               </span>
               <div v-if="lockSummary(item)" class="lock-summary">{{ lockSummary(item) }}</div>
             </td>
             <td>
               <span v-if="item.active_connections > 0" class="conn-badge online">
-                🟢 {{ item.active_connections }} 人在线
+                {{ $t('share.activeUsersCount', { count: item.active_connections }) }}
               </span>
-              <span v-else class="conn-badge idle">⚪ 空闲</span>
+              <span v-else class="conn-badge idle">{{ $t('share.idleStatus') }}</span>
             </td>
             <td>
               <div class="time-cell">{{ formatExpire(item.expires_at) }}</div>
@@ -85,13 +84,13 @@
             <td class="creator-cell">{{ item.creator }}</td>
             <td class="action-cell">
               <button class="table-btn copy-sm" @click="copyText(fullShareUrl(item.token_id), item.token_id)">
-                {{ copiedId === item.token_id ? '已复制 ✓' : '复制链接' }}
+                {{ copiedId === item.token_id ? $t('share.copiedCheck') : $t('share.copyShareUrl') }}
               </button>
-              <button class="table-btn config-sm" title="访客权限与设置值" @click="guestConfigFor = item">⚙️ 配置</button>
+              <button class="table-btn config-sm" :title="$t('share.configHint')" @click="guestConfigFor = item">{{ $t('share.configBtn') }}</button>
               <button v-if="parseExpire(item.expires_at)" class="table-btn extend-sm" @click.stop="openExtendMenu(item.token_id, $event)">
-                延时 ▾
+                {{ $t('share.extendDropdown') }}
               </button>
-              <button class="table-btn revoke-sm" @click="revokeShare(item.token_id)">撤销</button>
+              <button class="table-btn revoke-sm" @click="revokeShare(item.token_id)">{{ $t('share.revoke') }}</button>
             </td>
           </tr>
         </tbody>
@@ -110,9 +109,12 @@
 
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import CardConnectModal from '@/components/CardConnectModal.vue'
 import ShareGuestSettingsModal from '@/components/ShareGuestSettingsModal.vue'
 import { useAuthStore } from '@/stores/auth'
+
+const { t } = useI18n()
 
 const shares = ref([])
 const loading = ref(false)
@@ -123,13 +125,13 @@ const showCardModal = ref(false)
 const guestConfigFor = ref(null)
 const extendMenuFor = ref('')
 const extendMenuPos = ref({ top: 0, left: 0 })
-const extendOptions = [
-  { label: '30分钟', sec: 1800 },
-  { label: '1小时', sec: 3600 },
-  { label: '12小时', sec: 43200 },
-  { label: '1天', sec: 86400 },
-  { label: '7天', sec: 604800 }
-]
+const extendOptions = computed(() => [
+  { label: t('share.extend30m'), sec: 1800 },
+  { label: t('share.extend1h'), sec: 3600 },
+  { label: t('share.extend12h'), sec: 43200 },
+  { label: t('share.extend1d'), sec: 86400 },
+  { label: t('share.extend7d'), sec: 604800 }
+])
 
 const EXTEND_MENU_WIDTH = 100
 const extendMenuStyle = computed(() => ({
@@ -212,7 +214,7 @@ function copyText(text, id) {
 }
 
 async function revokeShare(tokenID) {
-  if (!confirm('确定要撤销此分享吗？撤销后卡密与链接立即失效，在线访客将立即断开连接。')) return
+  if (!confirm(t('share.confirmRevoke'))) return
   try {
     const res = await fetch('/api/share/revoke', {
       method: 'POST',
@@ -235,20 +237,19 @@ async function extendShare(tokenID, seconds) {
     if (res.ok && json.code === 0) {
       fetchShares()
     } else {
-      alert('延时失败: ' + (json.msg || ('HTTP ' + res.status)))
+      alert(t('share.extendFailed') + (json.msg || ('HTTP ' + res.status)))
     }
   } catch (e) {
-    alert('网络请求异常: ' + e.message)
+    alert(t('share.networkError') + e.message)
   }
 }
 
-// 细粒度权限锁定摘要：有禁止项时显示如 “🔒 码率·音频”
 function lockSummary(item) {
   const parts = []
-  if (item.forbid_bitrate) parts.push('码率')
-  if (item.forbid_fps) parts.push('帧率')
-  if (item.forbid_resolution) parts.push('分辨率')
-  if (item.forbid_audio) parts.push('音频')
+  if (item.forbid_bitrate) parts.push(t('settings.bitrate'))
+  if (item.forbid_fps) parts.push(t('settings.maxFps'))
+  if (item.forbid_resolution) parts.push(t('settings.maxSize'))
+  if (item.forbid_audio) parts.push(t('settings.audio'))
   return parts.length ? `🔒 ${parts.join('·')}` : ''
 }
 
@@ -265,22 +266,22 @@ function parseExpire(expiresAt) {
 }
 
 function formatExpire(expiresAt) {
-  const t = parseExpire(expiresAt)
-  if (!t) return '♾️ 永久有效'
-  return t.toLocaleString('zh-CN', { hour12: false })
+  const tExp = parseExpire(expiresAt)
+  if (!tExp) return t('share.neverExpire')
+  return tExp.toLocaleString(undefined, { hour12: false })
 }
 
 function formatRemain(expiresAt) {
-  const t = parseExpire(expiresAt)
-  if (!t) return ''
-  const ms = t.getTime() - Date.now()
-  if (ms <= 0) return '已到期'
+  const tExp = parseExpire(expiresAt)
+  if (!tExp) return ''
+  const ms = tExp.getTime() - Date.now()
+  if (ms <= 0) return t('share.expired')
   const d = Math.floor(ms / 86400000)
   const h = Math.floor((ms % 86400000) / 3600000)
   const m = Math.floor((ms % 3600000) / 60000)
-  if (d > 0) return `剩余 ${d} 天 ${h} 小时`
-  if (h > 0) return `剩余 ${h} 小时 ${m} 分`
-  return `剩余 ${m} 分`
+  if (d > 0) return t('share.remainDaysHours', { d, h })
+  if (h > 0) return t('share.remainHoursMins', { h, m })
+  return t('share.remainMins', { m })
 }
 
 // 连接状态近实时：页面驻留期间每 15s 静默刷新一次

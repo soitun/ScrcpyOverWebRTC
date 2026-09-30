@@ -7,6 +7,9 @@
 
 <script setup>
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const props = defineProps({
   status: {
@@ -25,13 +28,13 @@ const statusClass = computed(() => {
 const statusText = computed(() => {
   const s = props.status
   const map = {
-    'disconnected': '已断开',
-    'connecting': '连接中',
-    'signaling': '信令连接',
-    'waiting_offer': '等待响应',
-    'connecting_webrtc': '建立连接',
-    'connected': '已连接',
-    'error': '连接失败'
+    'disconnected': t('common.connStatus.disconnected'),
+    'connecting': t('common.connStatus.connecting'),
+    'signaling': t('common.connStatus.signaling'),
+    'waiting_offer': t('common.connStatus.waiting_offer'),
+    'connecting_webrtc': t('common.connStatus.connecting_webrtc'),
+    'connected': t('common.connStatus.connected'),
+    'error': t('common.connStatus.error')
   }
   return map[s] || s
 })

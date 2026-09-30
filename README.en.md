@@ -20,12 +20,16 @@ It adopts a **Fat Agent (Direct Connection)** architecture, combined with **Hard
 
 ## 1. Core Features
 
+- **Full-Site Deep i18n & Bilingual Support**: (v0.4.0) Dashboard, device direct control, surveillance console, WebADB terminal, file manager, and system settings now feature 100% seamless English / Chinese switching with local preference persistence; bilingual dictionaries are strictly verified.
+- **Smart Update Alert & User Feedback**: (v0.4.0) Added intelligent version update awareness dialog, supporting one-click submission of feedback, suggestions, and diagnostic logs right from the web console.
+- **Android App Keepalive & Full English Localization**: (v0.4.0) Introduced specialUse foreground service with watchdog auto-respawn, eliminating status bar icon flashing and boosting keepalive resilience; full UI English localization across XML, Compose, and dialogs; optimized Root and Shizuku boot auto-start and headless untethered hosting.
+- **Transmission Channel & Network Robustness**: (v0.4.0) Optimized weak network reconnection and long-session heartbeat handling, with intelligent stream mutexing to cut bandwidth and codec overhead.
 - **Ultimate Smoothness**: Zero-copy stream parsing + hardware-level PTS passthrough, featuring both WebCodecs phase-locked hardware rendering (matching native Scrcpy) and standard HTML5 video engines.
 - **Direct Public Network Access**: Native IPv6 direct connection bypassing CGNAT, intelligent WebRTC P2P NAT hole punching with automatic TURN relay fallback.
-- **Mobile & PC Dual Control**: (v0.3.8) Mobile browser defaults to immersive single-device fullscreen, fixing iOS H.264 playback, Safari fullscreen tips, and terminal jumping; PC single-device floating windows and free resizing fully revived with seamless single/multi-device mode hot-switching.
-- **Redroid Cloud Phone One-Click Support**: (v0.3.8) Added out-of-the-box AIO image build tools (`release/redroid`), auto-detecting and importing official images and AOSP offline tarballs with boot auto-start and instant setup.
-- **Magisk Offline Config & ADB Batch Launcher**: (v0.3.8) Offline ZIP configurator for Magisk modules without manual terminal commands (Windows zero-Python batch/PowerShell & shell scripts); automated ADB multi-device concurrent batch starter.
-- **Non-Root Host App (Shizuku)**: (v0.3.8) Modern Kotlin host app supporting Shizuku (UID 2000 shell) and Root dual-channel PC-free operation, with Android 14+ foreground service and self-healing watchdog.
+- **Mobile & PC Dual Control**: Mobile browser defaults to immersive single-device fullscreen, fixing iOS H.264 playback, Safari fullscreen tips, and terminal jumping; PC single-device floating windows and free resizing fully revived with seamless single/multi-device mode hot-switching.
+- **Redroid Cloud Phone One-Click Support**: Added out-of-the-box AIO image build tools (`release/redroid`), auto-detecting and importing official images and AOSP offline tarballs with boot auto-start and instant setup.
+- **Magisk Offline Config & ADB Batch Launcher**: Offline ZIP configurator for Magisk modules without manual terminal commands (Windows zero-Python batch/PowerShell & shell scripts); automated ADB multi-device concurrent batch starter.
+- **Non-Root Host App (Shizuku)**: Modern Kotlin host app supporting Shizuku (UID 2000 shell) and Root dual-channel PC-free operation, with Android 14+ foreground service and self-healing watchdog.
 - **High-Frequency Group Control**: Brand new Pub/Sub directional distribution architecture with 100% zero-leak tenant isolation; 4-tier streaming scope filters (Visible/All/Selected/Tag) saving 90% bandwidth; group control broadcast latency reduced to ~2ms.
 - **Lease & User Management**: Upgraded commercial user center into an all-in-one drawer with exclusive device lease models, granular expiration dates per machine, 7-dimension permission forbid isolation, and automatic lease recovery.
 - **Batch Text Broadcast**: Added Text Broadcast Tab in global console, clipboard atomic passthrough ensuring 100% text/Chinese injection; integrated quick-phrase store with dual cloud/local persistence.
@@ -35,7 +39,6 @@ It adopts a **Fat Agent (Direct Connection)** architecture, combined with **Hard
 - **Surveillance Camera Mode**: Screen-off hardware camera streaming for physical phones, dedicated monitoring console with multi-lens switching, PTZ digital zoom, lossless snapshots, and instant recording.
 - **All-Around Interaction**: Multi-touch, physical key simulation, visual keymapping, IME Chinese input passthrough, silent bidirectional clipboard, and WebADB console.
 - **One-Click Driverless Deployment**: Zero client needed (iOS/Android/PC/Mac); supports domain signaling with adaptive Android DNS resolver, WebUSB/WebADB browser deployment, and Magisk boot-start modules.
-- **Robustness & Teardown Hardening**: (v0.3.8) Mutex screen/camera stream switching with cold restart, 1500ms protocol switch debounce watchdog, and asynchronous agent teardown with aligned ping/pong timeouts.
 - **Broad Ecosystem Compatibility**: Compatible with physical Android phones (Root / Non-Root), emulators, redroid containers, and commercial cloud phones.
 
 ## 2. Quick Start

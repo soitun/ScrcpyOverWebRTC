@@ -1,8 +1,35 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { i18n } from '@/locales'
 import { useDeviceStore } from '@/stores/devices'
 
 const STORAGE_KEY = 'cloudphone_quick_texts_v1'
+
+function tt(key, fallback, params) {
+  if (i18n && i18n.global && typeof i18n.global.t === 'function') {
+    return i18n.global.t(key, params || {})
+  }
+  return fallback
+}
+
+export function getQuickTextTitle(item) {
+  if (!item) return ''
+  if (item.id === 'qt_welcome') return tt('quickTexts.defaultWelcomeTitle', item.title || '测试欢迎语')
+  if (item.id === 'qt_account') return tt('quickTexts.defaultAccountTitle', item.title || '测试账号')
+  if (item.id === 'qt_password') return tt('quickTexts.defaultPasswordTitle', item.title || '默认密码')
+  if (item.title === '测试欢迎语') return tt('quickTexts.defaultWelcomeTitle', '测试欢迎语')
+  if (item.title === '测试账号') return tt('quickTexts.defaultAccountTitle', '测试账号')
+  if (item.title === '默认密码') return tt('quickTexts.defaultPasswordTitle', '默认密码')
+  return item.title || tt('quickTexts.untitledPhrase', '未命名短语')
+}
+
+export function getQuickTextContent(item) {
+  if (!item) return ''
+  if (item.id === 'qt_welcome' || item.content === '欢迎体验云手机低延迟 WebRTC 投屏控制系统！🎉') {
+    return tt('quickTexts.defaultWelcomeContent', item.content)
+  }
+  return item.content || ''
+}
 
 export const DEFAULT_QUICK_TEXTS = [
   {

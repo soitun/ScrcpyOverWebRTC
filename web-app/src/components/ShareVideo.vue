@@ -55,7 +55,7 @@
     <div v-else-if="showError" class="state-overlay">
       <div class="error-icon">⚠️</div>
       <p class="state-text error-text">{{ errorText }}</p>
-      <button class="btn-reconnect" @click="reconnect">🔄 重新连接</button>
+      <button class="btn-reconnect" @click="reconnect">{{ $t('console.reconnect') }}</button>
     </div>
 
     <!-- 悬浮菜单展开时的全屏点击遮罩（与主控台 fab 一致） -->
@@ -73,22 +73,22 @@
       <div class="fab-menu" :class="{ 'show': showFabMenu, 'align-left': isFabOnLeft, 'align-top': isFabOnTop }">
         <template v-if="!isViewOnly">
           <button class="fab-item" @click="quickKey(26)">
-            <svg class="icon" viewBox="0 0 24 24"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg> 电源
+            <svg class="icon" viewBox="0 0 24 24"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg> {{ $t('deviceClient.power') }}
           </button>
           <button class="fab-item" @click="quickKey(3)">
-            <svg class="icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg> 首页
+            <svg class="icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg> {{ $t('deviceClient.home') }}
           </button>
           <button class="fab-item" @click="quickKey(4)">
-            <svg class="icon" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"></path></svg> 返回
+            <svg class="icon" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"></path></svg> {{ $t('deviceClient.back') }}
           </button>
           <button class="fab-item" @click="quickKey(187)">
-            <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg> 多任务
+            <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg> {{ $t('deviceClient.recents') }}
           </button>
           <button class="fab-item" @click="quickKey(24)">
-            <svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="19" y1="9" x2="19" y2="15"></line><line x1="16" y1="12" x2="22" y2="12"></line></svg> 音量+
+            <svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="19" y1="9" x2="19" y2="15"></line><line x1="16" y1="12" x2="22" y2="12"></line></svg> {{ $t('deviceClient.volumeUp') }}
           </button>
           <button class="fab-item" @click="quickKey(25)">
-            <svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="19" y1="12" x2="15" y2="12"></line><line x1="16" y1="12" x2="22" y2="12"></line></svg> 音量-
+            <svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="19" y1="12" x2="15" y2="12"></line><line x1="16" y1="12" x2="22" y2="12"></line></svg> {{ $t('deviceClient.volumeDown') }}
           </button>
           <div class="fab-divider"></div>
         </template>
@@ -96,24 +96,24 @@
         <button class="fab-item" @click="togglePageMute">
           <svg v-if="!localSettings.audio || !soundOn" class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>
           <svg v-else class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15 9a5 5 0 0 1 0 6"></path><path d="M17.7 6.3a9 9 0 0 1 0 11.4"></path></svg>
-          {{ (!localSettings.audio || !soundOn) ? '开启声音' : '页面静音' }}
+          {{ (!localSettings.audio || !soundOn) ? $t('deviceClient.enableAudio') : $t('deviceClient.mutePage') }}
         </button>
         <button class="fab-item" @click="openSettings">
-          <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1"></path></svg> 设置
+          <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1"></path></svg> {{ $t('settings.title') }}
         </button>
 
         <div class="fab-divider"></div>
         <button class="fab-item" @click="onToggleFullscreen">
           <svg class="icon" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
-          {{ isFullscreen ? '退出全屏' : '全屏' }}
+          {{ isFullscreen ? $t('deviceClient.exitFullscreen') : $t('deviceClient.enterFullscreen') }}
         </button>
         <button v-if="!isMobile" class="fab-item" @click="onToggleWebFullscreen">
           <svg class="icon" viewBox="0 0 24 24"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
-          {{ isWebFullscreen ? '退出页面全屏' : '页面全屏' }}
+          {{ isWebFullscreen ? $t('deviceClient.exitWebFullscreen') : $t('deviceClient.enterWebFullscreen') }}
         </button>
         <button v-if="!isMobile && pictureInPictureSupported" class="fab-item" @click="onTogglePictureInPicture">
           <svg class="icon" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><rect x="11" y="9" width="9" height="7" rx="1" ry="1" fill="currentColor" stroke="none"></rect></svg>
-          {{ isPiP ? '退出画中画' : '画中画' }}
+          {{ isPiP ? $t('deviceClient.exitPip') : $t('deviceClient.enterPip') }}
         </button>
       </div>
     </div>
@@ -137,9 +137,12 @@
 
 <script setup>
 import { ref, shallowRef, computed, onMounted, onUnmounted, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useWebRTC } from '@/composables/useWebRTC'
 import { defaultSettings } from '@/utils/settings'
 import SettingsModal from '@/components/SettingsModal.vue'
+
+const { t } = useI18n()
 
 const props = defineProps({
   deviceId: { type: String, required: true },
@@ -325,13 +328,13 @@ const showConnecting = computed(() =>
 const showError = computed(() => !!error.value || status.value === 'error' || status.value === 'disconnected')
 const statusText = computed(() => {
   switch (status.value) {
-    case 'signaling': return '信令通道已建立，协商连接参数...'
-    case 'waiting_offer': return '等待设备推流...'
-    case 'connecting_webrtc': return '正在建立 P2P 视频通道...'
-    default: return '正在连接设备...'
+    case 'signaling': return t('share.signalingDesc')
+    case 'waiting_offer': return t('share.waitingOffer')
+    case 'connecting_webrtc': return t('share.connectingWebrtc')
+    default: return t('share.connectingDevice')
   }
 })
-const errorText = computed(() => error.value || '连接已断开')
+const errorText = computed(() => error.value || t('share.connectionLost'))
 
 // 蒙板上方：当前访客（卡密）+ 分享剩余时间
 const connMetaText = computed(() => {
@@ -339,16 +342,16 @@ const connMetaText = computed(() => {
   const sec = props.remainingSeconds
   let remain = ''
   if (sec < 0) {
-    remain = '♾️ 永久有效'
+    remain = t('share.neverExpire')
   } else if (sec > 0) {
     const d = Math.floor(sec / 86400)
     const h = Math.floor((sec % 86400) / 3600)
     const m = Math.floor((sec % 3600) / 60)
-    const s = Math.floor(sec % 60)
-    if (d > 0) remain = `剩余 ${d} 天 ${h} 小时`
-    else if (h > 0) remain = `剩余 ${h} 小时 ${m} 分`
-    else if (m > 0) remain = `剩余 ${m} 分 ${s} 秒`
-    else remain = `剩余 ${s} 秒`
+    if (d > 0) remain = t('common.remainDaysHours', { d, h })
+    else if (h > 0) remain = t('common.remainHoursMins', { h, m })
+    else remain = t('common.remainMins', { m: Math.max(1, m) })
+  } else if (sec === 0) {
+    remain = t('common.expired')
   }
   if (remain) text = text ? `${text} · ${remain}` : remain
   return text

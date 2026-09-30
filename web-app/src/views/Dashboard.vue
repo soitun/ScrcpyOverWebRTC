@@ -18,7 +18,7 @@
         </div>
         <div class="card-stats">
           <div class="stat-item">
-            <span class="stat-lbl">告警数</span>
+            <span class="stat-lbl">{{ $t('dashboard.alertsCount') }}</span>
             <span class="stat-val" :class="{ warning: getWarningCount(card.key) > 0 }">
               {{ getWarningCount(card.key) }}
             </span>
@@ -30,15 +30,15 @@
     <!-- 数据大盘汇总信息栏 -->
     <div class="global-bar">
       <div class="bar-item">
-        <span class="bar-label">在线设备数</span>
+        <span class="bar-label">{{ $t('dashboard.onlineDevicesCount') }}</span>
         <span class="bar-value accent">{{ onlineCount }}</span>
       </div>
       <div class="bar-item">
-        <span class="bar-label">监控频率</span>
-        <span class="bar-value">5秒 / 次</span>
+        <span class="bar-label">{{ $t('dashboard.monitorInterval') }}</span>
+        <span class="bar-value">{{ $t('dashboard.intervalValue') }}</span>
       </div>
       <div class="bar-item">
-        <span class="bar-label">告警判定</span>
+        <span class="bar-label">{{ $t('dashboard.alertCriteria') }}</span>
         <span class="bar-value text-warning">{{ currentMetricConfig.warningLabel }}</span>
       </div>
     </div>
@@ -47,15 +47,15 @@
     <div class="chart-section">
       <div class="chart-header">
         <div class="title-area">
-          <span class="chart-title">{{ currentMetricConfig.label }} 实时趋势图 (最近 {{ timeWindow === 60 ? '5' : (timeWindow === 120 ? '10' : '30') }} 分钟)</span>
+          <span class="chart-title">{{ $t('dashboard.trendChartTitle', { metric: currentMetricConfig.label, mins: timeWindow === 60 ? '5' : (timeWindow === 120 ? '10' : '30') }) }}</span>
           <select v-model="timeWindow" class="window-select">
-            <option :value="60">5 分钟</option>
-            <option :value="120">10 分钟</option>
-            <option :value="360">30 分钟</option>
+            <option :value="60">{{ $t('dashboard.mins5') }}</option>
+            <option :value="120">{{ $t('dashboard.mins10') }}</option>
+            <option :value="360">{{ $t('dashboard.mins30') }}</option>
           </select>
         </div>
         <span class="chart-subtitle">
-          提示: 默认仅展示告警设备。点击下方矩阵方块可锁定/移除指定设备的趋势线。
+          {{ $t('dashboard.chartTip') }}
         </span>
       </div>
       <div class="chart-wrapper">
@@ -66,12 +66,12 @@
     <!-- 区域 C: 设备热力状态矩阵 -->
     <div class="matrix-section">
       <div class="matrix-header">
-        <span class="matrix-title">设备热力状态矩阵</span>
+        <span class="matrix-title">{{ $t('dashboard.matrixTitle') }}</span>
         <div class="legend-group">
-          <span class="legend-item"><span class="dot normal"></span>正常</span>
-          <span class="legend-item"><span class="dot alert-yellow"></span>告警</span>
-          <span class="legend-item"><span class="dot alert-red"></span>严重</span>
-          <span class="legend-item"><span class="dot alert-offline"></span>离线/休眠</span>
+          <span class="legend-item"><span class="dot normal"></span>{{ $t('dashboard.legendNormal') }}</span>
+          <span class="legend-item"><span class="dot alert-yellow"></span>{{ $t('dashboard.legendAlert') }}</span>
+          <span class="legend-item"><span class="dot alert-red"></span>{{ $t('dashboard.legendSevere') }}</span>
+          <span class="legend-item"><span class="dot alert-offline"></span>{{ $t('dashboard.legendOffline') }}</span>
         </div>
       </div>
       <div class="matrix-grid">
@@ -101,12 +101,12 @@
           v-for="dev in offlineDevices" 
           :key="dev.id"
           class="device-tile status-offline"
-          :title="'掉线时间: ' + formatTimeStr(dev.lastOffline) + '\n最后在线: ' + formatTimeStr(dev.lastSeen)"
+          :title="$t('dashboard.offlineTooltip', { offline: formatTimeStr(dev.lastOffline), lastSeen: formatTimeStr(dev.lastSeen) })"
           @click="showOfflineDetail(dev)"
         >
           <div class="tile-header">
             <span class="tile-id" :title="dev.id">{{ dev.id }}</span>
-            <span class="tile-offline-badge">离线</span>
+            <span class="tile-offline-badge">{{ $t('common.offline') || $t('console.offline') }}</span>
           </div>
           <div class="tile-body">
             <span class="tile-val">OFFLINE</span>
@@ -114,7 +114,7 @@
         </div>
 
         <div v-if="onlineDevices.length === 0 && offlineDevices.length === 0" class="no-devices-placeholder">
-          暂无在线或离线设备数据进行指标采集
+          {{ $t('dashboard.noDeviceData') }}
         </div>
       </div>
     </div>
@@ -123,9 +123,11 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useDeviceStore } from '@/stores/devices'
 import * as echarts from 'echarts'
 
+const { t } = useI18n()
 const deviceStore = useDeviceStore()
 const currentMetric = ref('cpu')
 const timeWindow = ref(60)
@@ -134,13 +136,13 @@ const offlineDevices = computed(() => deviceStore.offlineDevices)
 const chartRef = ref(null)
 let chartInstance = null
 
-const metricConfigs = [
+const metricConfigs = computed(() => [
   {
     key: 'cpu',
-    label: 'CPU 使用率',
+    label: t('dashboard.cpuUsage'),
     unit: '%',
     color: '#3b82f6',
-    warningLabel: '正常 <=70% | 告警 >70% | 严重 >85%',
+    warningLabel: t('dashboard.cpuThreshold'),
     iconSvg: `
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;">
         <rect x="4" y="4" width="16" height="16" rx="2" />
@@ -152,10 +154,10 @@ const metricConfigs = [
   },
   {
     key: 'memory',
-    label: '内存使用率',
+    label: t('dashboard.memUsage'),
     unit: '%',
     color: '#10b981',
-    warningLabel: '正常 <=75% | 告警 >75% | 严重 >90%',
+    warningLabel: t('dashboard.memThreshold'),
     iconSvg: `
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;">
         <rect x="2" y="5" width="20" height="14" rx="2" />
@@ -168,10 +170,10 @@ const metricConfigs = [
   },
   {
     key: 'disk',
-    label: '系统盘占用',
+    label: t('dashboard.diskUsage'),
     unit: '%',
     color: '#f59e0b',
-    warningLabel: '正常 <=80% | 告警 >80% | 严重 >90%',
+    warningLabel: t('dashboard.diskThreshold'),
     iconSvg: `
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;">
         <path d="M22 12H2" />
@@ -183,10 +185,10 @@ const metricConfigs = [
   },
   {
     key: 'temp',
-    label: '设备温度',
+    label: t('dashboard.temperature'),
     unit: '℃',
     color: '#ef4444',
-    warningLabel: '正常 <=65℃ | 告警 >65℃ | 严重 >75℃',
+    warningLabel: t('dashboard.tempThreshold'),
     iconSvg: `
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;">
         <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z" />
@@ -195,10 +197,10 @@ const metricConfigs = [
   },
   {
     key: 'downSpeed',
-    label: '下载速度',
+    label: t('dashboard.downloadSpeed'),
     unit: ' KB/s',
     color: '#818cf8',
-    warningLabel: '实时下行带宽流量 (无限制)',
+    warningLabel: t('dashboard.downSpeedHint'),
     iconSvg: `
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;">
         <line x1="12" y1="5" x2="12" y2="19" />
@@ -208,10 +210,10 @@ const metricConfigs = [
   },
   {
     key: 'upSpeed',
-    label: '上传速度',
+    label: t('dashboard.uploadSpeed'),
     unit: ' KB/s',
     color: '#c084fc',
-    warningLabel: '实时上行带宽流量 (无限制)',
+    warningLabel: t('dashboard.upSpeedHint'),
     iconSvg: `
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;">
         <line x1="12" y1="19" x2="12" y2="5" />
@@ -219,10 +221,10 @@ const metricConfigs = [
       </svg>
     `
   }
-]
+])
 
 const currentMetricConfig = computed(() => {
-  return metricConfigs.find(c => c.key === currentMetric.value)
+  return (metricConfigs.value || []).find(c => c.key === currentMetric.value) || metricConfigs.value[0]
 })
 
 const onlineDevices = computed(() => deviceStore.onlineDevices)
@@ -514,7 +516,7 @@ onUnmounted(() => {
 })
 
 function formatTimeStr(isoStr) {
-  if (!isoStr) return '未知'
+  if (!isoStr) return t('common.unknown')
   try {
     const d = new Date(isoStr)
     const yyyy = d.getFullYear()
@@ -530,21 +532,21 @@ function formatTimeStr(isoStr) {
 }
 
 function showOfflineDetail(device) {
-  let msg = `设备 ID: ${device.id}\n状态: 离线 / 休眠断联\n\n`
+  let msg = t('dashboard.offlineDetail.header', { id: device.id })
   if (device.lastOffline) {
-    msg += `掉线时间: ${formatTimeStr(device.lastOffline)}\n`
+    msg += t('dashboard.offlineDetail.offlineTime', { time: formatTimeStr(device.lastOffline) })
   }
   if (device.lastSeen) {
-    msg += `最后在线时间: ${formatTimeStr(device.lastSeen)}\n`
+    msg += t('dashboard.offlineDetail.lastSeenTime', { time: formatTimeStr(device.lastSeen) })
   }
   if (device.metrics) {
-    msg += `\n掉线前最后采集指标:\n`
-    msg += `- CPU 使用率: ${(device.metrics.cpu || 0).toFixed(1)}%\n`
-    msg += `- 内存使用率: ${(device.metrics.memory_percent || 0).toFixed(1)}%\n`
-    msg += `- 系统盘占用: ${(device.metrics.disk_percent || 0).toFixed(1)}%\n`
-    msg += `- 设备核心温度: ${(device.metrics.temperature || 0).toFixed(1)}℃\n`
+    msg += t('dashboard.offlineDetail.lastMetricsTitle')
+    msg += t('dashboard.offlineDetail.cpu', { val: (device.metrics.cpu || 0).toFixed(1) })
+    msg += t('dashboard.offlineDetail.mem', { val: (device.metrics.memory_percent || 0).toFixed(1) })
+    msg += t('dashboard.offlineDetail.disk', { val: (device.metrics.disk_percent || 0).toFixed(1) })
+    msg += t('dashboard.offlineDetail.temp', { val: (device.metrics.temperature || 0).toFixed(1) })
   } else {
-    msg += `\n(该设备无历史指标上报纪录)`
+    msg += t('dashboard.offlineDetail.noMetrics')
   }
   alert(msg)
 }

@@ -5,59 +5,59 @@
       <div class="admin-card settings-card">
         <div class="panel-header">
           <div class="header-left">
-            <h2>⚙️ 全局默认设置</h2>
+            <h2>{{ $t('settings.globalDefaultTitle') }}</h2>
           </div>
         </div>
         <p class="card-desc">
-          所有未单独配置的设备连接时使用的默认画质与功能参数，保存后实时同步到服务端并广播给在线客户端。
+          {{ $t('settings.globalDefaultDesc') }}
         </p>
         <div class="settings-summary">
           <div class="summary-item">
-            <span class="summary-label">视频码率</span>
+            <span class="summary-label">{{ $t('settings.bitrate') }}</span>
             <span class="summary-value">{{ bitrateText }}</span>
           </div>
           <div class="summary-item">
-            <span class="summary-label">帧率</span>
+            <span class="summary-label">{{ $t('settings.maxFps') }}</span>
             <span class="summary-value">{{ globalSettings.fps }} fps</span>
           </div>
           <div class="summary-item">
-            <span class="summary-label">分辨率</span>
-            <span class="summary-value">{{ globalSettings.size || '原始' }}</span>
+            <span class="summary-label">{{ $t('settings.maxSize') }}</span>
+            <span class="summary-value">{{ globalSettings.size || $t('settings.original') }}</span>
           </div>
           <div class="summary-item">
-            <span class="summary-label">音频</span>
-            <span class="summary-value">{{ globalSettings.audio ? '开启' : '关闭' }}</span>
+            <span class="summary-label">{{ $t('settings.audio') }}</span>
+            <span class="summary-value">{{ globalSettings.audio ? $t('common.on') : $t('common.off') }}</span>
           </div>
         </div>
-        <button class="open-editor-btn" @click="openEditor">编辑全局默认设置…</button>
+        <button class="open-editor-btn" @click="openEditor">{{ $t('settings.editGlobalDefault') }}</button>
       </div>
 
       <!-- 授权管理 -->
       <div class="admin-card settings-card">
         <div class="panel-header">
           <div class="header-left">
-            <h2>🔐 系统授权</h2>
+            <h2>{{ $t('settings.systemLicenseTitle') }}</h2>
           </div>
           <span class="license-chip" :class="deviceStore.licenseBadgeClass">{{ deviceStore.licenseBadgeText }}</span>
         </div>
         <p class="card-desc">
-          查看当前授权状态、虚机用量与到期时间，或提交新的激活码。
+          {{ $t('settings.systemLicenseDesc') }}
         </p>
         <div class="settings-summary" v-if="deviceStore.licenseDetailsLoaded">
           <div class="summary-item">
-            <span class="summary-label">虚机用量</span>
-            <span class="summary-value">{{ deviceStore.licenseUsedCount }} / {{ deviceStore.licenseMaxDevices }} 台</span>
+            <span class="summary-label">{{ $t('license.deviceUsage') }}</span>
+            <span class="summary-value">{{ deviceStore.licenseUsedCount }} / {{ deviceStore.licenseMaxDevices }} {{ $t('license.units') }}</span>
           </div>
           <div class="summary-item" v-if="deviceStore.licenseActivated">
-            <span class="summary-label">剩余有效期</span>
-            <span class="summary-value">{{ deviceStore.licenseDaysRemaining }} 天</span>
+            <span class="summary-label">{{ $t('license.remainingValidity') }}</span>
+            <span class="summary-value">{{ deviceStore.licenseDaysRemaining }} {{ $t('license.daysUnits') }}</span>
           </div>
           <div class="summary-item" v-if="deviceStore.licenseExpiresAt">
-            <span class="summary-label">到期时间</span>
+            <span class="summary-label">{{ $t('license.expireTime') }}</span>
             <span class="summary-value">{{ deviceStore.licenseExpiresAt }}</span>
           </div>
         </div>
-        <button class="open-editor-btn" @click="showLicensePanel = true">打开授权管理…</button>
+        <button class="open-editor-btn" @click="showLicensePanel = true">{{ $t('settings.openLicensePanel') }}</button>
       </div>
     </div>
 

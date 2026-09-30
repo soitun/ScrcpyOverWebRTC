@@ -4,31 +4,31 @@
       <div class="modal-header">
         <div class="header-title">
           <span class="icon">🔑</span>
-          <h3>卡密连接设备</h3>
+          <h3>{{ $t('share.cardConnectTitle') }}</h3>
         </div>
         <button type="button" class="close-btn" @click.stop.prevent="close">✕</button>
       </div>
 
       <div class="modal-body">
-        <p class="subtitle">请输入管理员或设备拥有者发放的 8 位卡密提取码免登录快速操控/观看云手机。</p>
+        <p class="subtitle">{{ $t('share.cardConnectSubtitle') }}</p>
 
         <div class="form-group">
-          <label>卡密提取码 (Card Code)</label>
+          <label>{{ $t('share.cardCodeLabel') }}</label>
           <input 
             v-model="cardCode" 
             type="text" 
-            placeholder="例如: CP-8A9F-2C3D" 
+            :placeholder="$t('share.cardCodePlaceholder')" 
             class="card-input"
             @keyup.enter.stop.prevent="connectWithCard"
           />
         </div>
 
         <div class="form-group mt-3" v-if="needPassword">
-          <label>🔒 访问密码</label>
+          <label>{{ $t('share.cardPasswordLabel') }}</label>
           <input 
             v-model="password" 
             type="password" 
-            placeholder="请输入该卡密的访问密码" 
+            :placeholder="$t('share.cardPasswordPlaceholder')" 
             class="card-input"
             @keyup.enter.stop.prevent="connectWithCard"
           />
@@ -40,8 +40,8 @@
 
         <div class="action-bar">
           <button type="button" class="btn-connect glow-btn" :disabled="loading || !cardCode.trim()" @click.stop.prevent="connectWithCard">
-            <span v-if="loading">正在校验卡密...</span>
-            <span v-else>🚀 立即连接设备</span>
+            <span v-if="loading">{{ $t('share.verifyingCard') }}</span>
+            <span v-else>{{ $t('share.connectDeviceNow') }}</span>
           </button>
         </div>
       </div>
@@ -52,6 +52,9 @@
 <script setup>
 import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const props = defineProps({
   visible: { type: Boolean, default: false }

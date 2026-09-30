@@ -1,6 +1,9 @@
 import { ref } from 'vue'
+import i18n from '@/locales'
 import { Adb, AdbDaemonTransport } from '@yume-chan/adb'
 import { AdbDaemonWebUsbDeviceManager } from '@yume-chan/adb-daemon-webusb'
+
+const t = (key, params) => i18n.global.t(key, params)
 
 export function useDeploy() {
   const isDeploying = ref(false)
@@ -60,17 +63,17 @@ export function useDeploy() {
 
       // 步骤 1: 连接 USB 设备
       log('请求 USB 设备连接...')
-      deployStatus.value = '请选择 USB 设备...'
+      deployStatus.value = t('deploy.status.selectUsb')
       const device = await AdbDaemonWebUsbDeviceManager.BROWSER.requestDevice()
-      if (!device) throw new Error('未选择设备')
+      if (!device) throw new Error(t('deploy.status.noDeviceSelected'))
 
       log(`已选择设备: ${device.name}`)
-      deployStatus.value = `正在连接 ${device.name}...`
+      deployStatus.value = t('deploy.status.connecting', { name: device.name })
       const connection = await device.connect()
       log('USB 连接已建立')
 
       // 步骤 2: ADB 认证
-      deployStatus.value = '正在认证握手，请确认手机屏幕...'
+      deployStatus.value = t('deploy.status.authenticating')
       log('正在进行 ADB 认证...')
       transport = await AdbDaemonTransport.authenticate({
         serial: device.serial || 'webadb',
@@ -83,7 +86,7 @@ export function useDeploy() {
       log('ADB 认证成功')
 
       // 步骤 3: 探测架构
-      deployStatus.value = '探测设备架构...'
+      deployStatus.value = t('deploy.status.detectArch')
       log('探测 CPU 架构...')
       const abi = await adb.subprocess.noneProtocol.spawnWaitText('getprop ro.product.cpu.abi')
       let arch = 'amd64'
@@ -99,7 +102,7 @@ export function useDeploy() {
       deployProgress.value = 40
 
       // 步骤 4: 推送文件
-      deployStatus.value = '推送 Agent 程序...'
+      deployStatus.value = t('deploy.status.pushing')
       log('下载 agent 和 libsys_core.so...')
       const [agentResp, jarResp] = await Promise.all([fetch(agentPath), fetch('/agent/libsys_core.so')])
       if (!agentResp.ok) throw new Error(`下载 agent 失败: ${agentResp.status}`)
@@ -127,7 +130,7 @@ export function useDeploy() {
       deployProgress.value = 80
 
       // 步骤 5: 启动服务
-      deployStatus.value = '正在后台启动服务...'
+      deployStatus.value = t('deploy.status.starting')
       log('清理旧进程...')
       const killSocket = await adb.createSocket('shell:killall cloudphone-agent 2>/dev/null; true')
       await killSocket.closed
@@ -172,7 +175,7 @@ export function useDeploy() {
       }
 
       log(`进程已启动, PID: ${checkResult.trim()}`)
-      deployStatus.value = '部署成功！'
+      deployStatus.value = t('deploy.status.success')
       deployProgress.value = 100
       log('部署完成!')
       return true

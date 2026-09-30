@@ -1,8 +1,16 @@
 import { defineStore } from 'pinia'
 import { ref, computed, shallowRef, markRaw, watch } from 'vue'
+import { i18n } from '@/locales'
 import { debugLog } from '@/utils/debug'
 import { useTagStore } from './tags'
 import { useAuthStore } from './auth'
+
+function tt(key, fallback, params) {
+  if (i18n && i18n.global && typeof i18n.global.t === 'function') {
+    return i18n.global.t(key, params || {})
+  }
+  return fallback
+}
 
 export const useDeviceStore = defineStore('devices', () => {
   const devices = ref([])
@@ -66,28 +74,27 @@ export const useDeviceStore = defineStore('devices', () => {
     const used = licenseUsedCount.value
     const max = licenseMaxDevices.value
     if (licenseActivated.value) {
-      // 普通用户拿不到详细字段（额度/剩余天数），只显示已授权状态，避免展示默认值误导
-      if (!licenseDetailsLoaded.value) return '已授权'
-      return `授权 ${used}/${max} 台 · 剩余 ${licenseDaysRemaining.value} 天`
+      if (!licenseDetailsLoaded.value) return tt('topBar.licenseLicensed', '已授权')
+      return tt('topBar.licenseStatusText', `授权 ${used}/${max} 台 · 剩余 ${licenseDaysRemaining.value} 天`, { used, max, days: licenseDaysRemaining.value })
     }
-    if (!licenseDetailsLoaded.value) return '未授权'
+    if (!licenseDetailsLoaded.value) return tt('topBar.licenseUnlicensed', '未授权')
     if (licensePromo.value) {
-      return `限时特惠 ${used}/${max} 台`
+      return tt('topBar.licensePromoText', `限时特惠 ${used}/${max} 台`, { used, max })
     }
-    return `免费版 ${used}/${max} 台`
+    return tt('topBar.licenseFreeText', `免费版 ${used}/${max} 台`, { used, max })
   })
 
   const licenseBadgeTitle = computed(() => {
     if (!licenseDetailsLoaded.value) {
-      return '点击查看授权管理'
+      return tt('topBar.licenseClickToManage', '点击查看授权管理')
     }
     if (licenseActivated.value) {
-      return `授权到期时间: ${licenseExpiresAt.value || '-'}，点击查看授权管理`
+      return tt('topBar.licenseExpiresTitle', `授权到期时间: ${licenseExpiresAt.value || '-'}，点击查看授权管理`, { time: licenseExpiresAt.value || '-' })
     }
     if (licensePromo.value) {
-      return `特惠至 ${licenseExpiresAt.value}，到期后恢复 ${licensePostPromoMaxDevices.value} 台`
+      return tt('topBar.licensePromoTitle', `特惠至 ${licenseExpiresAt.value}，到期后恢复 ${licensePostPromoMaxDevices.value} 台`, { time: licenseExpiresAt.value, max: licensePostPromoMaxDevices.value })
     }
-    return '免费版授权，点击查看授权管理'
+    return tt('topBar.licenseFreeTitle', '免费版授权，点击查看授权管理')
   })
 
   const licenseBadgeClass = computed(() => {

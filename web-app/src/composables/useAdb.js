@@ -3,6 +3,9 @@ import { Terminal } from 'xterm'
 import { FitAddon } from 'xterm-addon-fit'
 import 'xterm/css/xterm.css'
 import { debugLog } from '@/utils/debug'
+import i18n from '@/locales'
+
+const t = (key, params) => i18n.global.t(key, params)
 
 export function useAdb(webrtc) {
   const isAdbConnected = ref(false)
@@ -11,12 +14,14 @@ export function useAdb(webrtc) {
   let sessionChannel = null
   let unwatchWebrtcStatus = null
 
-  function handleDisconnect(reason = '远程设备连接已断开') {
+  function handleDisconnect(reasonKey = 'shellRemoteDisconnected') {
     if (!isAdbConnected.value && !sessionChannel) return
     isAdbConnected.value = false
     if (term) {
-      term.writeln(`\r\n\x1b[1;31m[ADB 调试] ⚠️ ${reason}，终端会话已终止。\x1b[0m`)
-      term.writeln('\x1b[90m提示: 远程连接已断开，如需继续调试请重新连接设备。\x1b[0m\r\n')
+      const fullKey = `console.${reasonKey}`
+      const reason = i18n.global.te(fullKey) ? t(fullKey) : reasonKey
+      term.writeln(`\r\n\x1b[1;31m${t('console.shellTerminated', { reason })}\x1b[0m`)
+      term.writeln(`\x1b[90m${t('console.shellReconnectHint')}\x1b[0m\r\n`)
     }
   }
 
@@ -95,7 +100,7 @@ export function useAdb(webrtc) {
       }
     }, 150)
 
-    term.writeln('\x1b[33m[Shell] 正在建立 WebRTC 终端通道...\x1b[0m')
+    term.writeln(`\x1b[33m${t('console.shellConnectingChannel')}\x1b[0m`)
 
     try {
       if (typeof webrtc.createAdbSessionChannel !== 'function') {
@@ -108,11 +113,11 @@ export function useAdb(webrtc) {
       // 绑定通道生命周期断开监听
       if (sessionChannel?.channel) {
         sessionChannel.channel.addEventListener('close', () => {
-          handleDisconnect('数据通道已关闭')
+          handleDisconnect('shellChannelClosed')
         })
         sessionChannel.channel.addEventListener('error', (e) => {
           console.error('[Shell] DataChannel error:', e)
-          handleDisconnect('数据通道发生异常')
+          handleDisconnect('shellChannelError')
         })
       }
 
@@ -120,7 +125,7 @@ export function useAdb(webrtc) {
       if (webrtc && webrtc.status) {
         unwatchWebrtcStatus = watch(() => webrtc.status.value, (newStatus) => {
           if (newStatus === 'disconnected' || newStatus === 'failed') {
-            handleDisconnect('远程设备连接已断开')
+            handleDisconnect('shellRemoteDisconnected')
           }
         })
       }
@@ -128,7 +133,7 @@ export function useAdb(webrtc) {
       // 等待 150ms 确保 DataChannel 建立稳定
       await new Promise(r => setTimeout(r, 150))
 
-      term.writeln('\x1b[33m[Shell] 正在创建独立终端会话...\x1b[0m')
+      term.writeln(`\x1b[33m${t('console.shellCreatingSession')}\x1b[0m`)
 
       // 发送初始化窗口行列前先重新 fit 一次，确保准确上报当前移动端或桌面端可视行列
       if (fitAddon) {
@@ -147,7 +152,7 @@ export function useAdb(webrtc) {
       const initPayload = JSON.stringify({ type: 'init', rows, cols })
       sessionChannel.sendData(new TextEncoder().encode(initPayload))
 
-      term.writeln('\x1b[32m[Shell] 反代终端已就绪\x1b[0m\r\n')
+      term.writeln(`\x1b[32m${t('console.shellReady')}\x1b[0m\r\n`)
       isAdbConnected.value = true
       setTimeout(() => { 
         if (fitAddon && term) {
@@ -186,7 +191,7 @@ export function useAdb(webrtc) {
 
     } catch (e) {
       console.error('[Shell] Connection failed:', e)
-      if (term) term.writeln(`\r\n\x1b[31m[Shell] 连接失败: ${e.message}\x1b[0m`)
+      if (term) term.writeln(`\r\n\x1b[31m${t('console.shellConnectFailed', { error: e.message })}\x1b[0m`)
       isAdbConnected.value = false
     }
   }

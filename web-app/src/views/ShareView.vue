@@ -5,7 +5,7 @@
       <div class="header-left">
         <div class="logo">
           <span class="pulse-dot"></span>
-          <span class="title-text">云手机免登录接入</span>
+          <span class="title-text">{{ $t('share.guestAccessTitle') }}</span>
         </div>
         <div v-if="shareInfo" class="device-info-pill">
           <span class="icon">📱</span>
@@ -17,16 +17,16 @@
       <div class="header-center" v-if="shareInfo">
         <div class="countdown-badge" :class="{ 'warning': remainingSeconds < 300 }">
           <span class="clock-icon">⏱️</span>
-          <span class="label">剩余有效时间:</span>
+          <span class="label">{{ $t('share.remainingTime') }}</span>
           <span class="time-value">{{ formatCountdown(remainingSeconds) }}</span>
         </div>
       </div>
 
       <div class="header-right" v-if="shareInfo">
         <span :class="['mode-tag', shareInfo.access_mode]">
-          {{ shareInfo.access_mode === 'full' ? '⚡ 完整控制' : '👁️ 仅观看' }}
+          {{ shareInfo.access_mode === 'full' ? $t('share.modeFull') : $t('share.modeViewOnly') }}
         </span>
-        <button class="btn-refresh" @click="reloadPage" title="刷新重连">🔄 重连</button>
+        <button class="btn-refresh" @click="reloadPage" :title="('share.reconnectBtn')">{{ $t('share.reconnectBtn') }}</button>
       </div>
     </header>
 
@@ -35,33 +35,33 @@
       <!-- 1. 加载中状态 -->
       <div v-if="loading" class="state-container">
         <div class="loading-spinner"></div>
-        <p class="loading-text">正在验证分享凭证与连接信令...</p>
+        <p class="loading-text">{{ $t('share.verifyingCredentials') }}</p>
       </div>
 
       <!-- 2. 需要访问密码 -->
       <div v-else-if="needPassword" class="state-container">
         <div class="pwd-icon">🔒</div>
-        <h2>该分享需要访问密码</h2>
-        <p class="pwd-desc">请输入分享创建者设置的访问 PIN 码</p>
+        <h2>{{ $t('share.passwordRequiredTitle') }}</h2>
+        <p class="pwd-desc">{{ $t('share.passwordRequiredDesc') }}</p>
         <input
           v-model="password"
           type="password"
           class="pwd-input"
-          placeholder="访问密码"
+          :placeholder="$t('share.passwordPlaceholderShort')"
           @keyup.enter="submitPassword"
         />
         <div v-if="pwdError" class="pwd-error">⚠️ {{ pwdError }}</div>
-        <button class="pwd-submit" @click="submitPassword">确认并连接</button>
+        <button class="pwd-submit" @click="submitPassword">{{ $t('share.confirmAndConnect') }}</button>
       </div>
 
       <!-- 3. 过期 / 无效状态 -->
       <div v-else-if="error" class="state-container error-state">
         <div class="error-icon">🚫</div>
-        <h2>分享链接或卡密已失效</h2>
+        <h2>{{ $t('share.expiredTitle') }}</h2>
         <p class="error-desc">{{ error }}</p>
         <div class="error-actions">
-          <router-link to="/" class="btn-home">返回系统首页</router-link>
-          <button class="btn-card-reconnect" @click="showCardModal = true">使用其他卡密连接</button>
+          <router-link to="/" class="btn-home">{{ $t('share.backToHome') }}</router-link>
+          <button class="btn-card-reconnect" @click="showCardModal = true">{{ $t('share.connectOtherCode') }}</button>
         </div>
       </div>
 
@@ -86,7 +86,7 @@
         <div v-if="shareInfo.access_mode === 'view_only'" class="view-only-overlay">
           <div class="view-only-banner">
             <span class="eye-icon">👁️</span>
-            <span>当前处于“仅观看/只读模式”，无法进行点击与按键操作</span>
+            <span>{{ $t('share.viewOnlyWarning') }}</span>
           </div>
         </div>
       </div>

@@ -38,7 +38,7 @@
       <div class="card-header-right" @click.stop>
         <!-- 群控 / 预览直选勾选框 -->
         <div v-if="(groupControlStore.isGroupControlActive || (deviceStore.globalPreviewMode && deviceStore.previewScopeMode === 'selected')) && device.status === 'online'" class="group-select-wrap">
-          <span v-if="groupControlStore.isGroupControlActive && groupControlStore.masterId === device.id" class="master-badge">主控</span>
+          <span v-if="groupControlStore.isGroupControlActive && groupControlStore.masterId === device.id" class="master-badge">{{ $t('deviceCard.masterBadge') }}</span>
           <template v-else>
             <input 
               type="checkbox" 
@@ -51,7 +51,7 @@
           </template>
         </div>
         <!-- 功能菜单按钮 -->
-        <button class="card-menu-btn" @click.stop="toggleMenu" title="更多操作">
+        <button class="card-menu-btn" @click.stop="toggleMenu" :title="$t('deviceCard.moreActions')">
           <svg viewBox="0 0 16 16" fill="currentColor">
             <circle cx="4" cy="8" r="1.5"/>
             <circle cx="8" cy="8" r="1.5"/>
@@ -62,7 +62,7 @@
 
       <!-- 群控主控制轻量边框徽标（不再全屏蒙版） -->
       <div v-if="groupControlStore.isGroupControlActive && groupControlStore.masterId === device.id" class="master-indicator">
-        <span class="master-indicator-pill">群控·主控端</span>
+        <span class="master-indicator-pill">{{ $t('deviceCard.groupMasterPill') }}</span>
       </div>
 
       <!-- 隐藏的预加载图片 -->
@@ -70,10 +70,10 @@
 
       <!-- Hover 点击进入控制提示 -->
       <div class="hover-action-overlay" v-if="!isInteractiveActive && device.status === 'online'">
-        <span class="play-hint">进入控制</span>
+        <span class="play-hint">{{ $t('deviceCard.clickToControl') }}</span>
       </div>
       <div class="hover-action-overlay offline" v-else-if="device.status !== 'online'">
-        <span class="play-hint offline-hint">离线</span>
+        <span class="play-hint offline-hint">{{ $t('deviceCard.offline') }}</span>
       </div>
 
       <!-- 预览直控覆盖交互层 (仅当高频推流且符合勾选/范围模式时才出现控键) -->
@@ -91,16 +91,16 @@
       >
         <!-- 悬浮毛玻璃虚拟按键栏 -->
         <div class="virtual-navbar" @pointerdown.stop @pointerup.stop @click.stop>
-          <button class="nav-btn connect-btn" @click="deviceStore.setDeviceMode(device.id, 'display'); emit('connect', device.id)" title="进入详情控制">
+          <button class="nav-btn connect-btn" @click="deviceStore.setDeviceMode(device.id, 'display'); emit('connect', device.id)" :title="$t('deviceCard.enterDetailControl')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
           </button>
-          <button class="nav-btn" @click="sendKey(4)" title="返回 (BACK)">
+          <button class="nav-btn" @click="sendKey(4)" :title="$t('deviceCard.backKeyHint')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
           </button>
-          <button class="nav-btn" @click="sendKey(3)" title="主页 (HOME)">
+          <button class="nav-btn" @click="sendKey(3)" :title="$t('deviceCard.homeKeyHint')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle></svg>
           </button>
-          <button class="nav-btn" @click="sendKey(187)" title="最近任务 (RECENTS)">
+          <button class="nav-btn" @click="sendKey(187)" :title="$t('deviceCard.recentsKeyHint')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg>
           </button>
         </div>
@@ -110,11 +110,11 @@
         <div class="bottom-left-info">
           <span class="status-dot" :class="statusClass"></span>
           <span class="device-name" :title="device.id">{{ device.id }}</span>
-          <span v-if="isCameraMode" class="camera-mode-badge" title="当前设备正在以摄像头监控模式运行">📷 监控中</span>
-          <span v-else-if="isWebSocketMode" class="ws-mode-badge" title="当前设备正在以 WebSocket 投屏模式运行">⚡ 投屏中</span>
+          <span v-if="isCameraMode" class="camera-mode-badge" :title="$t('deviceCard.cameraModeTitle')">{{ $t('deviceCard.cameraMonitoring') }}</span>
+          <span v-else-if="isWebSocketMode" class="ws-mode-badge" :title="$t('deviceCard.wsModeTitle')">{{ $t('deviceCard.wsStreaming') }}</span>
           <span v-if="device.status !== 'online' && lastSeenText" class="offline-last-seen" :title="lastSeenText">{{ lastSeenText }}</span>
-          <span v-if="myLeaseText" class="my-lease-badge" :class="{ urgent: myLeaseUrgent }" title="我的设备租约剩余时长">{{ myLeaseText }}</span>
-          <span v-if="adminLeaseText" class="my-lease-badge admin-lease" :class="{ urgent: adminLeaseUrgent }" title="当前租户与租约剩余时长">{{ adminLeaseText }}</span>
+          <span v-if="myLeaseText" class="my-lease-badge" :class="{ urgent: myLeaseUrgent }" :title="$t('deviceCard.myLeaseTitle')">{{ myLeaseText }}</span>
+          <span v-if="adminLeaseText" class="my-lease-badge admin-lease" :class="{ urgent: adminLeaseUrgent }" :title="$t('deviceCard.adminLeaseTitle')">{{ adminLeaseText }}</span>
         </div>
         <div v-if="tags.length > 0" class="device-tags">
           <span
@@ -137,35 +137,35 @@
     <div v-if="showMenu" class="card-menu" @click.stop>
       <button class="menu-item" @click.stop="onAddToMulti" v-if="device.status === 'online'">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="8" height="18" rx="2"></rect><rect x="14" y="3" width="8" height="18" rx="2"></rect></svg>
-        加入多机直连
+        {{ $t('deviceCard.joinMulti') }}
       </button>
       <button class="menu-item" @click.stop="onWebSocketMirror" v-if="device.status === 'online' && authStore.isAdmin">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-        WebSocket 投屏
+        {{ $t('deviceCard.wsMode') }}
       </button>
       <button class="menu-item" @click.stop="onCameraSettings" v-if="device.status === 'online' && authStore.isAdmin">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
-        摄像头监控模式
+        {{ $t('deviceCard.cameraMode') }}
       </button>
       <button class="menu-item" @click.stop="onSettings">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-        连接设置
+        {{ $t('settings.title') }}
       </button>
       <button class="menu-item" @click.stop="onShareDevice" v-if="authStore.isAdmin">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
-        分享设备 / 卡密
+        {{ $t('deviceCard.shareDevice') }}
       </button>
       <button class="menu-item" @click.stop="onEditTags" v-if="authStore.isAdmin">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 12v7a1 1 0 0 1-1 1h-7L4 12V5a1 1 0 0 1 1-1h7l8 8z"></path><circle cx="8.5" cy="8.5" r="1.5"></circle></svg>
-        编辑标签
+        {{ $t('deviceCard.editTags') }}
       </button>
       <button class="menu-item danger" @click.stop="onQuitAgent" :disabled="device.status !== 'online'" v-if="authStore.isAdmin">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2v6M12 4.5a6 6 0 11-8 0"/></svg>
-        退出 Agent
+        {{ $t('deviceCard.restartAgent') }}
       </button>
       <button v-if="device.status !== 'online'" class="menu-item danger" @click.stop="onDeleteRecord">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-        移除记录
+        {{ $t('deviceCard.remove') }}
       </button>
     </div>
     
@@ -176,6 +176,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useDeviceStore } from '@/stores/devices'
 import { useAuthStore } from '@/stores/auth'
 import { H264Decoder } from 'h264decoder'
@@ -183,6 +184,8 @@ import { getDeviceSettings } from '@/utils/settings'
 import { useGroupControlStore } from '@/stores/groupControl'
 import { useTagStore } from '@/stores/tags'
 import { formatLeaseRemaining } from '@/utils/format'
+
+const { t, locale } = useI18n()
 
 const props = defineProps({
   device: {
@@ -250,27 +253,27 @@ const isInteractiveActive = computed(() => {
 const clientsInfo = computed(() => props.device.clients || [])
 
 function formatClientRemain(sec) {
-  if (sec === undefined || sec === null || sec < 0) return '正在连接' // 永久/无期限：使用中遮罩里时长无意义，显示连接状态
-  if (sec === 0) return '已到期'
+  if (sec === undefined || sec === null || sec < 0) return t('deviceCard.inUseConnecting') // 永久/无期限：使用中遮罩里时长无意义，显示连接状态
+  if (sec === 0) return t('common.expired')
   const d = Math.floor(sec / 86400)
   const h = Math.floor((sec % 86400) / 3600)
   const m = Math.floor((sec % 3600) / 60)
-  if (d > 0) return `剩余 ${d} 天`
-  if (h > 0) return `剩余 ${h} 小时`
-  return `剩余 ${Math.max(1, m)} 分`
+  if (d > 0) return t('common.remainDays', { days: d })
+  if (h > 0) return t('common.remainHours', { hours: h })
+  return t('common.remainMinutes', { minutes: Math.max(1, m) })
 }
 
 const primaryClientText = computed(() => {
   const c = clientsInfo.value[0]
   if (!c) return ''
   const icon = c.kind === 'guest' ? '🔑' : '👤'
-  const extra = clientsInfo.value.length > 1 ? ` 等${clientsInfo.value.length}人` : ''
+  const extra = clientsInfo.value.length > 1 ? t('deviceCard.andOthers', { count: clientsInfo.value.length }) : ''
   return `${icon} ${c.name} · ${formatClientRemain(c.remaining_seconds)}${extra}`
 })
 
 const inUseTitle = computed(() => {
   const lines = clientsInfo.value.map(c => `${c.name}（${formatClientRemain(c.remaining_seconds)}）`)
-  return lines.length ? `当前接入：\n${lines.join('\n')}` : `当前有 ${props.device.clientCount} 个连接`
+  return lines.length ? t('deviceCard.currentConnected', { lines: lines.join('\n') }) : t('deviceCard.currentConnCount', { count: props.device.clientCount || 0 })
 })
 
 const snapshotWidth = ref(0)
@@ -495,18 +498,18 @@ function tagStyle(tag) {
 
 function onQuitAgent() {
   showMenu.value = false
-  if (confirm(`警告：确定要停止设备 "${props.device.id}" 上的 Agent 进程吗？停止后该设备将下线。`)) {
+  if (confirm(t('deviceCard.confirmQuitAgent', { id: props.device.id }))) {
     deviceStore.quitAgent(props.device.id)
   }
 }
 
 async function onDeleteRecord() {
   showMenu.value = false
-  if (confirm(`确定要删除设备 "${props.device.id}" 的离线记录吗？删除后该设备将从列表中移除（不影响设备本身，重新上线后会再次注册）。`)) {
+  if (confirm(t('deviceCard.confirmDeleteRecord', { id: props.device.id }))) {
     try {
       await deviceStore.deleteOfflineDevice(props.device.id)
     } catch (e) {
-      alert('删除离线记录失败: ' + (e.message || e))
+      alert(t('deviceCard.deleteRecordFailed') + (e.message || e))
     }
   }
 }

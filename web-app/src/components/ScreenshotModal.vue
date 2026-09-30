@@ -3,15 +3,15 @@
     <div class="screenshot-modal" @click.self="$emit('close')">
       <div class="modal-content">
         <div class="modal-header">
-          <h3>📷 截图</h3>
+          <h3>{{ $t('common.screenshotTitle') }}</h3>
           <button class="close-btn" @click="$emit('close')">×</button>
         </div>
         <div class="modal-body">
           <img :src="imageUrl" alt="Screenshot" class="screenshot-image" />
         </div>
         <div class="modal-footer">
-          <a :href="imageUrl" :download="downloadName" class="btn">下载</a>
-          <button class="btn btn-secondary" @click="copyToClipboard">复制到剪贴板</button>
+          <a :href="imageUrl" :download="downloadName" class="btn">{{ $t('common.download') || $t('files.download') }}</a>
+          <button class="btn btn-secondary" @click="copyToClipboard">{{ $t('common.copyToClipboard') }}</button>
         </div>
       </div>
     </div>
@@ -68,10 +68,10 @@ async function copyToClipboard() {
     await navigator.clipboard.write([
       new ClipboardItem({ 'image/png': blob })
     ])
-    alert('已复制到剪贴板')
+    alert(t('common.copiedToClipboard'))
   } catch (e) {
     console.error('Copy failed:', e)
-    alert('复制失败')
+    alert(t('common.copyFailed'))
   }
 }
 </script>

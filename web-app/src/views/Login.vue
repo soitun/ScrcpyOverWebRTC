@@ -3,6 +3,17 @@
     <div class="background-decor animate-bg"></div>
     <div class="background-decor-2 animate-bg-2"></div>
     
+    <!-- 语言切换开关 -->
+    <div class="login-lang-switch">
+      <button 
+        class="lang-pill-btn" 
+        @click="toggleLang"
+        :title="$t('login.langToggleHint')"
+      >
+        🌐 {{ locale === 'zh-CN' ? 'English' : '简体中文' }}
+      </button>
+    </div>
+
     <div class="glass-card">
       <div class="brand">
         <div class="brand-logo">
@@ -16,8 +27,8 @@
             </defs>
           </svg>
         </div>
-        <h1>云手机管理系统</h1>
-        <p class="subtitle">CloudPhone Management Platform</p>
+        <h1>{{ $t('login.title') }}</h1>
+        <p class="subtitle">{{ $t('login.subtitle') }}</p>
       </div>
 
       <!-- 切换 Tab -->
@@ -25,13 +36,13 @@
         <button 
           class="tab-btn active" 
         >
-          安全登录
+          {{ $t('login.secureLogin') }}
         </button>
         <button 
           class="tab-btn card-tab-btn"
           @click="showCardModal = true"
         >
-          🔑 卡密直连
+          {{ $t('login.cardLogin') }}
         </button>
       </div>
 
@@ -61,7 +72,7 @@
               placeholder=" " 
               id="username-input"
             />
-            <label for="username-input">用户名 / Username</label>
+            <label for="username-input">{{ $t('login.username') }}</label>
             <span class="input-line"></span>
           </div>
 
@@ -73,18 +84,18 @@
               placeholder=" " 
               id="password-input"
             />
-            <label for="password-input">密码 / Password</label>
+            <label for="password-input">{{ $t('login.password') }}</label>
             <span class="input-line"></span>
           </div>
 
           <button type="submit" class="submit-btn" :disabled="loading">
             <span v-if="loading" class="spinner"></span>
-            <span v-else>登 录</span>
+            <span v-else>{{ $t('login.loginBtn') }}</span>
           </button>
         </form>
 
         <div class="form-footer-tip">
-          <span>💡 公网自主注册已关闭，如需账号请联系管理员分配</span>
+          <span>💡 {{ isDemoMode ? $t('login.demoTip') : $t('login.contactAdminTip') }}</span>
         </div>
       </div>
     </div>
@@ -94,15 +105,24 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+import { setLanguage } from '@/locales'
 import { useAuthStore } from '../stores/auth'
-
-const router = useRouter()
 import CardConnectModal from '@/components/CardConnectModal.vue'
 
+const { t, locale } = useI18n()
+const router = useRouter()
 const authStore = useAuthStore()
 const showCardModal = ref(false)
+
+const isDemoMode = computed(() => import.meta.env.MODE === 'demo')
+
+function toggleLang() {
+  const next = locale.value === 'zh-CN' ? 'en-US' : 'zh-CN'
+  setLanguage(next)
+}
 
 const loading = ref(false)
 const errorMsg = ref('')
@@ -121,11 +141,11 @@ async function handleSubmit() {
   const password = form.password
 
   if (!username) {
-    errorMsg.value = '用户名不能为空'
+    errorMsg.value = locale.value === 'zh-CN' ? '用户名不能为空' : 'Username cannot be empty'
     return
   }
   if (password.length < 6) {
-    errorMsg.value = '密码长度不能少于 6 位'
+    errorMsg.value = locale.value === 'zh-CN' ? '密码长度不能少于 6 位' : 'Password must be at least 6 characters'
     return
   }
 
@@ -135,7 +155,7 @@ async function handleSubmit() {
     await authStore.login(username, password)
     router.push('/')
   } catch (err) {
-    errorMsg.value = err.message || '登录失败，请检查账号密码'
+    errorMsg.value = err.message || (locale.value === 'zh-CN' ? '登录失败，请检查账号密码' : 'Login failed, please check username and password')
   } finally {
     loading.value = false
   }
@@ -143,6 +163,34 @@ async function handleSubmit() {
 </script>
 
 <style scoped>
+.login-lang-switch {
+  position: absolute;
+  top: 24px;
+  right: 28px;
+  z-index: 100;
+}
+
+.lang-pill-btn {
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #cbd5e1;
+  padding: 6px 16px;
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.lang-pill-btn:hover {
+  background: rgba(14, 165, 233, 0.2);
+  border-color: rgba(56, 189, 248, 0.5);
+  color: #38bdf8;
+  transform: translateY(-1px);
+}
+
 .login-container {
   position: relative;
   width: 100vw;

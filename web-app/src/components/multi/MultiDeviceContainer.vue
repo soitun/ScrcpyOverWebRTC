@@ -9,8 +9,8 @@
             <rect x="2" y="3" width="8" height="18" rx="2"></rect>
             <rect x="14" y="3" width="8" height="18" rx="2"></rect>
           </svg>
-          <span class="brand-title">多机直连</span>
-          <span class="device-count-badge">{{ activeDeviceIds.length }} 台</span>
+          <span class="brand-title">{{ $t('multi.brandTitle') }}</span>
+          <span class="device-count-badge">{{ activeDeviceIds.length }} {{ $t('multi.units') }}</span>
         </div>
 
         <!-- 快捷设备 Tab 栏 -->
@@ -25,17 +25,17 @@
           >
             <span class="pill-dot"></span>
             <span class="pill-name">{{ id }}</span>
-            <span class="pill-close" @click.stop="deviceStore.closeDevice(id)" title="关闭">×</span>
+            <span class="pill-close" @click.stop="deviceStore.closeDevice(id)" :title="$t('common.close')">×</span>
           </button>
 
           <!-- 添加设备加入多开下拉菜单 -->
           <div class="add-device-dropdown-container" @click.stop>
-            <button class="add-device-btn" @click="showAddMenu = !showAddMenu" title="添加更多虚机加入直连">
-              <span class="plus-icon">+</span> 添加虚机
+            <button class="add-device-btn" @click="showAddMenu = !showAddMenu" :title="$t('multi.addDeviceHint')">
+              <span class="plus-icon">+</span> {{ $t('multi.addDevice') }}
             </button>
 
             <div v-if="showAddMenu" class="add-device-menu">
-              <div class="menu-header">选择在线设备加入直连:</div>
+              <div class="menu-header">{{ $t('multi.selectDeviceToJoin') }}</div>
               <div class="menu-list">
                 <div 
                   v-for="dev in availableDevices" 
@@ -48,7 +48,7 @@
                   <span class="dev-model" v-if="dev.info?.model">({{ dev.info.model }})</span>
                 </div>
                 <div v-if="availableDevices.length === 0" class="menu-empty">
-                  无可用在线设备或已全部打开
+                  {{ $t('multi.noAvailableDevices') }}
                 </div>
               </div>
             </div>
@@ -64,7 +64,7 @@
             class="layout-mode-btn" 
             :class="{ active: multiLayoutMode === 'grid' }"
             @click="deviceStore.setMultiLayoutMode('grid')"
-            title="网格平铺分屏"
+            :title="$t('multi.tilingTitle')"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <rect x="3" y="3" width="7" height="7"></rect>
@@ -72,33 +72,33 @@
               <rect x="14" y="14" width="7" height="7"></rect>
               <rect x="3" y="14" width="7" height="7"></rect>
             </svg>
-            <span class="btn-lbl">平铺</span>
+            <span class="btn-lbl">{{ $t('multi.tilingBtn') }}</span>
           </button>
 
           <button 
             class="layout-mode-btn" 
             :class="{ active: multiLayoutMode === 'tabs' }"
             @click="deviceStore.setMultiLayoutMode('tabs')"
-            title="多标签页视图"
+            :title="$t('multi.tabsTitle')"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
               <line x1="4" y1="9" x2="20" y2="9"></line>
             </svg>
-            <span class="btn-lbl">标签</span>
+            <span class="btn-lbl">{{ $t('multi.tabsBtn') }}</span>
           </button>
 
           <button 
             class="layout-mode-btn" 
             :class="{ active: multiLayoutMode === 'floating' }"
             @click="deviceStore.setMultiLayoutMode('floating')"
-            title="自由多浮窗桌面"
+            :title="$t('multi.floatingTitle')"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <rect x="3" y="3" width="11" height="11" rx="2"></rect>
               <path d="M9 9h12v12H9z"></path>
             </svg>
-            <span class="btn-lbl">浮窗</span>
+            <span class="btn-lbl">{{ $t('multi.floatingBtn') }}</span>
           </button>
         </div>
 
@@ -109,24 +109,24 @@
           class="top-tool-btn" 
           :class="{ active: audioFocusMode === 'exclusive' }"
           @click="toggleAudioMode"
-          :title="audioFocusMode === 'exclusive' ? '当前策略: 焦点设备独占音频 (点击切为全部混音)' : '当前策略: 自由混音模式'"
+          :title="audioFocusMode === 'exclusive' ? $t('multi.audioExclusiveTitle') : $t('multi.audioMixTitle')"
         >
           <span class="tool-icon">🔊</span>
-          <span class="tool-text">{{ audioFocusMode === 'exclusive' ? '焦点独占' : '混音模式' }}</span>
+          <span class="tool-text">{{ audioFocusMode === 'exclusive' ? $t('multi.audioExclusive') : $t('multi.audioMix') }}</span>
         </button>
 
         <!-- 切为单机模式 -->
         <button 
           class="top-tool-btn" 
           @click="deviceStore.setDirectControlMode('single')"
-          title="切换为单机专属直控模式 (保留当前焦点设备)"
+          :title="$t('multi.singleModeTitle')"
         >
           <span class="tool-icon">📱</span>
-          <span class="tool-text">单机模式</span>
+          <span class="tool-text">{{ $t('multi.singleMode') }}</span>
         </button>
 
         <!-- 全部关闭退出 -->
-        <button class="close-all-btn" @click="closeAll" title="关闭多机直连工作台">
+        <button class="close-all-btn" @click="closeAll" :title="$t('multi.closeWorkspaceTitle')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <line x1="18" y1="6" x2="6" y2="18"></line>
             <line x1="6" y1="6" x2="18" y2="18"></line>

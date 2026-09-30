@@ -5,9 +5,9 @@
       <header class="modal-header">
         <div class="header-left">
           <span class="header-icon">💬</span>
-          <h3 class="modal-title">群控批量文本下发</h3>
+          <h3 class="modal-title">{{ $t('batchText.title') }}</h3>
         </div>
-        <button class="close-btn" @click="$emit('close')" title="关闭">✕</button>
+        <button class="close-btn" @click="$emit('close')" :title="$t('common.close')">✕</button>
       </header>
 
       <!-- 弹窗主体 -->
@@ -16,15 +16,15 @@
         <div class="target-strip">
           <div class="strip-title-row">
             <span class="strip-label">
-              下发目标设备 (共 <b>{{ currentTargets.length }}</b> 台):
+              {{ $t('batchText.target') }} (<b>{{ currentTargets.length }}</b>):
             </span>
             <button 
               v-if="currentTargets.length > 1" 
               class="strip-clear-btn" 
               @click="currentTargets = []"
-              title="清空当前目标"
+              :title="$t('common.clear')"
             >
-              清空
+              {{ $t('common.clear') }}
             </button>
           </div>
           <div class="strip-chips-wrap custom-scrollbar">
@@ -38,11 +38,11 @@
               <button 
                 class="chip-remove-btn" 
                 @click.stop="removeTarget(id)" 
-                title="剔除此设备"
+                title="Remove"
               >×</button>
             </span>
             <div v-if="currentTargets.length === 0" class="strip-empty-warning">
-              ⚠️ 未勾选任何下发目标，请先选择设备
+              ⚠️ {{ $t('batchText.noTargetSelected') }}
             </div>
           </div>
         </div>
@@ -50,14 +50,14 @@
         <!-- 2. 常用快速短语选填区 -->
         <div class="quick-texts-section">
           <div class="qt-header-row">
-            <span class="qt-section-label">⚡ 常用快速短语 (点击填入):</span>
+            <span class="qt-section-label">⚡ {{ $t('batchText.quickPhrasesLabel') }}</span>
             <button 
               v-if="inputContent.trim() && !isSavingNew" 
               class="save-as-qt-btn" 
               @click="openSaveAsQt"
-              title="将当前输入的文本保存为新的常用短语"
+              title="Save as quick text"
             >
-              + 存为新短语
+              + {{ $t('batchText.saveNewPhrase') }}
             </button>
           </div>
 
@@ -66,14 +66,14 @@
               v-for="qt in quickTextStore.quickTexts" 
               :key="qt.id" 
               class="qt-pill"
-              :title="qt.content"
+              :title="getQuickTextContent(qt)"
               @click="applyQuickText(qt)"
             >
-              <span class="qt-pill-title">{{ qt.title }}</span>
-              <span class="qt-pill-badge" v-if="qt.autoEnter" title="追加回车">↵</span>
+              <span class="qt-pill-title">{{ getQuickTextTitle(qt) }}</span>
+              <span class="qt-pill-badge" v-if="qt.autoEnter" title="Enter">↵</span>
             </button>
             <div v-if="quickTextStore.quickTexts.length === 0" class="qt-empty-hint">
-              暂无预设短语，可在下方输入并保存
+              {{ $t('batchText.noPresetPhrases') }}
             </div>
           </div>
 
@@ -81,19 +81,19 @@
           <div v-if="isSavingNew" class="save-qt-box animate-fade-in">
             <input 
               v-model="newQtTitle" 
-              placeholder="短语标题（如：登录欢迎语、测试密码）" 
+              :placeholder="$t('batchText.phraseTitlePlaceholder')" 
               class="save-qt-input"
               @keyup.enter="saveAsQuickText"
               ref="newTitleInputRef"
             />
             <div class="save-qt-actions">
-              <button class="save-qt-cancel" @click="isSavingNew = false">取消</button>
+              <button class="save-qt-cancel" @click="isSavingNew = false">{{ $t('common.cancel') }}</button>
               <button 
                 class="save-qt-confirm" 
                 @click="saveAsQuickText" 
                 :disabled="!newQtTitle.trim()"
               >
-                保存到短语库
+                {{ $t('common.save') }}
               </button>
             </div>
           </div>
@@ -104,18 +104,18 @@
           <textarea 
             v-model="inputContent" 
             ref="textareaRef"
-            placeholder="在此输入要下发到已选设备的文本内容（100% 汉字支持、换行、测试文案、账号密码、Emoji 等）..." 
+            :placeholder="$t('batchText.placeholder')" 
             class="batch-textarea custom-scrollbar" 
             rows="4"
           ></textarea>
 
           <div class="editor-tools-row">
             <div class="tools-left">
-              <label class="auto-enter-label" title="文本落屏后自动敲击一次回车键 (KEYCODE_ENTER)">
+              <label class="auto-enter-label" :title="$t('batchText.appendEnter')">
                 <input type="checkbox" v-model="autoEnter" class="checkbox-input" />
-                <span class="checkbox-text">追加 Enter 回车</span>
+                <span class="checkbox-text">{{ $t('batchText.appendEnter') }}</span>
               </label>
-              <span class="char-count">{{ inputContent.length }} 字符</span>
+              <span class="char-count">{{ inputContent.length }} {{ $t('batchText.charUnit') }}</span>
             </div>
             <div class="tools-right">
               <button 
@@ -123,7 +123,7 @@
                 @click="inputContent = ''" 
                 :disabled="!inputContent"
               >
-                清空输入
+                {{ $t('common.clear') }}
               </button>
             </div>
           </div>
@@ -132,13 +132,13 @@
 
       <!-- 弹窗底部操作栏 -->
       <footer class="modal-footer">
-        <button class="btn-cancel" @click="$emit('close')">取消</button>
+        <button class="btn-cancel" @click="$emit('close')">{{ $t('common.cancel') }}</button>
         <button 
           class="btn-send" 
           :disabled="!inputContent.trim() || currentTargets.length === 0 || isSending"
           @click="handleSend"
         >
-          {{ isSending ? '正在批量下发...' : `🚀 一键下发至已选 (${currentTargets.length} 台设备)` }}
+          {{ isSending ? $t('batchText.sending') : `${$t('batchText.sendBtn')} (${currentTargets.length})` }}
         </button>
       </footer>
     </div>
@@ -147,7 +147,10 @@
 
 <script setup>
 import { ref, watch, nextTick } from 'vue'
-import { useQuickTextStore } from '@/stores/quickTexts'
+import { useI18n } from 'vue-i18n'
+import { useQuickTextStore, getQuickTextTitle, getQuickTextContent } from '@/stores/quickTexts'
+
+const { t, locale } = useI18n()
 
 const props = defineProps({
   visible: {
@@ -198,7 +201,7 @@ function removeTarget(id) {
 
 function applyQuickText(qt) {
   if (!qt) return
-  inputContent.value = qt.content
+  inputContent.value = getQuickTextContent(qt)
   if (qt.autoEnter !== undefined) {
     autoEnter.value = qt.autoEnter
   }

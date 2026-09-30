@@ -3,9 +3,9 @@
     <div class="modal" :class="{ 'modal-compact': mode === 'assign' }">
       <header class="modal-header">
         <div>
-          <h2>{{ mode === 'assign' ? '批量设置标签' : '标签管理' }}</h2>
+          <h2>{{ mode === 'assign' ? $t('tags.batchSetTags') : $t('tags.tagManagement') }}</h2>
         </div>
-        <button class="close-btn" @click="$emit('close')" title="关闭">
+        <button class="close-btn" @click="$emit('close')" :title="$t('common.close')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
             <path d="M18 6L6 18M6 6l12 12"/>
           </svg>
@@ -15,8 +15,8 @@
       <div class="modal-body" :class="{ 'assign-mode': mode === 'assign' }">
         <section v-if="mode === 'full'" class="panel tags-panel">
           <div class="panel-header">
-            <h3>标签</h3>
-            <span>{{ tagStore.tags.length }} 个</span>
+            <h3>{{ $t('tags.tags') }}</h3>
+            <span>{{ tagStore.tags.length }} {{ $t('tags.countUnits') }}</span>
           </div>
 
           <form class="tag-form" @submit.prevent="addTag">
@@ -25,16 +25,16 @@
               class="text-input"
               type="text"
               maxlength="20"
-              placeholder="新标签名称"
+              :placeholder="$t('tags.newTagNamePlaceholder')"
             >
-            <input v-model="newTagColor" class="color-input" type="color" title="标签颜色">
-            <button class="primary-btn" type="submit">新增</button>
+            <input v-model="newTagColor" class="color-input" type="color" :title="$t('tags.tagColorTitle')">
+            <button class="primary-btn" type="submit">{{ $t('tags.add') }}</button>
           </form>
 
           <p v-if="tagError" class="error-text">{{ tagError }}</p>
 
           <div v-if="tagStore.tags.length === 0" class="empty-state">
-            还没有标签
+            {{ $t('tags.noTagsYet') }}
           </div>
 
           <div v-else class="tag-list">
@@ -44,7 +44,7 @@
                 type="color"
                 :value="tag.color"
                 @input="updateColor(tag, $event.target.value)"
-                title="修改颜色"
+                :title="$t('tags.changeColor')"
               >
               <input
                 class="text-input tag-name-input"
@@ -53,7 +53,7 @@
                 :value="tag.name"
                 @change="renameTag(tag, $event.target.value)"
               >
-              <button class="icon-btn danger" @click="deleteTag(tag)" title="删除标签">
+              <button class="icon-btn danger" @click="deleteTag(tag)" :title="$t('tags.deleteTag')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
                   <path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/>
                 </svg>
@@ -64,12 +64,12 @@
 
         <section class="panel devices-panel" :class="{ 'assign-panel-only': mode === 'assign' }">
           <div class="panel-header" v-if="mode === 'full'">
-            <h3>设备分配</h3>
-            <span>已选 {{ selectedDeviceIds.length }} 台</span>
+            <h3>{{ $t('tags.deviceAssignment') }}</h3>
+            <span>{{ $t('tags.selectedDevicesCount', { count: selectedDeviceIds.length }) }}</span>
           </div>
 
           <div v-if="devices.length === 0" class="empty-state">
-            暂无在线虚机
+            {{ $t('tags.noOnlineVms') }}
           </div>
 
           <div v-else class="assignment-layout" :class="{ 'assign-layout-only': mode === 'assign' }">
@@ -83,7 +83,7 @@
                     :indeterminate="isSomeDevicesSelected"
                     @change="toggleSelectAllDevices"
                   >
-                  <span>全选 ({{ devices.length }})</span>
+                  <span>{{ $t('tags.selectAllWithCount', { count: devices.length }) }}</span>
                 </label>
               </div>
               <label
@@ -107,10 +107,10 @@
 
             <div class="assignment-panel">
               <div v-if="selectedDeviceIds.length === 0" class="empty-state">
-                选择设备后批量分配标签
+                {{ $t('tags.selectDeviceTip') }}
               </div>
               <div v-else-if="tagStore.tags.length === 0" class="empty-state">
-                先创建标签
+                {{ $t('tags.createTagFirst') }}
               </div>
               <div v-else class="checkbox-list-container">
                 <div class="checkbox-list">
@@ -128,11 +128,11 @@
                 </div>
 
                 <div class="assignment-actions" v-if="hasChanges">
-                  <button class="primary-btn apply-btn" @click="applyAssignments">保存分配</button>
-                  <button class="secondary-btn cancel-btn" @click="resetChanges">撤销修改</button>
+                  <button class="primary-btn apply-btn" @click="applyAssignments">{{ $t('tags.saveAssignment') }}</button>
+                  <button class="secondary-btn cancel-btn" @click="resetChanges">{{ $t('tags.resetChanges') }}</button>
                 </div>
                 <div class="assignment-actions-placeholder" v-else-if="mode === 'assign'">
-                  <button class="secondary-btn cancel-btn-only" @click="$emit('close')">关闭</button>
+                  <button class="secondary-btn cancel-btn-only" @click="$emit('close')">{{ $t('common.close') }}</button>
                 </div>
               </div>
             </div>
@@ -145,7 +145,10 @@
 
 <script setup>
 import { ref, watch, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { DEFAULT_TAG_COLORS, useTagStore } from '@/stores/tags'
+
+const { t } = useI18n()
 
 const props = defineProps({
   devices: {
@@ -326,7 +329,7 @@ async function updateColor(tag, color) {
 }
 
 async function deleteTag(tag) {
-  if (confirm(`删除标签 "${tag.name}"？该标签会从所有设备上移除。`)) {
+  if (confirm(t('tags.confirmDeleteTag', { name: tag.name }))) {
     await tagStore.deleteTag(tag.id)
   }
 }

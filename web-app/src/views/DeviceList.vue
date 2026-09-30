@@ -6,18 +6,18 @@
       <div class="mh-row">
         <!-- 批量操作弹层（admin 或多设备用户）：群控 + 预览开关 + 标签管理/全局设置 -->
         <div v-if="authStore.isAdmin || deviceStore.devices.length > 1" class="mh-dropdown">
-          <button class="mh-filter-btn" @click.stop="toggleMobileMenu('batch')">☰ 批量 ▾</button>
+          <button class="mh-filter-btn" @click.stop="toggleMobileMenu('batch')">{{ $t('deviceList.batch') }}</button>
           <div v-if="mobileOpenMenu === 'batch'" class="mh-panel" @click.stop>
             <button class="mh-panel-item" @click="toggleMobileGroupControl">
-              {{ groupControlStore.isGroupControlActive ? '退出群控' : '进入群控' }}
+              {{ groupControlStore.isGroupControlActive ? $t('deviceList.exitGroupControl') : $t('deviceList.enterGroupControl') }}
             </button>
             <!-- 群控激活时的快捷操作（与桌面端群控工具栏等价） -->
             <template v-if="groupControlStore.isGroupControlActive">
-              <button class="mh-panel-item" @click.stop="selectAllOnline">全选在线</button>
-              <button class="mh-panel-item" @click.stop="clearSlaves">清空已选</button>
+              <button class="mh-panel-item" @click.stop="selectAllOnline">{{ $t('deviceList.selectAllOnline') }}</button>
+              <button class="mh-panel-item" @click.stop="clearSlaves">{{ $t('deviceList.clearSelected') }}</button>
               <div class="tag-select-dropdown">
                 <button class="mh-panel-item dropdown-trigger" @click.stop="showTagDropdown = !showTagDropdown">
-                  按标签勾选 ▾
+                  {{ $t('deviceList.selectByTag') }}
                 </button>
                 <div v-if="showTagDropdown" class="tag-dropdown-menu" @click.stop>
                   <div
@@ -29,58 +29,58 @@
                     <span class="tag-color-dot" :style="{ backgroundColor: tag.color }"></span>
                     <span class="tag-name-text">{{ tag.name }}</span>
                   </div>
-                  <div v-if="tagStore.tags.length === 0" class="tag-dropdown-empty">暂无标签</div>
+                  <div v-if="tagStore.tags.length === 0" class="tag-dropdown-empty">{{ $t('deviceList.noTags') }}</div>
                 </div>
               </div>
-              <div class="mh-panel-static">已选 {{ groupControlStore.selectedSlaveIds.length }} 台</div>
+              <div class="mh-panel-static">{{ $t('deviceList.selectedDevices', { count: groupControlStore.selectedSlaveIds.length }) }}</div>
               <button
                 v-if="groupControlStore.selectedSlaveIds.length > 0"
                 class="mh-panel-item"
                 @click="openTagManager('batch'); closeMobileMenus()"
-              >批量打标签</button>
+              >{{ $t('deviceList.batchTag') }}</button>
               <button
                 v-if="groupControlStore.selectedSlaveIds.length > 0"
                 class="mh-panel-item"
                 @click="openBatchTextModal(); closeMobileMenus()"
-              >💬 批量文本下发</button>
+              >{{ $t('deviceList.batchText') }}</button>
             </template>
             <div class="mh-panel-divider"></div>
             <!-- 高频预览 / 预览直控开关（v-model 绑定与桌面端一致） -->
-            <label class="switch-label mh-switch" title="开启后，可视区域内的虚机将使用 WebCodecs 硬件加速播放实时预览">
+            <label class="switch-label mh-switch" :title="$t('deviceList.previewSwitchTitle')">
               <input
                 type="checkbox"
                 v-model="deviceStore.globalPreviewMode"
                 class="switch-checkbox"
               >
-              <span class="switch-text">高频预览</span>
+              <span class="switch-text">{{ $t('deviceList.highFreqPreview') }}</span>
             </label>
             <div v-if="deviceStore.globalPreviewMode" class="mh-scope-row">
-              <span class="mh-scope-title">范围:</span>
+              <span class="mh-scope-title">{{ $t('deviceList.previewScope') }}</span>
               <button 
                 class="mh-scope-btn" 
                 :class="{ active: deviceStore.previewScopeMode === 'visible' }"
                 @click.stop="deviceStore.setPreviewScopeMode('visible')"
-              >可视</button>
+              >{{ $t('deviceList.scopeVisible') }}</button>
               <button 
                 class="mh-scope-btn" 
                 :class="{ active: deviceStore.previewScopeMode === 'all' }"
                 @click.stop="deviceStore.setPreviewScopeMode('all')"
-              >全部</button>
+              >{{ $t('deviceList.scopeAll') }}</button>
               <button 
                 class="mh-scope-btn" 
                 :class="{ active: deviceStore.previewScopeMode === 'selected' }"
                 @click.stop="deviceStore.setPreviewScopeMode('selected')"
-              >勾选</button>
+              >{{ $t('deviceList.scopeSelected') }}</button>
               <button 
                 class="mh-scope-btn" 
                 :class="{ active: deviceStore.previewScopeMode === 'tag' }"
                 @click.stop="deviceStore.setPreviewScopeMode('tag')"
-              >标签</button>
+              >{{ $t('deviceList.scopeTag') }}</button>
             </div>
             <label
               class="switch-label mh-switch"
               :class="{ 'disabled': !deviceStore.globalPreviewMode }"
-              title="开启后，可直接点击列表里的预览画面进行触控和按键控制，无需进入详情页 (需要先开启高频预览)"
+              :title="$t('deviceList.directControlTitle')"
             >
               <input
                 type="checkbox"
@@ -88,13 +88,13 @@
                 :disabled="!deviceStore.globalPreviewMode"
                 class="switch-checkbox"
               >
-              <span class="switch-text">预览直控</span>
+              <span class="switch-text">{{ $t('deviceList.directControl') }}</span>
             </label>
             <template v-if="authStore.isAdmin">
               <div class="mh-panel-divider"></div>
-              <button class="mh-panel-item" @click="openTagManager('full'); closeMobileMenus()">标签管理</button>
-              <button class="mh-panel-item" @click="openGlobalSettings(); closeMobileMenus()">全局设置</button>
-              <button class="mh-panel-item" @click="showLicensePanel = true; closeMobileMenus()">授权管理</button>
+              <button class="mh-panel-item" @click="openTagManager('full'); closeMobileMenus()">{{ $t('deviceList.tagManager') }}</button>
+              <button class="mh-panel-item" @click="openGlobalSettings(); closeMobileMenus()">{{ $t('deviceList.globalSettings') }}</button>
+              <button class="mh-panel-item" @click="showLicensePanel = true; closeMobileMenus()">{{ $t('deviceList.licenseManager') }}</button>
             </template>
           </div>
         </div>
@@ -104,7 +104,7 @@
             class="mh-filter-btn"
             :class="{ active: tagStore.selectedTagIds.length > 0 || deviceStore.showOfflineOnly }"
             @click.stop="toggleMobileMenu('tag')"
-          >标签 ▾</button>
+          >{{ $t('deviceList.tagsDropdown') }}</button>
           <div v-if="mobileOpenMenu === 'tag'" class="mh-panel" @click.stop>
             <button
               class="mh-panel-item"
@@ -112,7 +112,7 @@
               @click="selectAllTags(); closeMobileMenus()"
             >
               <span class="tag-dot all"></span>
-              <span class="mh-item-name">全部设备</span>
+              <span class="mh-item-name">{{ $t('deviceList.allDevices') }}</span>
               <span class="mh-item-count">{{ deviceStore.devices.length }}</span>
             </button>
             <button
@@ -132,7 +132,7 @@
               @click="toggleOfflineView(); closeMobileMenus()"
             >
               <span class="tag-dot offline"></span>
-              <span class="mh-item-name">离线设备</span>
+              <span class="mh-item-name">{{ $t('deviceList.offlineDevices') }}</span>
               <span class="mh-item-count">{{ deviceStore.offlineDevices.length }}</span>
             </button>
             <!-- 标签管理为管理员专属（标签写入口径已收口 admin），普通用户不展示写入口 -->
@@ -140,15 +140,15 @@
         </div>
         <!-- 排序 -->
         <div class="mh-dropdown">
-          <button class="mh-filter-btn" :class="{ active: sortBy !== 'default' }" @click.stop="toggleMobileMenu('sort')">排序 ▾</button>
+          <button class="mh-filter-btn" :class="{ active: sortBy !== 'default' }" @click.stop="toggleMobileMenu('sort')">{{ $t('deviceList.sortDropdown') }}</button>
           <div v-if="mobileOpenMenu === 'sort'" class="mh-panel" @click.stop>
-            <button class="mh-panel-item" :class="{ active: sortBy === 'default' }" @click="setSortBy('default')">默认排序</button>
-            <button class="mh-panel-item" :class="{ active: sortBy === 'recent' }" @click="setSortBy('recent')">最近活跃</button>
+            <button class="mh-panel-item" :class="{ active: sortBy === 'default' }" @click="setSortBy('default')">{{ $t('deviceList.sortDefault') }}</button>
+            <button class="mh-panel-item" :class="{ active: sortBy === 'recent' }" @click="setSortBy('recent')">{{ $t('deviceList.sortRecent') }}</button>
           </div>
         </div>
         <!-- 宫格列数（面板右对齐防溢出） -->
         <div class="mh-dropdown drop-right">
-          <button class="mh-filter-btn" @click.stop="toggleMobileMenu('cols')">宫格 ▾</button>
+          <button class="mh-filter-btn" @click.stop="toggleMobileMenu('cols')">{{ $t('deviceList.gridDropdown') }}</button>
           <div v-if="mobileOpenMenu === 'cols'" class="mh-panel" @click.stop>
             <button
               v-for="n in [1, 2, 3, 4]"
@@ -156,7 +156,7 @@
               class="mh-panel-item"
               :class="{ active: mobileCols === n }"
               @click="setMobileCols(n)"
-            >{{ n === 1 ? '单列' : n + ' 列' }}</button>
+            >{{ n === 1 ? $t('deviceList.singleCol') : $t('deviceList.cols', { n }) }}</button>
           </div>
         </div>
         <!-- 账号剩余时间（仅账号设有有效期时显示） -->
@@ -164,17 +164,17 @@
           v-if="accountExpiryChip"
           class="mh-expiry-chip"
           :class="{ expired: accountExpired }"
-          :title="accountExpiryTime ? '账号到期时间: ' + accountExpiryTime.toLocaleString('zh-CN', { hour12: false }) : ''"
+          :title="accountExpiryTime ? $t('deviceList.accountExpiry', { time: accountExpiryTime.toLocaleString(locale === 'zh-CN' ? 'zh-CN' : 'en-US', { hour12: false }) }) : ''"
         >⏳ {{ accountExpiryChip }}</span>
         <div class="mh-actions">
-          <button class="mh-icon-btn" :class="{ active: showMobileSearch }" @mousedown.prevent @click.stop="toggleMobileSearch" title="搜索" aria-label="搜索">
+          <button class="mh-icon-btn" :class="{ active: showMobileSearch }" @mousedown.prevent @click.stop="toggleMobileSearch" :title="$t('deviceList.searchHint')" :aria-label="$t('deviceList.searchHint')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
               <circle cx="11" cy="11" r="7"></circle>
               <path d="M20 20l-4-4"></path>
             </svg>
           </button>
-          <button class="mh-icon-btn" @click="refreshDevices" title="刷新设备列表" aria-label="刷新">⟳</button>
-          <button class="mh-icon-btn" @click="toggleViewMode" :title="viewMode === 'grid' ? '切换到列表视图' : '切换到卡片视图'" aria-label="切换视图">
+          <button class="mh-icon-btn" @click="refreshDevices" :title="$t('deviceList.refreshHint')" :aria-label="$t('deviceList.refreshHint')">⟳</button>
+          <button class="mh-icon-btn" @click="toggleViewMode" :title="viewMode === 'grid' ? $t('deviceList.switchToListView') : $t('deviceList.switchToCardView')" :aria-label="viewMode === 'grid' ? $t('deviceList.switchToListView') : $t('deviceList.switchToCardView')">
             <svg v-if="viewMode === 'grid'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
               <line x1="8" y1="6" x2="21" y2="6"></line>
               <line x1="8" y1="12" x2="21" y2="12"></line>
@@ -204,7 +204,7 @@
             ref="mobileSearchInput"
             v-model="searchQuery"
             type="search"
-            placeholder="搜索设备或标签"
+            :placeholder="$t('deviceList.searchPlaceholder')"
             @blur="onMobileSearchBlur"
           >
         </div>
@@ -213,9 +213,9 @@
 
     <!-- 虚机数量超限警告条（本次会话可关闭，徽标保持红色） -->
     <div v-if="isLicenseFull && !limitBannerDismissed" class="license-limit-banner">
-      <span class="limit-banner-text">⚠️ 虚机数量已达上限 ({{ licenseUsedCount }}/{{ deviceStore.licenseMaxDevices }})，新设备将无法接入。</span>
-      <button class="limit-upgrade-btn" @click="showLicensePanel = true">升级授权</button>
-      <button class="limit-close-btn" @click="limitBannerDismissed = true" title="关闭提示">✕</button>
+      <span class="limit-banner-text">{{ $t('deviceList.limitBanner', { used: licenseUsedCount, max: deviceStore.licenseMaxDevices }) }}</span>
+      <button class="limit-upgrade-btn" @click="showLicensePanel = true">{{ $t('deviceList.upgradeLicense') }}</button>
+      <button class="limit-close-btn" @click="limitBannerDismissed = true" :title="$t('deviceList.dismissTip')">✕</button>
     </div>
 
     <div class="content-layout">
@@ -226,7 +226,7 @@
           @click="selectAllTags"
         >
           <span class="tag-dot all"></span>
-          <span class="tag-name">全部设备</span>
+          <span class="tag-name">{{ $t('nav.allDevices') }}</span>
           <span class="tag-count">{{ deviceStore.devices.length }}</span>
         </button>
         <button
@@ -247,7 +247,7 @@
           @click="toggleOfflineView"
         >
           <span class="tag-dot offline"></span>
-          <span class="tag-name">离线设备</span>
+          <span class="tag-name">{{ $t('nav.offlineDevices') }}</span>
           <span class="tag-count">{{ deviceStore.offlineDevices.length }}</span>
         </button>
       </section>
@@ -255,18 +255,18 @@
       <!-- 群控快捷操作工具条 (Group Control Toolbar) -->
       <section v-if="groupControlStore.isGroupControlActive" class="group-control-bar animate-fade-in" @click.stop>
         <div class="gc-bar-left">
-          <span class="gc-brand-badge">⚡ 群控模式</span>
-          <button class="gc-btn" @click.stop="selectAllOnline" title="全选所有在线虚机">
-            全选在线
+          <span class="gc-brand-badge">⚡ {{ $t('topBar.groupControl') }}</span>
+          <button class="gc-btn" @click.stop="selectAllOnline" :title="$t('topBar.selectAllOnline')">
+            {{ $t('topBar.selectAllOnline') }}
           </button>
-          <button class="gc-btn" @click.stop="clearSlaves" title="清空所有已选从机">
-            清空已选
+          <button class="gc-btn" @click.stop="clearSlaves" :title="$t('common.clear')">
+            {{ $t('common.clear') }}
           </button>
 
           <!-- 按标签勾选下拉菜单 -->
           <div class="gc-tag-dropdown-wrap" @click.stop>
             <button class="gc-btn gc-dropdown-btn" @click.stop="showTagDropdown = !showTagDropdown">
-              <span>按标签勾选 ▾</span>
+              <span>{{ $t('deviceList.selectByTag') }}</span>
             </button>
             <div v-if="showTagDropdown" class="gc-tag-dropdown-menu" @click.stop>
               <div 
@@ -278,38 +278,38 @@
                 <span class="gc-tag-dot" :style="{ backgroundColor: tag.color }"></span>
                 <span class="gc-tag-name">{{ tag.name }}</span>
               </div>
-              <div v-if="tagStore.tags.length === 0" class="gc-tag-empty">暂无可用标签</div>
+              <div v-if="tagStore.tags.length === 0" class="gc-tag-empty">{{ $t('deviceList.noTags') }}</div>
             </div>
           </div>
 
-          <span class="gc-count-badge">已勾选 {{ groupControlStore.selectedSlaveIds.length }} 台从机</span>
+          <span class="gc-count-badge">{{ $t('topBar.selectedCount', { count: groupControlStore.selectedSlaveIds.length }) }}</span>
 
           <!-- 高频推流范围切换 -->
-          <div class="gc-scope-group" title="高频预览推流范围控制">
+          <div class="gc-scope-group" :title="$t('topBar.previewScope')">
             <button 
               class="gc-scope-btn" 
               :class="{ active: deviceStore.previewScopeMode === 'visible' }" 
               @click.stop="deviceStore.setPreviewScopeMode('visible')"
-              title="屏幕可视区域内所有设备均推流"
-            >可视区域</button>
+              :title="$t('topBar.scopeVisibleTip')"
+            >{{ $t('topBar.scopeVisible') }}</button>
             <button 
               class="gc-scope-btn" 
               :class="{ active: deviceStore.previewScopeMode === 'all' }" 
               @click.stop="deviceStore.setPreviewScopeMode('all')"
-              title="全量所有在线设备持续推流"
-            >全部在线</button>
+              :title="$t('topBar.scopeAllTip')"
+            >{{ $t('topBar.scopeAll') }}</button>
             <button 
               class="gc-scope-btn" 
               :class="{ active: deviceStore.previewScopeMode === 'selected' }" 
               @click.stop="deviceStore.setPreviewScopeMode('selected')"
-              title="仅对群控勾选的从机或主控机推流（最省资源，推荐）"
-            >仅勾选</button>
+              :title="$t('topBar.scopeSelectedTip')"
+            >{{ $t('topBar.scopeSelected') }}</button>
             <button 
               class="gc-scope-btn" 
               :class="{ active: deviceStore.previewScopeMode === 'tag' }" 
               @click.stop="deviceStore.setPreviewScopeMode('tag')"
-              title="仅匹配当前所选标签的设备推流"
-            >标签筛选</button>
+              :title="$t('topBar.scopeTagTip')"
+            >{{ $t('topBar.scopeTag') }}</button>
           </div>
 
           <!-- 预览直控按键 -->
@@ -317,34 +317,34 @@
             class="gc-btn gc-interactive-btn"
             :class="{ active: deviceStore.globalInteractiveMode }"
             @click.stop="toggleGlobalInteractive"
-            title="开启后可直接在大盘预览画面上触控操作，无需进入详情页"
+            :title="$t('topBar.directTouchTip')"
           >
             <span class="gc-btn-icon">🎮</span>
-            <span>预览直控 {{ deviceStore.globalInteractiveMode ? '已开启' : '已关闭' }}</span>
+            <span>{{ $t('topBar.directTouch') }} {{ deviceStore.globalInteractiveMode ? $t('common.on') : $t('common.off') }}</span>
           </button>
 
           <button 
             v-if="groupControlStore.selectedSlaveIds.length > 0"
             class="gc-btn gc-tag-action-btn"
             @click="openTagManager('batch')"
-            title="对已勾选设备批量打标签"
+            :title="$t('deviceList.batchTagSelected')"
           >
-            🏷 批量打标签
+            {{ $t('deviceList.batchTagBtn') }}
           </button>
 
           <button 
             v-if="groupControlStore.selectedSlaveIds.length > 0"
             class="gc-btn gc-text-action-btn"
             @click.stop="openBatchTextModal"
-            title="向当前所有已选从机批量下发文本"
+            :title="$t('batchText.desc')"
           >
-            💬 批量文本下发
+            💬 {{ $t('batchText.title') }}
           </button>
         </div>
 
         <div class="gc-bar-right">
-          <button class="gc-exit-btn" @click="groupControlStore.toggleGroupControl(false)" title="退出群控模式">
-            退出群控 ✕
+          <button class="gc-exit-btn" @click="groupControlStore.toggleGroupControl(false)" :title="$t('topBar.exitGroupControl')">
+            {{ $t('topBar.exitGroupControl') }} ✕
           </button>
         </div>
       </section>
@@ -352,71 +352,71 @@
       <main class="grid-container">
         <div v-if="deviceStore.loading && deviceStore.devices.length === 0" class="state-view">
           <div class="spinner"></div>
-          <p>正在获取虚机列表...</p>
+          <p>{{ $t('common.loading') }}</p>
         </div>
 
         <div v-else-if="deviceStore.devices.length === 0 && deviceStore.offlineDevices.length === 0 && authStore.isAdmin" class="quickstart-container">
           <div class="quickstart-header">
             <div class="empty-icon">🔌</div>
-            <h3 class="qs-title">快速接入您的第一台云手机</h3>
-            <p class="qs-subtitle">当前系统中暂无在线设备。请使用以下方式之一，将 Android 设备（真机/模拟器/redroid 容器）注册至本控制端：</p>
+            <h3 class="qs-title">{{ $t('deviceList.quickstartTitle') }}</h3>
+            <p class="qs-subtitle">{{ $t('deviceList.quickstartSubtitle') }}</p>
           </div>
 
           <div class="quickstart-layout">
             <!-- 方式一：网页一键 USB 部署 -->
             <div class="qs-card-box highlight">
-              <div class="qs-badge">推荐</div>
-              <h4 class="qs-card-title">方式一：网页一键 USB 自动部署</h4>
-              <p class="qs-card-desc">物理手机通过 USB 连接当前电脑，利用浏览器的 WebUSB/WebADB 功能免装任何环境，直接一键检测架构、推送并拉起投屏 Agent，适合个人调试物理手机。</p>
-              <p class="qs-card-desc-warn">⚠️ 注意：此方式基于 WebUSB 协议直连物理端口，<b>不支持无线或网络 ADB 连接模式</b>。</p>
+              <div class="qs-badge">{{ $t('deviceList.recommended') }}</div>
+              <h4 class="qs-card-title">{{ $t('deviceList.method1Title') }}</h4>
+              <p class="qs-card-desc">{{ $t('deviceList.method1Desc') }}</p>
+              <p class="qs-card-desc-warn" v-html="$t('deviceList.method1Warn')"></p>
               <div class="qs-action-wrapper">
                 <button class="qs-btn-primary" @click="goToDeploy">
                   <svg class="qs-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
                     <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
                   </svg>
-                  前往网页 USB 部署
+                  {{ $t('deviceList.goToUsbDeploy') }}
                 </button>
               </div>
             </div>
 
             <!-- 方式二：手动/命令行快速部署 -->
             <div class="qs-card-box">
-              <h4 class="qs-card-title">方式二：手动 / 命令行一键部署</h4>
-              <p class="qs-card-desc">适用于 Linux/macOS 物理设备、redroid 容器、远端虚拟机或已存在 adb 连接的集群。</p>
+              <h4 class="qs-card-title">{{ $t('deviceList.method2Title') }}</h4>
+              <p class="qs-card-desc">{{ $t('deviceList.method2Desc') }}</p>
 
               <!-- 接入前准备工作 -->
               <div class="qs-prerequisites">
-                <div class="qs-prereq-title">📋 接入前准备工作：</div>
+                <div class="qs-prereq-title">{{ $t('deviceList.prereqTitle') }}</div>
                 <ul class="qs-prereq-list">
-                  <li><b>手机端配置</b>：需进入「设置 -> 开发者选项」开启「USB 调试」；物理机需用数据线连上电脑。</li>
-                  <li><b>电脑端配置</b>：电脑需已安装并配置好 ADB 工具，并在命令行能成功识别到设备。</li>
+                  <li v-html="$t('deviceList.prereqPhone')"></li>
+                  <li v-html="$t('deviceList.prereqPc')"></li>
                 </ul>
               </div>
 
               <!-- 动态参数配置区 -->
               <div class="qs-form-grid">
                 <div class="qs-form-item">
-                  <label class="qs-form-label">信令服务器 IP:Port</label>
-                  <input v-model="quickstartSignaling" class="qs-form-input" placeholder="例如: 192.168.1.100:8443">
+                  <label class="qs-form-label">{{ $t('deviceList.signalingIpPort') }}</label>
+                  <input v-model="quickstartSignaling" class="qs-form-input" :placeholder="$t('deviceList.signalingIpPortPlaceholder')">
                 </div>
                 <div class="qs-form-item">
-                  <label class="qs-form-label">分配设备 ID (可选)</label>
-                  <input v-model="quickstartDeviceId" class="qs-form-input" placeholder="例如: device_01">
+                  <label class="qs-form-label">{{ $t('deviceList.assignDeviceId') }}</label>
+                  <input v-model="quickstartDeviceId" class="qs-form-input" :placeholder="$t('deviceList.assignDeviceIdPlaceholder')">
                 </div>
               </div>
 
               <!-- 核心配置展示 -->
               <div class="qs-real-config">
                 <div class="qs-config-row">
-                  <span class="qs-config-label">信令连接 (-signaling):</span>
+                  <span class="qs-config-label">{{ $t('deviceList.signalingConn') }}</span>
                   <code class="qs-config-val">{{ signalingProtocol }}{{ quickstartSignaling }}/register_agent</code>
-                  <button class="qs-config-copy" @click="copyText(`${signalingProtocol}${quickstartSignaling}/register_agent`)">复制</button>
+                  <button class="qs-config-copy" @click="copyText(`${signalingProtocol}${quickstartSignaling}/register_agent`)">{{ $t('deviceList.copy') }}</button>
                 </div>
                 <div class="qs-config-row">
-                  <span class="qs-config-label">中转服务 (-ice-servers):</span>
+                  <span class="qs-config-label">{{ $t('deviceList.relayIce') }}</span>
                   <code class="qs-config-val">{{ computedIceServers }}</code>
-                  <button class="qs-config-copy" @click="copyText(computedIceServers)">复制</button>
+                  <button class="qs-config-copy" @click="copyText(computedIceServers)">{{ $t('deviceList.copy') }}</button>
                 </div>
               </div>
 
@@ -427,14 +427,14 @@
                   :class="{ active: quickstartMode === 'adb' }" 
                   @click="quickstartMode = 'adb'"
                 >
-                  💻 电脑 ADB 一键部署 (无需 Root)
+                  {{ $t('deviceList.tabAdbDeploy') }}
                 </button>
                 <button 
                   class="qs-mode-btn magisk-qs-mode" 
                   :class="{ active: quickstartMode === 'magisk' }" 
                   @click="quickstartMode = 'magisk'"
                 >
-                  📱 Magisk / KSU 刷机模块 (Root 开机自启)
+                  {{ $t('deviceList.tabMagiskDeploy') }}
                 </button>
               </div>
 
@@ -442,7 +442,7 @@
               <template v-if="quickstartMode === 'adb'">
                 <!-- 步骤一：下载部署包 -->
                 <div class="qs-step-block">
-                  <div class="qs-step-title">第一步：下载 ADB 部署包 (包含全架构 Agent 及一键执行脚本)</div>
+                  <div class="qs-step-title">{{ $t('deviceList.step1AdbTitle') }}</div>
                   <div class="qs-download-row">
                     <a href="/agent/agent-deploy.pkg" download="agent-deploy.zip" class="qs-download-link">
                       <svg class="qs-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -450,29 +450,29 @@
                         <polyline points="7 10 12 15 17 10"></polyline>
                         <line x1="12" y1="15" x2="12" y2="3"></line>
                       </svg>
-                      下载统一部署包 (agent-deploy.zip)
+                      {{ $t('deviceList.downloadDeployPkg') }}
                     </a>
                   </div>
                 </div>
 
                 <!-- 步骤二：运行命令 -->
                 <div class="qs-step-block">
-                  <div class="qs-step-title">第二步：解压 ZIP 并在连接了设备的电脑终端运行命令</div>
+                  <div class="qs-step-title">{{ $t('deviceList.step2AdbTitle') }}</div>
                   
                   <!-- 切换 OS 平台 -->
                   <div class="qs-tabs">
-                    <button class="qs-tab" :class="{ active: qsActiveOs === 'unix' }" @click="qsActiveOs = 'unix'">Linux / macOS (一键)</button>
-                    <button class="qs-tab" :class="{ active: qsActiveOs === 'win' }" @click="qsActiveOs = 'win'">Windows CMD (一键)</button>
+                    <button class="qs-tab" :class="{ active: qsActiveOs === 'unix' }" @click="qsActiveOs = 'unix'">{{ $t('deviceList.tabUnix') }}</button>
+                    <button class="qs-tab" :class="{ active: qsActiveOs === 'win' }" @click="qsActiveOs = 'win'">{{ $t('deviceList.tabWin') }}</button>
                   </div>
 
                   <!-- 终端视口 -->
                   <div class="qs-terminal">
-                    <pre v-if="qsActiveOs === 'unix'" class="qs-code-text"># 解压后在本地终端执行一键命令 (自动探测手机架构并推送拉起服务)
+                    <pre v-if="qsActiveOs === 'unix'" class="qs-code-text"># Auto-detect architecture and launch agent
 chmod +x run.sh
 ./run.sh -id "{{ quickstartDeviceId || 'device_01' }}" -signaling "{{ signalingProtocol }}{{ quickstartSignaling }}" -ice-servers "{{ computedIceServers }}"</pre>
-                    <pre v-else-if="qsActiveOs === 'win'" class="qs-code-text">:: 解压后在本地 CMD 窗口执行一键命令 (自动探测手机架构并推送拉起服务)
+                    <pre v-else-if="qsActiveOs === 'win'" class="qs-code-text">:: Auto-detect architecture and launch agent
 run.bat -id "{{ quickstartDeviceId || 'device_01' }}" -signaling "{{ signalingProtocol }}{{ quickstartSignaling }}" -ice-servers "{{ computedIceServers }}"</pre>
-                    <button class="qs-copy-btn" @click="copyCommandText">复制运行指令</button>
+                    <button class="qs-copy-btn" @click="copyCommandText">{{ $t('deviceList.copyRunCmd') }}</button>
                   </div>
                 </div>
               </template>
@@ -481,31 +481,31 @@ run.bat -id "{{ quickstartDeviceId || 'device_01' }}" -signaling "{{ signalingPr
               <template v-else-if="quickstartMode === 'magisk'">
                 <!-- 步骤一：下载模块包 -->
                 <div class="qs-step-block">
-                  <div class="qs-step-title">第一步：下载 Magisk 模块刷机包 (物理真机已 Root 环境)</div>
+                  <div class="qs-step-title">{{ $t('deviceList.step1MagiskTitle') }}</div>
                   <div class="qs-download-row">
                     <a href="/agent/cloudphone-agent-magisk.pkg" download="cloudphone-agent-magisk.zip" class="qs-download-link magisk-qs-btn">
                       <svg class="qs-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
                         <line x1="12" y1="18" x2="12.01" y2="18"></line>
                       </svg>
-                      下载 Magisk 模块包 (cloudphone-agent-magisk.zip)
+                      {{ $t('deviceList.downloadMagiskPkg') }}
                     </a>
                   </div>
                 </div>
 
                 <!-- 步骤二：刷入与热重载 -->
                 <div class="qs-step-block">
-                  <div class="qs-step-title">第二步：手机端刷入模块重启，并执行命令配置信令服务器</div>
+                  <div class="qs-step-title">{{ $t('deviceList.step2MagiskTitle') }}</div>
                   
                   <!-- 终端视口 -->
                   <div class="qs-terminal">
-                    <pre class="qs-code-text"># 手机刷入模块重启后，在手机终端或 ADB shell 执行以下命令设置地址并重启服务:
+                    <pre class="qs-code-text"># After flashing and rebooting, configure signaling address in ADB shell:
 su
 cpctl set CP_AGENT_SIGNALING "{{ signalingProtocol }}{{ quickstartSignaling }}"
 cpctl set CP_AGENT_ICE_SERVERS "{{ computedIceServers }}"<template v-if="quickstartDeviceId">
 cpctl set CP_AGENT_ID "{{ quickstartDeviceId }}"</template>
 cpctl restart</pre>
-                    <button class="qs-copy-btn" @click="copyCommandText">复制运行指令</button>
+                    <button class="qs-copy-btn" @click="copyCommandText">{{ $t('deviceList.copyRunCmd') }}</button>
                   </div>
                 </div>
               </template>
@@ -515,14 +515,14 @@ cpctl restart</pre>
 
         <div v-else-if="deviceStore.devices.length === 0 && deviceStore.offlineDevices.length === 0" class="state-view">
           <div class="empty-icon">📱</div>
-          <h3>暂无可用云手机</h3>
-          <p>您当前没有可用的云手机，请联系管理员购买或开通。</p>
+          <h3>{{ $t('deviceList.noAvailablePhones') }}</h3>
+          <p>{{ $t('deviceList.noAvailablePhonesHint') }}</p>
         </div>
 
         <div v-else-if="noVisibleDevices" class="state-view">
           <div class="empty-icon">🔎</div>
-          <h3>没有匹配结果</h3>
-          <p>调整搜索关键字或标签筛选</p>
+          <h3>{{ $t('deviceList.noMatchResult') }}</h3>
+          <p>{{ $t('deviceList.noMatchResultHint') }}</p>
         </div>
 
         <div v-else>
@@ -532,22 +532,22 @@ cpctl restart</pre>
               <div class="device-table-header">
                 <div class="th col-select">
                   <span v-if="groupControlStore.isGroupControlActive">
-                    <input type="checkbox" :checked="isAllSelected" @change="toggleSelectAll" title="全选/取消全选" class="header-checkbox" />
+                    <input type="checkbox" :checked="isAllSelected" @change="toggleSelectAll" :title="$t('deviceList.selectAllCheckboxHint')" class="header-checkbox" />
                   </span>
                 </div>
-                <div class="th col-thumb">预览</div>
-                <div class="th col-device sortable" @click="handleTableSort('id')" title="点击排序">
-                  设备标识 <span class="sort-icon">{{ getSortIcon('id') }}</span>
+                <div class="th col-thumb">{{ $t('deviceList.thThumb') }}</div>
+                <div class="th col-device sortable" @click="handleTableSort('id')" :title="$t('deviceList.clickToSort')">
+                  {{ $t('deviceList.thDeviceId') }} <span class="sort-icon">{{ getSortIcon('id') }}</span>
                 </div>
-                <div class="th col-status sortable" @click="handleTableSort('status')" title="点击排序">
-                  运行状态 <span class="sort-icon">{{ getSortIcon('status') }}</span>
+                <div class="th col-status sortable" @click="handleTableSort('status')" :title="$t('deviceList.clickToSort')">
+                  {{ $t('deviceList.thStatus') }} <span class="sort-icon">{{ getSortIcon('status') }}</span>
                 </div>
-                <div class="th col-clients">接入情况</div>
-                <div class="th col-metrics sortable" @click="handleTableSort('cpu')" title="点击按 CPU 占用排序">
-                  系统负载 <span class="sort-icon">{{ getSortIcon('cpu') }}</span>
+                <div class="th col-clients">{{ $t('deviceList.thClients') }}</div>
+                <div class="th col-metrics sortable" @click="handleTableSort('cpu')" :title="$t('deviceList.clickToSortCpu')">
+                  {{ $t('deviceList.thMetrics') }} <span class="sort-icon">{{ getSortIcon('cpu') }}</span>
                 </div>
-                <div class="th col-tags">标签</div>
-                <div class="th col-actions">快捷操作</div>
+                <div class="th col-tags">{{ $t('deviceList.thTags') }}</div>
+                <div class="th col-actions">{{ $t('deviceList.thActions') }}</div>
               </div>
 
               <div class="device-table-body">
@@ -578,7 +578,7 @@ cpctl restart</pre>
                   <!-- 离线设备分区（在表格中直接无缝衔接） -->
                   <template v-if="sortedOfflineDevices.length > 0">
                     <div class="table-offline-divider">
-                      <span>离线设备 ({{ sortedOfflineDevices.length }})</span>
+                      <span>{{ $t('deviceList.offlineDevicesWithCount', { count: sortedOfflineDevices.length }) }}</span>
                     </div>
                     <DeviceListItem
                       v-for="device in sortedOfflineDevices"
@@ -639,7 +639,7 @@ cpctl restart</pre>
                   </div>
                 </template>
                 <div v-else class="single-pager-empty">
-                  暂无在线设备<template v-if="filteredOfflineDevices.length > 0">（{{ filteredOfflineDevices.length }} 台离线，可切换多列查看）</template>
+                  {{ $t('deviceList.noOnlineDevices') }}<template v-if="filteredOfflineDevices.length > 0">{{ $t('deviceList.offlineCountSuffix', { count: filteredOfflineDevices.length }) }}</template>
                 </div>
               </template>
               <template v-else>
@@ -663,7 +663,7 @@ cpctl restart</pre>
               <!-- 离线设备区块（数据来自服务端离线记录，可折叠，默认折叠） -->
               <div v-if="filteredOfflineDevices.length > 0" class="offline-section">
                 <div class="offline-section-header clickable" @click="offlineCollapsed = !offlineCollapsed">
-                  <span class="offline-section-title">离线设备</span>
+                  <span class="offline-section-title">{{ $t('deviceList.offlineSection') }}</span>
                   <span class="offline-section-count">{{ filteredOfflineDevices.length }}</span>
                   <span class="offline-section-arrow">{{ offlineCollapsed ? '▸' : '▾' }}</span>
                 </div>
@@ -741,6 +741,7 @@ cpctl restart</pre>
 <script setup>
 import { computed, ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useDeviceStore } from '@/stores/devices'
 import { useTagStore } from '@/stores/tags'
 import DeviceCard from '@/components/DeviceCard.vue'
@@ -755,6 +756,7 @@ import { getDeviceSettings, saveDeviceSettings, hasCustomSettings, deleteDeviceS
 import { useAuthStore } from '@/stores/auth'
 import { useGroupControlStore } from '@/stores/groupControl'
 
+const { t, locale } = useI18n()
 const router = useRouter()
 const deviceStore = useDeviceStore()
 const tagStore = useTagStore()
@@ -781,19 +783,19 @@ const licenseBadgeText = computed(() => {
   const max = deviceStore.licenseMaxDevices
   if (deviceStore.licenseActivated) {
     // 普通用户拿不到详细字段（额度/剩余天数），只显示已授权状态，避免展示默认值误导
-    if (!deviceStore.licenseDetailsLoaded) return '已授权'
-    return `授权 ${used}/${max} 台 · 剩余 ${deviceStore.licenseDaysRemaining} 天`
+    if (!deviceStore.licenseDetailsLoaded) return t('license.authorized')
+    return t('license.licensedDesc', { used, max, days: deviceStore.licenseDaysRemaining })
   }
-  if (!deviceStore.licenseDetailsLoaded) return '未授权'
+  if (!deviceStore.licenseDetailsLoaded) return t('license.unauthorized')
   if (deviceStore.licensePromo) {
-    return `限时特惠 ${used}/${max} 台`
+    return t('license.promoDesc', { used, max })
   }
-  return `免费版 ${used}/${max} 台`
+  return t('license.freeDesc', { used, max })
 })
 
 const licenseBadgeTitle = computed(() => {
   if (!deviceStore.licenseDetailsLoaded) {
-    return '点击查看授权管理'
+    return t('license.clickToManage')
   }
   if (deviceStore.licenseActivated) {
     return `授权到期时间: ${deviceStore.licenseExpiresAt || '-'}，点击查看授权管理`
@@ -977,14 +979,14 @@ const groupControlTargetIds = computed(() => {
 
 function openBatchTextModal() {
   if (groupControlTargetIds.value.length === 0) {
-    alert('请先勾选需要下发文本的从机设备')
+    alert(t('license.selectSlaveAlert'))
     return
   }
   showBatchTextModal.value = true
 }
 
 function onBatchTextSent({ count }) {
-  batchTextNotice.value = `已成功向 ${count} 台设备下发文本！`
+  batchTextNotice.value = t('license.batchTextSuccess', { count })
   if (batchTextNoticeTimer) clearTimeout(batchTextNoticeTimer)
   batchTextNoticeTimer = setTimeout(() => {
     batchTextNotice.value = ''
@@ -1046,12 +1048,12 @@ const accountExpiryChip = computed(() => {
   const t = accountExpiryTime.value
   if (!t) return ''
   const ms = t.getTime() - accountNowTick.value
-  if (ms <= 0) return '已到期'
+  if (ms <= 0) return t('license.expired')
   const d = Math.floor(ms / 86400000)
   const h = Math.floor((ms % 86400000) / 3600000).toString().padStart(2, '0')
   const m = Math.floor((ms % 3600000) / 60000).toString().padStart(2, '0')
   const s = Math.floor((ms % 60000) / 1000).toString().padStart(2, '0')
-  return d > 0 ? `剩 ${d} 天` : `剩 ${h}:${m}:${s}`
+  return d > 0 ? t('license.daysRemaining', { d }) : `${h}:${m}:${s}`
 })
 
 const localSettings = ref(applyPolicyToSettings(getDeviceSettings(''), authStore.userPolicy))
@@ -1336,10 +1338,10 @@ async function fetchIceServers() {
 
 function copyText(text) {
   navigator.clipboard.writeText(text).then(() => {
-    alert('已成功复制到剪贴板！')
+    alert(t('license.copySuccess'))
   }).catch(err => {
     console.error('复制失败:', err)
-    alert('复制失败，请手动选择复制。')
+    alert(t('license.copyFailed'))
   })
 }
 

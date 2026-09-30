@@ -2,30 +2,30 @@
   <div class="multi-floating-workspace" ref="workspaceRef">
     <!-- 浮窗工作台快捷整理栏 -->
     <div class="workspace-toolbar">
-      <span class="toolbar-title">自由多浮窗工作台</span>
+      <span class="toolbar-title">{{ $t('multi.floatingTitle') }}</span>
       <div class="toolbar-buttons">
-        <button class="arrange-btn" @click="arrangeCascade" title="层叠排列">
+        <button class="arrange-btn" @click="arrangeCascade" :title="$t('multi.cascadeTitle')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="2" y="2" width="13" height="13" rx="2"></rect>
             <path d="M9 9h13v13H9z"></path>
           </svg>
-          层叠
+          {{ $t('multi.cascadeBtn') }}
         </button>
-        <button class="arrange-btn" @click="arrangeTile" title="横向均匀平铺">
+        <button class="arrange-btn" @click="arrangeTile" :title="$t('multi.sideBySideTitle')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="3" y="3" width="7" height="18" rx="1"></rect>
             <rect x="14" y="3" width="7" height="18" rx="1"></rect>
           </svg>
-          并排
+          {{ $t('multi.sideBySideBtn') }}
         </button>
-        <button class="arrange-btn" @click="arrangeGrid" title="四角对齐排列">
+        <button class="arrange-btn" @click="arrangeGrid" :title="$t('multi.quadTitle')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="3" y="3" width="8" height="8" rx="1"></rect>
             <rect x="13" y="3" width="8" height="8" rx="1"></rect>
             <rect x="3" y="13" width="8" height="8" rx="1"></rect>
             <rect x="13" y="13" width="8" height="8" rx="1"></rect>
           </svg>
-          四角
+          {{ $t('multi.quadBtn') }}
         </button>
       </div>
     </div>
@@ -56,15 +56,15 @@
               class="win-btn master-btn" 
               :class="{ active: deviceStore.masterDeviceId === id }" 
               @click="deviceStore.setMasterDevice(id)" 
-              :title="deviceStore.masterDeviceId === id ? '当前为主控机（指令广播源）' : '设为主控机'"
+              :title="deviceStore.masterDeviceId === id ? $t('multi.currentMasterTitle') : $t('multi.setMasterTitle')"
             >
               👑
             </button>
-            <button class="win-btn" @click="toggleMinimize(id)" title="最小化到托盘">─</button>
-            <button class="win-btn" @click="deviceStore.toggleMaximizeDevice(id)" :title="deviceStore.maximizedDeviceId === id ? '还原窗口' : '最大化'">
+            <button class="win-btn" @click="toggleMinimize(id)" :title="$t('multi.minimizeToTray')">─</button>
+            <button class="win-btn" @click="deviceStore.toggleMaximizeDevice(id)" :title="deviceStore.maximizedDeviceId === id ? $t('multi.restore') : $t('multi.maximize')">
               {{ deviceStore.maximizedDeviceId === id ? '❐' : '⤢' }}
             </button>
-            <button class="win-btn close" @click="closeWindow(id)" title="关闭">✕</button>
+            <button class="win-btn close" @click="closeWindow(id)" :title="$t('common.close')">✕</button>
           </div>
         </div>
 
@@ -88,7 +88,7 @@
 
     <!-- 底部最小化任务托盘 -->
     <div class="minimized-dock" v-if="minimizedWindows.length > 0">
-      <span class="dock-label">托盘:</span>
+      <span class="dock-label">{{ $t('multi.trayLabel') }}</span>
       <div 
         v-for="id in minimizedWindows" 
         :key="id"

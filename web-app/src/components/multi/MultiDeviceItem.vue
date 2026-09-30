@@ -23,7 +23,7 @@
           class="item-btn audio-btn" 
           :class="{ muted: isMuted }" 
           @click="toggleMute"
-          :title="isMuted ? '取消静音' : '静音'"
+          :title="isMuted ? $t('multi.unmute') : $t('multi.mute')"
         >
           <svg v-if="!isMuted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
@@ -40,7 +40,7 @@
         <button 
           class="item-btn close-btn" 
           @click="closeThis"
-          title="关闭此虚机直连"
+          :title="$t('multi.closeDeviceConn')"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <line x1="18" y1="6" x2="6" y2="18"></line>

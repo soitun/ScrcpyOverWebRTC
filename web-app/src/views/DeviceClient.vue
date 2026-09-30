@@ -7,18 +7,18 @@
         <!-- 监控专属 OSD 水印状态栏 -->
         <div v-if="isCameraMode" class="camera-osd-bar">
           <div class="osd-left">
-            <span class="osd-badge live-dot">● 实时监控</span>
+            <span class="osd-badge live-dot">{{ $t('deviceClient.liveSurveillance') }}</span>
             <span class="osd-item osd-title" :title="currentId">{{ currentId }}</span>
             <span class="osd-divider">|</span>
             <span class="osd-item osd-lens">📷 {{ currentLensName }}</span>
             <span class="osd-divider">|</span>
             <span class="osd-item osd-res">{{ currentResText }}</span>
-            <span class="osd-badge eco-dot" v-if="localSettings.cameraLowPower">🌿 节能中</span>
-            <span class="osd-item osd-fps" v-if="videoStats" :title="videoStats.fpsLabel ? '4层帧率: SRC(手机采集) | RX(网络接收) | DEC(解码) | PRES(呈现渲染)' : '实时帧率'">{{ videoStats.fpsLabel || (videoStats.fps + 'fps') }}</span>
+            <span class="osd-badge eco-dot" v-if="localSettings.cameraLowPower">{{ $t('deviceClient.ecoMode') }}</span>
+            <span class="osd-item osd-fps" v-if="videoStats" :title="videoStats.fpsLabel ? $t('deviceClient.fpsLabelHint') : $t('deviceClient.realtimeFps')">{{ videoStats.fpsLabel || (videoStats.fps + 'fps') }}</span>
             <span class="osd-divider" v-if="videoStats">|</span>
-            <span class="osd-item osd-bitrate" v-if="videoStats" :title="`视频接收码率 (目标: ${videoStats.targetBitrate || localSettings.bitrate || 4} Mbps)`">
+            <span class="osd-item osd-bitrate" v-if="videoStats" :title="$t('deviceClient.bitrateTitle', { target: videoStats.targetBitrate || localSettings.bitrate || 4 })">
               {{ videoStats.bitrate > 1000 ? (videoStats.bitrate / 1000).toFixed(1) + ' Mbps' : videoStats.bitrate + ' kbps' }}
-              <span v-if="isWebSocketMode" class="osd-sub"> (目标 {{ videoStats.targetBitrate || localSettings.bitrate || 4 }}M)</span>
+              <span v-if="isWebSocketMode" class="osd-sub">{{ $t('deviceClient.targetBitrateSuffix', { target: videoStats.targetBitrate || localSettings.bitrate || 4 }) }}</span>
             </span>
           </div>
 
@@ -38,7 +38,7 @@
         </div>
 
         <!-- 移动端退出按钮 (右上角，全屏时自动隐藏让画面更纯净) -->
-        <button v-if="isMobile && !isFullscreen && !isWebFullscreen" class="mobile-close-fab" @click="deviceStore.clearActiveDevice()" title="关闭连接">
+        <button v-if="isMobile && !isFullscreen && !isWebFullscreen" class="mobile-close-fab" @click="deviceStore.clearActiveDevice()" :title="$t('deviceClient.closeConn')">
           ✕
         </button>
 
@@ -47,7 +47,7 @@
           class="fullscreen-fab" 
           :class="{ 'is-active': isFullscreen || isWebFullscreen, 'fs-ui-visible': fsUiVisible }"
           @click="toggleFullscreen" 
-          :title="(isFullscreen || isWebFullscreen) ? '退出全屏' : '全屏显示'"
+          :title="(isFullscreen || isWebFullscreen) ? $t('deviceClient.exitFullscreen') : $t('deviceClient.enterFullscreen')"
         >
           <svg v-if="isFullscreen || isWebFullscreen" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polyline points="4 14 10 14 10 20"></polyline>
@@ -64,13 +64,13 @@
           class="webfullscreen-fab" 
           :class="{ 'is-active': isWebFullscreen }" 
           @click="toggleWebFullscreen" 
-          :title="isWebFullscreen ? '退出页面全屏 (按 Esc 键)' : '页面全屏'"
+          :title="isWebFullscreen ? $t('deviceClient.exitWebFullscreen') : $t('deviceClient.enterWebFullscreen')"
         >
           <svg v-if="isWebFullscreen" class="icon" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           <svg v-else class="icon" viewBox="0 0 24 24"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
         </button>
         <!-- 画中画按钮 -->
-        <button v-if="!isMobile && pictureInPictureSupported" class="pip-fab" @click="togglePictureInPicture" :title="isPiP ? '退出画中画' : '画中画'">
+        <button v-if="!isMobile && pictureInPictureSupported" class="pip-fab" @click="togglePictureInPicture" :title="isPiP ? $t('deviceClient.exitPip') : $t('deviceClient.enterPip')">
           <svg class="icon" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><rect x="11" y="9" width="9" height="7" rx="1" ry="1" fill="currentColor" stroke="none"></rect></svg>
         </button>
 
@@ -140,23 +140,23 @@
 
         <!-- 视频流状态面板 (常规模式左上角) -->
         <div v-if="videoStats && localSettings.showStats !== false && !isCameraMode" class="stats-badge">
-          <span v-if="isWebSocketMode" class="stat-conn-type ws-pill" title="WebSocket TCP 二进制流传输">⚡ WS 投屏</span>
-          <span class="stat-fps" :title="videoStats.fpsLabel ? '4层帧率: SRC(手机采集) | RX(网络接收) | DEC(解码) | PRES(呈现渲染)' : '实时帧率'">{{ videoStats.fpsLabel || (videoStats.fps + 'fps') }}</span>
+          <span v-if="isWebSocketMode" class="stat-conn-type ws-pill" :title="$t('deviceClient.wsTcpStream')">{{ $t('deviceClient.wsStreamBadge') }}</span>
+          <span class="stat-fps" :title="videoStats.fpsLabel ? $t('deviceClient.fpsLabelHint') : $t('deviceClient.realtimeFps')">{{ videoStats.fpsLabel || (videoStats.fps + 'fps') }}</span>
           <span class="stat-delimiter">|</span>
           <template v-if="!isWebSocketMode">
-            <span class="stat-delay" title="网络延迟(RTT) + 缓冲(JB) + 解码 + 云端处理">E2E ~{{ videoStats.e2eDelay }}ms</span>
+            <span class="stat-delay" :title="$t('deviceClient.e2eDelay')">E2E ~{{ videoStats.e2eDelay }}ms</span>
             <span class="stat-delimiter">|</span>
             <span class="stat-delay" title="Jitter Buffer">JB {{ videoStats.jbDelay }}ms</span>
             <span class="stat-delimiter">|</span>
-            <span class="stat-delay" title="网络往返延迟">RTT {{ videoStats.rtt }}ms</span>
+            <span class="stat-delay" :title="$t('deviceClient.rttDelay')">RTT {{ videoStats.rtt }}ms</span>
             <span class="stat-delimiter">|</span>
           </template>
-          <span class="stat-bitrate" :title="`当前视频接收码率 (目标: ${videoStats.targetBitrate || localSettings.bitrate || 4} Mbps)`">
+          <span class="stat-bitrate" :title="$t('deviceClient.bitrateTitle', { target: videoStats.targetBitrate || localSettings.bitrate || 4 })">
             {{ videoStats.bitrate > 1000 ? (videoStats.bitrate / 1000).toFixed(1) + ' Mbps' : videoStats.bitrate + ' kbps' }}
-            <span v-if="isWebSocketMode" class="stat-sub"> (目标 {{ videoStats.targetBitrate || localSettings.bitrate || 4 }}M)</span>
+            <span v-if="isWebSocketMode" class="stat-sub">{{ $t('deviceClient.targetBitrateSuffix', { target: videoStats.targetBitrate || localSettings.bitrate || 4 }) }}</span>
           </span>
           <span class="stat-delimiter">|</span>
-          <span class="stat-conn-type" :title="isWebSocketMode ? 'WebSocket TCP 纯流传输' : 'WebRTC 传输通道类型'">{{ isWebSocketMode ? 'TCP (WebSocket)' : (videoStats.connectionType || 'UDP p2p') }}</span>
+          <span class="stat-conn-type" :title="isWebSocketMode ? $t('deviceClient.wsConnTypeTitle') : $t('deviceClient.connTypeTitle')">{{ isWebSocketMode ? 'TCP (WebSocket)' : (videoStats.connectionType || 'UDP p2p') }}</span>
           <template v-if="!isWebSocketMode">
             <span class="stat-delimiter">|</span>
             <span :class="['stat-lost', { 'stat-warn': videoStats.lostCount > 0 }]">Lost {{ videoStats.lostCount }}</span>
@@ -172,20 +172,20 @@
               <p>{{ loadingText }}</p>
             </template>
             <template v-else-if="currentWebRTC.error.value">
-              <p class="error-msg">❌ 连接失败</p>
+              <p class="error-msg">❌ {{ $t('deviceClient.connectFailed') }}</p>
               <p class="error-tip">{{ currentWebRTC.error.value }}</p>
-              <button class="retry-btn" @click="retry">重试</button>
+              <button class="retry-btn" @click="retry">{{ $t('deviceClient.retry') }}</button>
               <template v-if="!isWebSocketMode">
-                <p class="error-tip ws-fallback-hint">若 UDP/WebRTC 握手受阻或兼容性异常，可改走 TCP 100% 穿透通道：</p>
-                <button class="retry-btn ws-fallback-btn" @click="toggleStreamMode">⚡ 改用 WebSocket 投屏</button>
+                <p class="error-tip ws-fallback-hint">{{ $t('deviceClient.wsFallbackHint') }}</p>
+                <button class="retry-btn ws-fallback-btn" @click="toggleStreamMode">⚡ {{ $t('deviceClient.switchToWs') }}</button>
               </template>
             </template>
             <template v-else-if="currentWebRTC.status.value === 'disconnected'">
-              <p class="error-msg">连接已断开</p>
-              <button class="retry-btn" @click="retry">重新连接</button>
+              <p class="error-msg">{{ $t('deviceClient.connectionLost') }}</p>
+              <button class="retry-btn" @click="retry">{{ $t('deviceClient.reconnect') }}</button>
               <template v-if="!isWebSocketMode">
-                <p class="error-tip ws-fallback-hint">若 WebRTC 握手超时或网络断开，可改走 TCP 穿透通道：</p>
-                <button class="retry-btn ws-fallback-btn" @click="toggleStreamMode">⚡ 改用 WebSocket 投屏</button>
+                <p class="error-tip ws-fallback-hint">{{ $t('deviceClient.wsFallbackTimeout') }}</p>
+                <button class="retry-btn ws-fallback-btn" @click="toggleStreamMode">⚡ {{ $t('deviceClient.switchToWs') }}</button>
               </template>
             </template>
           </div>
@@ -206,7 +206,7 @@
           <div class="mobile-fab-menu" :class="{ 'show': showMobileMenu, 'align-left': isFabOnLeft, 'align-top': isFabOnTop }">
             <!-- 监控模式下的快捷悬浮菜单 -->
             <template v-if="isCameraMode">
-              <div class="fab-section-title">镜头选择</div>
+              <div class="fab-section-title">{{ $t('deviceClient.lensSelect') }}</div>
               <button 
                 v-for="lens in availableLenses" 
                 :key="lens.key" 
@@ -217,7 +217,7 @@
                 {{ lens.icon }} {{ lens.shortName || lens.name }}
               </button>
               <div class="fab-divider"></div>
-              <div class="fab-section-title">硬件分辨率</div>
+              <div class="fab-section-title">{{ $t('deviceClient.hardwareRes') }}</div>
               <div class="fab-res-row">
                 <button 
                   v-for="res in ['3840x2160', '1920x1080', '1280x720', '640x480']" 
@@ -231,24 +231,24 @@
               </div>
               <div class="fab-divider"></div>
               <button class="fab-item" :class="{ 'cam-active': localSettings.cameraLowPower }" @click="toggleCameraLowPower(); showMobileMenu=false">
-                {{ localSettings.cameraLowPower ? '🌿 节能模式 (已开启)' : '⚡ 开启安防节能 (防发热)' }}
+                {{ localSettings.cameraLowPower ? '🌿 ' + $t('deviceClient.lowPowerMode') : '⚡ ' + $t('deviceClient.lowPowerMode') }}
               </button>
               <div class="fab-divider"></div>
               <button class="fab-item" @click="rotateCamera(); showMobileMenu=false">
-                🔄 旋转 90° (当前 {{ cameraRotation }}°)
+                🔄 {{ $t('deviceClient.rotate90') }} ({{ cameraRotation }}°)
               </button>
               <button class="fab-item" :class="{ 'cam-active': cameraMirrored }" @click="toggleMirror(); showMobileMenu=false">
-                ↔️ 水平镜像
+                ↔️ {{ $t('deviceClient.mirror') }}
               </button>
               <button class="fab-item" @click="takeCameraSnapshot(); showMobileMenu=false">
-                📸 高清抓拍 (JPG)
+                📸 {{ $t('deviceClient.snapshot') }}
               </button>
               <button class="fab-item" :class="{ 'recording': isRecording }" @click="toggleCameraRecording(); showMobileMenu=false">
                 <span class="rec-dot" v-if="isRecording"></span>
-                🔴 {{ isRecording ? `停止录像 (${formattedRecordingTime})` : '本地即时录像' }}
+                🔴 {{ isRecording ? `${$t('deviceClient.stopRecord')} (${formattedRecordingTime})` : $t('deviceClient.localRecord') }}
               </button>
               <button class="fab-item" @click="togglePageMute(); showMobileMenu=false">
-                {{ pageAudioMuted ? '🔊 开启声音监听' : '🔇 静音' }}
+                {{ pageAudioMuted ? '🔊 ' + $t('deviceClient.audioListen') : '🔇 ' + $t('deviceClient.mute') }}
               </button>
               <button class="fab-item" :class="{ 'group-active': isFullscreen || isWebFullscreen }" @click="toggleFullscreen(); showMobileMenu=false">
                 <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -260,17 +260,17 @@
                     <line x1="3" y1="21" x2="10" y2="14"></line>
                   </template>
                 </svg>
-                {{ (isFullscreen || isWebFullscreen) ? '退出全屏' : '全屏显示' }}
+                {{ (isFullscreen || isWebFullscreen) ? $t('deviceClient.exitFullscreen') : $t('deviceClient.fullscreen') }}
               </button>
               <div class="fab-divider"></div>
               <button class="fab-item" @click="switchToDisplayMode(); showMobileMenu=false">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg> 切回手机屏幕
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg> {{ $t('deviceClient.switchToDisplay') }}
               </button>
               <button class="fab-item" @click="showSettingsModal = true; showMobileMenu=false">
-                <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg> 监控设置
+                <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg> {{ $t('deviceClient.settings') }}
               </button>
               <button class="fab-item danger" @click="goBackToList(); showMobileMenu=false">
-                <svg class="icon" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg> 断开监控
+                <svg class="icon" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg> {{ $t('deviceClient.disconnectCamera') }}
               </button>
             </template>
 
@@ -278,11 +278,11 @@
             <template v-else>
               <button v-if="authStore.isAdmin || deviceStore.devices.length > 1" class="fab-item" :class="{ 'group-active': groupControlStore.isGroupControlActive }" @click="toggleGroupControl(); showMobileMenu=false">
                 <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"></rect><rect x="14" y="3" width="7" height="5" rx="1"></rect><rect x="14" y="12" width="7" height="9" rx="1"></rect><rect x="3" y="16" width="7" height="5" rx="1"></rect></svg>
-                {{ groupControlStore.isGroupControlActive ? '取消群控' : '群控主控' }}
+                {{ groupControlStore.isGroupControlActive ? $t('deviceClient.cancelGroupControl') : $t('deviceClient.groupControl') }}
               </button>
               <button class="fab-item" :class="{ 'group-active': isWebSocketMode }" @click="toggleStreamMode(); showMobileMenu=false">
                 <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                {{ isWebSocketMode ? '切回 WebRTC 直连' : '切换 WebSocket 投屏' }}
+                {{ isWebSocketMode ? $t('deviceClient.switchToWebRTC') : $t('deviceClient.switchToWs') }}
               </button>
               <button class="fab-item" :class="{ 'group-active': isFullscreen || isWebFullscreen }" @click="toggleFullscreen(); showMobileMenu=false">
                 <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -294,57 +294,57 @@
                     <line x1="3" y1="21" x2="10" y2="14"></line>
                   </template>
                 </svg>
-                {{ (isFullscreen || isWebFullscreen) ? '退出全屏' : '全屏显示' }}
+                {{ (isFullscreen || isWebFullscreen) ? $t('deviceClient.exitFullscreen') : $t('deviceClient.fullscreen') }}
               </button>
               <div class="fab-divider"></div>
               <template v-if="!forbidTerminal">
               <button class="fab-item" @click="quickKey('input keyevent 26'); showMobileMenu=false">
-                <svg class="icon" viewBox="0 0 24 24"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg> 电源
+                <svg class="icon" viewBox="0 0 24 24"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg> {{ $t('deviceClient.power') }}
               </button>
               <button class="fab-item" @click="quickKey('input keyevent 3'); showMobileMenu=false">
-                <svg class="icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg> 首页
+                <svg class="icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg> {{ $t('deviceClient.home') }}
               </button>
               <button class="fab-item" @click="quickKey('input keyevent 4'); showMobileMenu=false">
-                <svg class="icon" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"></path></svg> 返回
+                <svg class="icon" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"></path></svg> {{ $t('deviceClient.back') }}
               </button>
               <button class="fab-item" @click="quickKey('input keyevent 24'); showMobileMenu=false">
-                <svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="19" y1="9" x2="19" y2="15"></line><line x1="16" y1="12" x2="22" y2="12"></line></svg> 音量+
+                <svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="19" y1="9" x2="19" y2="15"></line><line x1="16" y1="12" x2="22" y2="12"></line></svg> {{ $t('deviceClient.volumeUp') }}
               </button>
               <button class="fab-item" @click="quickKey('input keyevent 25'); showMobileMenu=false">
-                <svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="19" y1="12" x2="15" y2="12"></line></svg> 音量-
+                <svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="19" y1="12" x2="15" y2="12"></line></svg> {{ $t('deviceClient.volumeDown') }}
               </button>
               </template>
               <button class="fab-item" @click="togglePageMute(); showMobileMenu=false">
                 <svg v-if="pageAudioMuted" class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>
                 <svg v-else class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15 9a5 5 0 0 1 0 6"></path><path d="M17.7 6.3a9 9 0 0 1 0 11.4"></path></svg>
-                {{ pageAudioMuted ? '取消静音' : '页面静音' }}
+                {{ pageAudioMuted ? $t('deviceClient.unmute') : $t('deviceClient.mute') }}
               </button>
               <button class="fab-item" @click="toggleConsole(); showMobileMenu=false">
-                <svg class="icon" viewBox="0 0 24 24"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg> 终端
+                <svg class="icon" viewBox="0 0 24 24"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg> {{ $t('deviceClient.terminal') }}
               </button>
               <button class="fab-item" @click="keymapStore.setEditMode(true); showMobileMenu=false">
-                <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle></svg> 按键映射
+                <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle></svg> {{ $t('deviceClient.keymap') }}
               </button>
               <button class="fab-item" @click="keymapStore.toggleKeyHints(); showMobileMenu=false">
                 <svg v-if="keymapStore.showKeyHints" class="icon" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                 <svg v-else class="icon" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
-                {{ keymapStore.showKeyHints ? '隐藏提示' : '显示提示' }}
+                {{ keymapStore.showKeyHints ? $t('deviceClient.hideKeyHints') : $t('deviceClient.showKeyHints') }}
               </button>
               <button class="fab-item" @click="showSettingsModal = true; showMobileMenu=false">
-                <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg> 设置
+                <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg> {{ $t('deviceClient.settings') }}
               </button>
               <button class="fab-item" @click="sendClipboardToDevice(); showMobileMenu=false">
-                <svg class="icon" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg> 送剪贴板
+                <svg class="icon" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg> {{ $t('deviceClient.sendClipboard') }}
               </button>
               <button class="fab-item" @click="getClipboardFromDevice(); showMobileMenu=false">
                 <svg class="icon" viewBox="0 0 24 24">
                   <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
                   <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
                   <path d="M12 11v6M9 14l3 3 3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
-                </svg> 收剪贴板
+                </svg> {{ $t('deviceClient.getClipboard') }}
               </button>
               <button class="fab-item" @click="showMobileQuickTextModal = true; showMobileMenu = false">
-                <svg class="icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg> 快捷文本
+                <svg class="icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg> {{ $t('deviceClient.quickText') }}
               </button>
               
               <template v-if="!forbidTerminal">
@@ -353,22 +353,22 @@
                 <button class="fab-item custom-item" @click="quickKey(btn.cmd); showMobileMenu=false" :title="btn.cmd">
                   <svg class="icon" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg> {{ btn.name }}
                 </button>
-                <button class="fab-item-delete" @click.stop="removeCustomButton(idx)" title="删除此按键">×</button>
+                <button class="fab-item-delete" @click.stop="removeCustomButton(idx)" :title="$t('deviceClient.deleteBtnHint')">×</button>
               </div>
               <button class="fab-item add-btn" @click="addCustomButton">
-                <svg class="icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> 添加按键
+                <svg class="icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> {{ $t('deviceClient.addKey') }}
               </button>
               </template>
               
               <div class="fab-divider"></div>
               <button class="fab-item danger" @click="goBackToList(); showMobileMenu=false">
-                <svg class="icon" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg> 断开连接
+                <svg class="icon" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg> {{ $t('deviceClient.disconnect') }}
               </button>
               <button v-if="authStore.isAdmin" class="fab-item danger" @click="quitAgent(); showMobileMenu=false">
-                <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="15"></line><line x1="15" y1="9" x2="9" y2="15"></line></svg> 退出 Agent
+                <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="15"></line><line x1="15" y1="9" x2="9" y2="15"></line></svg> {{ $t('deviceClient.quitAgent') }}
               </button>
             </template>
-            <div class="fab-agent-version" :title="'Agent 完整版本号: ' + agentVersion">
+            <div class="fab-agent-version" :title="$t('deviceClient.agentVersionTitle', { version: agentVersion })">
               Agent {{ agentVersion.split('-')[0] }}
             </div>
           </div>
@@ -382,48 +382,48 @@
     <!-- PC 右侧控制栏 (常规云手机模式) -->
     <div v-if="!isMobile && !isMini && !isCameraMode" class="control-sidebar" :class="{ 'fs-ui-visible': fsUiVisible }">
       <div class="sidebar-group">
-        <button v-if="authStore.isAdmin || deviceStore.devices.length > 1" class="sidebar-btn group-control-btn" :class="{ active: groupControlStore.isGroupControlActive }" @click="toggleGroupControl" :title="groupControlStore.isGroupControlActive ? '退出群控主控模式' : '设为群控主控机'">
+        <button v-if="authStore.isAdmin || deviceStore.devices.length > 1" class="sidebar-btn group-control-btn" :class="{ active: groupControlStore.isGroupControlActive }" @click="toggleGroupControl" :title="groupControlStore.isGroupControlActive ? $t('deviceClient.cancelGroupControl') : $t('deviceClient.groupControl')">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="3" y="3" width="7" height="9" rx="1"></rect>
             <rect x="14" y="3" width="7" height="5" rx="1"></rect>
             <rect x="14" y="12" width="7" height="9" rx="1"></rect>
             <rect x="3" y="16" width="7" height="5" rx="1"></rect>
           </svg>
-          <span class="btn-text">{{ groupControlStore.isGroupControlActive ? '取消群控' : '群控主控' }}</span>
+          <span class="btn-text">{{ groupControlStore.isGroupControlActive ? $t('deviceClient.cancelGroupControl') : $t('deviceClient.groupControl') }}</span>
         </button>
-        <button class="sidebar-btn" :class="{ active: isWebSocketMode }" @click="toggleStreamMode" :title="isWebSocketMode ? '当前为 WebSocket 投屏，点击切换为 WebRTC 直连' : '当前为 WebRTC 直连，点击切换为 WebSocket 投屏'">
+        <button class="sidebar-btn" :class="{ active: isWebSocketMode }" @click="toggleStreamMode" :title="isWebSocketMode ? $t('deviceClient.switchToWebRTC') : $t('deviceClient.switchToWs')">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
           </svg>
-          <span class="btn-text">{{ isWebSocketMode ? 'WS投屏' : 'WebRTC' }}</span>
+          <span class="btn-text">{{ isWebSocketMode ? $t('deviceClient.wsStream') : 'WebRTC' }}</span>
         </button>
         <div class="sidebar-divider"></div>
         <template v-if="!forbidTerminal">
-        <button class="sidebar-btn" @click="quickKey('input keyevent 26')" title="电源">
+        <button class="sidebar-btn" @click="quickKey('input keyevent 26')" :title="$t('deviceClient.power')">
           <svg class="icon" viewBox="0 0 24 24"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg>
-          <span class="btn-text">电源</span>
+          <span class="btn-text">{{ $t('deviceClient.power') }}</span>
         </button>
-        <button class="sidebar-btn" @click="quickKey('input keyevent 3')" title="HOME">
+        <button class="sidebar-btn" @click="quickKey('input keyevent 3')" :title="$t('deviceClient.home')">
           <svg class="icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-          <span class="btn-text">首页</span>
+          <span class="btn-text">{{ $t('deviceClient.home') }}</span>
         </button>
-        <button class="sidebar-btn" @click="quickKey('input keyevent 4')" title="BACK">
+        <button class="sidebar-btn" @click="quickKey('input keyevent 4')" :title="$t('deviceClient.back')">
           <svg class="icon" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"></path></svg>
-          <span class="btn-text">返回</span>
+          <span class="btn-text">{{ $t('deviceClient.back') }}</span>
         </button>
-        <button class="sidebar-btn" @click="quickKey('input keyevent 24')" title="音量加">
+        <button class="sidebar-btn" @click="quickKey('input keyevent 24')" :title="$t('deviceClient.volumeUp')">
           <svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="19" y1="9" x2="19" y2="15"></line><line x1="16" y1="12" x2="22" y2="12"></line></svg>
-          <span class="btn-text">音量+</span>
+          <span class="btn-text">{{ $t('deviceClient.volumeUp') }}</span>
         </button>
-        <button class="sidebar-btn" @click="quickKey('input keyevent 25')" title="音量减">
+        <button class="sidebar-btn" @click="quickKey('input keyevent 25')" :title="$t('deviceClient.volumeDown')">
           <svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="19" y1="12" x2="15" y2="12"></line></svg>
-          <span class="btn-text">音量-</span>
+          <span class="btn-text">{{ $t('deviceClient.volumeDown') }}</span>
         </button>
         </template>
-        <button class="sidebar-btn" :class="{ active: pageAudioMuted }" @click="togglePageMute" :title="pageAudioMuted ? '取消页面静音' : '页面静音'">
+        <button class="sidebar-btn" :class="{ active: pageAudioMuted }" @click="togglePageMute" :title="pageAudioMuted ? $t('deviceClient.unmute') : $t('deviceClient.mute')">
           <svg v-if="pageAudioMuted" class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>
           <svg v-else class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15 9a5 5 0 0 1 0 6"></path><path d="M17.7 6.3a9 9 0 0 1 0 11.4"></path></svg>
-          <span class="btn-text">{{ pageAudioMuted ? '取消静音' : '静音' }}</span>
+          <span class="btn-text">{{ pageAudioMuted ? $t('deviceClient.unmute') : $t('deviceClient.mute') }}</span>
         </button>
         <button 
           class="sidebar-btn" 
@@ -432,31 +432,31 @@
             'is-behind': deviceStore.showGlobalConsole && deviceStore.consoleDeviceId === currentId && deviceStore.activeTopLayer !== 'console'
           }" 
           @click="toggleConsole" 
-          :title="deviceStore.showGlobalConsole && deviceStore.consoleDeviceId === currentId && deviceStore.activeTopLayer !== 'console' ? '终端已开启 (点击置顶显示)' : '控制台'"
+          :title="deviceStore.showGlobalConsole && deviceStore.consoleDeviceId === currentId && deviceStore.activeTopLayer !== 'console' ? $t('deviceClient.terminalOpenHint') : $t('deviceClient.terminal')"
         >
           <svg class="icon" viewBox="0 0 24 24"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
-          <span class="btn-text">终端</span>
+          <span class="btn-text">{{ $t('deviceClient.terminal') }}</span>
         </button>
-        <button class="sidebar-btn" @click="keymapStore.setEditMode(true)" title="按键映射">
+        <button class="sidebar-btn" @click="keymapStore.setEditMode(true)" :title="$t('deviceClient.keymap')">
           <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle></svg>
-          <span class="btn-text">映射</span>
+          <span class="btn-text">{{ $t('deviceClient.keymapShort') }}</span>
         </button>
-        <button class="sidebar-btn" @click="keymapStore.toggleKeyHints()" :title="keymapStore.showKeyHints ? '隐藏按键提示' : '显示按键提示'">
+        <button class="sidebar-btn" @click="keymapStore.toggleKeyHints()" :title="keymapStore.showKeyHints ? $t('deviceClient.hideKeyHints') : $t('deviceClient.showKeyHints')">
           <svg v-if="keymapStore.showKeyHints" class="icon" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
           <svg v-else class="icon" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
-          <span class="btn-text">提示</span>
+          <span class="btn-text">{{ $t('deviceClient.keyHints') }}</span>
         </button>
-        <button class="sidebar-btn" @click="sendClipboardToDevice" title="发送剪切板到设备">
+        <button class="sidebar-btn" @click="sendClipboardToDevice" :title="$t('deviceClient.sendClipboard')">
           <svg class="icon" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
-          <span class="btn-text">送剪贴板</span>
+          <span class="btn-text">{{ $t('deviceClient.sendClipboard') }}</span>
         </button>
-        <button class="sidebar-btn" @click="getClipboardFromDevice" title="获取设备剪切板到本地">
+        <button class="sidebar-btn" @click="getClipboardFromDevice" :title="$t('deviceClient.getClipboard')">
           <svg class="icon" viewBox="0 0 24 24">
             <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
             <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
             <path d="M12 11v6M9 14l3 3 3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
           </svg>
-          <span class="btn-text">收剪贴板</span>
+          <span class="btn-text">{{ $t('deviceClient.getClipboard') }}</span>
         </button>
 
         <!-- 快捷文本触发按键 -->
@@ -464,12 +464,12 @@
           class="sidebar-btn quick-text-sidebar-btn" 
           :class="{ active: showQuickTextDropdown }" 
           @click.stop="toggleQuickTextDropdown" 
-          title="常用快捷文本"
+          :title="$t('deviceClient.quickText')"
         >
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
           </svg>
-          <span class="btn-text">快捷文本</span>
+          <span class="btn-text">{{ $t('deviceClient.quickText') }}</span>
         </button>
       </div>
       
@@ -481,28 +481,28 @@
             <svg class="icon" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
             <span class="btn-text">{{ btn.name }}</span>
           </button>
-          <button class="sidebar-btn-delete" @click.stop="removeCustomButton(idx)" title="删除此按键">×</button>
+          <button class="sidebar-btn-delete" @click.stop="removeCustomButton(idx)" :title="$t('deviceClient.deleteBtnHint')">×</button>
         </div>
-        <button class="sidebar-btn add-btn" @click="addCustomButton" title="添加按键">
+        <button class="sidebar-btn add-btn" @click="addCustomButton" :title="$t('deviceClient.addKey')">
           <svg class="icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-          <span class="btn-text">添加</span>
+          <span class="btn-text">{{ $t('deviceClient.addKey') }}</span>
         </button>
       </div>
       
       <div style="flex: 1"></div>
       
-      <button v-if="authStore.isAdmin" class="sidebar-btn danger" @click="quitAgent" title="退出 Agent">
+      <button v-if="authStore.isAdmin" class="sidebar-btn danger" @click="quitAgent" :title="$t('deviceClient.quitAgent')">
         <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="15"></line><line x1="15" y1="9" x2="9" y2="15"></line></svg>
-        <span class="btn-text">退出</span>
+        <span class="btn-text">{{ $t('deviceClient.quitAgent') }}</span>
       </button>
 
-      <button class="sidebar-btn" @click="showSettingsModal = true" title="连接设置">
+      <button class="sidebar-btn" @click="showSettingsModal = true" :title="$t('deviceClient.settings')">
         <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-        <span class="btn-text">设置</span>
+        <span class="btn-text">{{ $t('deviceClient.settings') }}</span>
       </button>
 
       <!-- 底部微小 Agent 版本号展示 -->
-      <div class="sidebar-agent-version" :title="'Agent 完整版本号: ' + agentVersion">
+      <div class="sidebar-agent-version" :title="$t('deviceClient.agentVersionTitle', { version: agentVersion })">
         {{ agentVersion.split('-')[0] }}
       </div>
     </div>
@@ -510,12 +510,12 @@
     <!-- 快捷文本独立弹出面板 (脱离 sidebar 的 overflow 裁剪，确保 100% 正常弹出) -->
     <div v-if="showQuickTextDropdown && !isMobile" class="quick-text-popover-menu" @click.stop>
       <div class="popover-header">
-        <span class="popover-title">⚡ 快速文本</span>
+        <span class="popover-title">⚡ {{ $t('deviceClient.quickText') }}</span>
         <div class="popover-header-tools">
-          <button class="popover-manage-link" @click="goToConsoleQuickText" title="前往终端管理短语库">
-            ⚙️ 管理
+          <button class="popover-manage-link" @click="goToConsoleQuickText" :title="$t('deviceClient.manageQuickTextsHint')">
+            {{ $t('deviceClient.manageQuickTexts') }}
           </button>
-          <button class="popover-close-btn" @click="showQuickTextDropdown = false" title="关闭">✕</button>
+          <button class="popover-close-btn" @click="showQuickTextDropdown = false" :title="$t('common.close')">✕</button>
         </div>
       </div>
       <div class="popover-items-list custom-scrollbar">
@@ -524,17 +524,17 @@
           :key="qt.id" 
           class="popover-item"
           @click="injectQuickTextToCurrent(qt)"
-          :title="qt.content"
+          :title="getQuickTextContent(qt)"
         >
           <div class="item-title-row">
-            <span class="item-title">{{ qt.title }}</span>
-            <span class="item-enter-tag" v-if="qt.autoEnter">↵ 回车</span>
+            <span class="item-title">{{ getQuickTextTitle(qt) }}</span>
+            <span class="item-enter-tag" v-if="qt.autoEnter">{{ $t('deviceClient.enterKey') }}</span>
           </div>
-          <div class="item-snippet">{{ qt.content }}</div>
+          <div class="item-snippet">{{ getQuickTextContent(qt) }}</div>
         </div>
         <div v-if="quickTextStore.quickTexts.length === 0" class="popover-empty">
-          暂无快速文本<br/>
-          <a href="javascript:void(0)" @click="goToConsoleQuickText">前往管理添加</a>
+          {{ $t('deviceClient.noQuickTexts') }}<br/>
+          <a href="javascript:void(0)" @click="goToConsoleQuickText">{{ $t('deviceClient.goAddQuickTexts') }}</a>
         </div>
       </div>
     </div>
@@ -546,14 +546,14 @@
           <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
           <circle cx="12" cy="13" r="4"></circle>
         </svg>
-        <span>监控控制台</span>
+        <span>{{ $t('deviceClient.cameraConsole') }}</span>
       </div>
 
       <div class="camera-sidebar-scroll">
         <!-- 1. 镜头切换 -->
         <div class="cam-section">
           <div class="cam-section-header">
-            <span>镜头选择</span>
+            <span>{{ $t('deviceClient.cameraLens') }}</span>
             <span class="cam-badge">{{ currentLensName }}</span>
           </div>
           <div class="cam-btn-grid">
@@ -574,7 +574,7 @@
         <!-- 2. 硬件分辨率 -->
         <div class="cam-section">
           <div class="cam-section-header">
-            <span>硬件分辨率</span>
+            <span>{{ $t('deviceClient.cameraResolution') }}</span>
             <span class="cam-badge">{{ currentResText }}</span>
           </div>
           <div class="cam-btn-grid res-grid">
@@ -593,7 +593,7 @@
         <!-- 3. PTZ 数字变焦 -->
         <div class="cam-section">
           <div class="cam-section-header">
-            <span>PTZ 数字变焦</span>
+            <span>{{ $t('deviceClient.cameraPtz') }}</span>
             <span class="cam-badge zoom-val">{{ cameraZoom.toFixed(1) }}x</span>
           </div>
           <div class="zoom-slider-row">
@@ -612,16 +612,16 @@
             <button class="cam-btn preset-btn" :class="{ active: cameraZoom === 2.0 }" @click="setZoom(2.0)">2.0x</button>
             <button class="cam-btn preset-btn" :class="{ active: cameraZoom === 3.0 }" @click="setZoom(3.0)">3.0x</button>
             <button class="cam-btn preset-btn" :class="{ active: cameraZoom === 5.0 }" @click="setZoom(5.0)">5.0x</button>
-            <button class="cam-btn reset-btn" @click="resetPTZ" title="复位缩放和平移">复位</button>
+            <button class="cam-btn reset-btn" @click="resetPTZ" :title="$t('deviceClient.resetPtzHint')">{{ $t('deviceClient.resetPtz') }}</button>
           </div>
         </div>
 
         <!-- 功耗与发热控制 -->
         <div class="cam-section">
           <div class="cam-section-header">
-            <span>功耗与发热控制</span>
+            <span>{{ $t('deviceClient.cameraPowerControl') }}</span>
             <span class="cam-badge" :class="{ 'eco-badge': localSettings.cameraLowPower }">
-              {{ localSettings.cameraLowPower ? '🌿 节能模式运行中' : '全规格模式' }}
+              {{ localSettings.cameraLowPower ? $t('deviceClient.cameraEcoRunning') : $t('deviceClient.cameraFullSpec') }}
             </span>
           </div>
           <div class="audio-control-row">
@@ -629,13 +629,13 @@
               class="cam-btn eco-toggle-btn" 
               :class="{ active: localSettings.cameraLowPower }" 
               @click="toggleCameraLowPower"
-              title="一键关停 OIS防抖/连续对焦/时域降噪/畸变校正/声音软编，锁15FPS，大幅减少发热与CPU开销"
+              :title="$t('deviceClient.ecoTooltip')"
             >
               <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10S2 17.523 2 12a10 10 0 0 1 10-10z"></path>
                 <path d="M12 6v6l4 2"></path>
               </svg>
-              <span>{{ localSettings.cameraLowPower ? '🌿 节能模式已开启 (点击恢复)' : '⚡ 开启安防节能模式 (防发热/降载)' }}</span>
+              <span>{{ localSettings.cameraLowPower ? $t('deviceClient.ecoBtnActive') : $t('deviceClient.ecoBtnInactive') }}</span>
             </button>
           </div>
         </div>
@@ -643,17 +643,17 @@
         <!-- 4. 画面方向与校正 -->
         <div class="cam-section">
           <div class="cam-section-header">
-            <span>画面校正</span>
-            <span class="cam-badge">{{ cameraRotation }}° {{ cameraMirrored ? '镜像' : '' }}</span>
+            <span>{{ $t('deviceClient.screenCorrection') }}</span>
+            <span class="cam-badge">{{ cameraRotation }}° {{ cameraMirrored ? $t('deviceClient.mirroredBadge') : '' }}</span>
           </div>
           <div class="cam-btn-grid">
-            <button class="cam-btn" @click="rotateCamera" title="顺时针旋转90度 (适配吊装/侧装)">
+            <button class="cam-btn" @click="rotateCamera" :title="$t('deviceClient.rotateHint')">
               <svg class="icon" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
-              <span>旋转 90°</span>
+              <span>{{ $t('deviceClient.cameraRotate') }}</span>
             </button>
-            <button class="cam-btn" :class="{ active: cameraMirrored }" @click="toggleMirror" title="水平镜像翻转 (矫正前置自拍)">
+            <button class="cam-btn" :class="{ active: cameraMirrored }" @click="toggleMirror" :title="$t('deviceClient.mirrorHint')">
               <svg class="icon" viewBox="0 0 24 24"><path d="M12 2v20M7 8l-4 4 4 4M17 8l4 4-4 4"></path></svg>
-              <span>水平镜像</span>
+              <span>{{ $t('deviceClient.cameraMirror') }}</span>
             </button>
           </div>
         </div>
@@ -661,14 +661,14 @@
         <!-- 5. 环境音监听 -->
         <div class="cam-section">
           <div class="cam-section-header">
-            <span>环境声音监听</span>
-            <span class="cam-badge" :class="{ 'audio-on': !pageAudioMuted }">{{ pageAudioMuted ? '已静音' : '监听中' }}</span>
+            <span>{{ $t('deviceClient.audioMonitor') }}</span>
+            <span class="cam-badge" :class="{ 'audio-on': !pageAudioMuted }">{{ pageAudioMuted ? $t('deviceClient.muted') : $t('deviceClient.monitoring') }}</span>
           </div>
           <div class="audio-control-row">
             <button class="cam-btn audio-toggle-btn" :class="{ active: !pageAudioMuted }" @click="togglePageMute">
               <svg v-if="!pageAudioMuted" class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15 9a5 5 0 0 1 0 6"></path><path d="M17.7 6.3a9 9 0 0 1 0 11.4"></path></svg>
               <svg v-else class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>
-              <span>{{ pageAudioMuted ? '开启声音监听' : '关闭声音监听' }}</span>
+              <span>{{ pageAudioMuted ? $t('deviceClient.enableAudioMonitor') : $t('deviceClient.disableAudioMonitor') }}</span>
             </button>
           </div>
         </div>
@@ -676,21 +676,21 @@
         <!-- 6. 抓拍与即时录像 -->
         <div class="cam-section">
           <div class="cam-section-header">
-            <span>安防存证</span>
+            <span>{{ $t('deviceClient.securityEvidence') }}</span>
           </div>
           <div class="cam-btn-grid">
-            <button class="cam-btn snapshot-btn" @click="takeCameraSnapshot" title="抓拍当前高清帧并保存为JPG">
+            <button class="cam-btn snapshot-btn" @click="takeCameraSnapshot" :title="$t('deviceClient.snapshotHint')">
               <svg class="icon" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
-              <span>高清抓拍</span>
+              <span>{{ $t('deviceClient.hdSnapshot') }}</span>
             </button>
             <button 
               class="cam-btn record-btn" 
               :class="{ recording: isRecording }" 
               @click="toggleCameraRecording"
-              :title="isRecording ? '点击停止录像并下载' : '开启本地录像'"
+              :title="isRecording ? $t('deviceClient.stopRecordingHint') : $t('deviceClient.startRecordingHint')"
             >
               <span class="rec-dot"></span>
-              <span>{{ isRecording ? `停止 (${formattedRecordingTime})` : '本地录像' }}</span>
+              <span>{{ isRecording ? $t('deviceClient.stopRecordingTime', { time: formattedRecordingTime }) : $t('deviceClient.localRecording') }}</span>
             </button>
           </div>
         </div>
@@ -698,17 +698,17 @@
         <!-- 7. 系统设置与退出 -->
         <div class="cam-section bottom-section">
           <div class="cam-btn-grid" style="grid-template-columns: repeat(3, 1fr);">
-            <button class="cam-btn" @click="switchToDisplayMode" title="切回手机屏幕直控模式">
+            <button class="cam-btn" @click="switchToDisplayMode" :title="$t('deviceClient.switchToDisplayHint')">
               <svg class="icon" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
-              <span>切回屏幕</span>
+              <span>{{ $t('deviceClient.switchToDisplay') }}</span>
             </button>
-            <button class="cam-btn" @click="showSettingsModal = true" title="高级监控与编码设置">
+            <button class="cam-btn" @click="showSettingsModal = true" :title="$t('deviceClient.cameraSettingsHint')">
               <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-              <span>设置</span>
+              <span>{{ $t('settings.title') }}</span>
             </button>
-            <button class="cam-btn danger-btn" @click="goBackToList" title="退出监控返回列表">
+            <button class="cam-btn danger-btn" @click="goBackToList" :title="$t('deviceClient.disconnectHint')">
               <svg class="icon" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-              <span>断开</span>
+              <span>{{ $t('deviceClient.disconnect') }}</span>
             </button>
           </div>
         </div>
@@ -740,7 +740,7 @@
     <div v-if="showMobileQuickTextModal" class="modal-overlay" @click.self="showMobileQuickTextModal = false">
       <div class="modal-card mobile-quick-text-card">
         <div class="modal-header">
-          <h3>⚡ 快捷文本</h3>
+          <h3>{{ $t('deviceClient.quickTextTitle') }}</h3>
           <button class="close-btn" @click="showMobileQuickTextModal = false">✕</button>
         </div>
         <div class="modal-body custom-scrollbar">
@@ -752,13 +752,13 @@
               @click="injectQuickTextToCurrent(qt); showMobileQuickTextModal = false"
             >
               <div class="mobile-qt-header">
-                <span class="mobile-qt-title">{{ qt.title }}</span>
-                <span class="mobile-qt-enter" v-if="qt.autoEnter">↵ 回车</span>
+                <span class="mobile-qt-title">{{ getQuickTextTitle(qt) }}</span>
+                <span class="mobile-qt-enter" v-if="qt.autoEnter">{{ $t('deviceClient.enterKey') }}</span>
               </div>
-              <div class="mobile-qt-content">{{ qt.content }}</div>
+              <div class="mobile-qt-content">{{ getQuickTextContent(qt) }}</div>
             </div>
             <div v-if="quickTextStore.quickTexts.length === 0" class="no-shortcuts">
-              暂无快速短语
+              {{ $t('console.noQuickPhrases') }}
             </div>
           </div>
         </div>
@@ -777,6 +777,7 @@
 
 <script setup>
 import { ref, shallowRef, computed, onMounted, onUnmounted, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { debugLog, debugWarn } from '@/utils/debug'
 import { useDeviceStore } from '@/stores/devices'
 import { useWebRTC } from '@/composables/useWebRTC'
@@ -786,11 +787,13 @@ import { KeymapEngine } from '@/utils/keymapEngine'
 import { getDeviceSettings, saveDeviceSettings, hasCustomSettings, deleteDeviceSettings, applyPolicyToSettings, policyLockedSections, getCameraPreferences, saveCameraPreferences } from '@/utils/settings'
 import { useAuthStore } from '@/stores/auth'
 import { useGroupControlStore } from '@/stores/groupControl'
-import { useQuickTextStore } from '@/stores/quickTexts'
+import { useQuickTextStore, getQuickTextTitle, getQuickTextContent } from '@/stores/quickTexts'
 import ConnectionStatus from '@/components/ConnectionStatus.vue'
 import ScreenshotModal from '@/components/ScreenshotModal.vue'
 import SettingsModal from '@/components/SettingsModal.vue'
 import KeymapEditor from '@/components/KeymapEditor.vue'
+
+const { t } = useI18n()
 
 const props = defineProps({
   deviceId: {
@@ -857,7 +860,7 @@ function injectQuickTextToCurrent(qt) {
     }, 80)
   }
 
-  triggerQuickTextToast(`已注入: ${qt.title}`)
+  triggerQuickTextToast(t('deviceClient.injectedToast', { title: qt.title }))
   showQuickTextDropdown.value = false
 }
 
@@ -1355,7 +1358,7 @@ function toggleCameraRecording() {
 function startRecording() {
   const stream = currentWebRTC.value?.stream?.value || videoElement.value?.srcObject || (canvasElement.value?.captureStream ? canvasElement.value.captureStream(30) : null)
   if (!stream) {
-    alert('视频流尚未就绪，无法开始录像')
+    alert(t('deviceClient.streamNotReady'))
     return
   }
   recordedChunks = []
@@ -1390,7 +1393,7 @@ function startRecording() {
     }, 1000)
   } catch (err) {
     console.error('Recording start failed:', err)
-    alert('无法启动本地录像: ' + err.message)
+    alert(t('deviceClient.recordStartFailed') + err.message)
   }
 }
 
@@ -1542,16 +1545,16 @@ function onFabEnd(e) {
 const customButtons = ref(JSON.parse(localStorage.getItem('cloudphone_custom_btns') || '[]'))
 
 function addCustomButton() {
-  const name = prompt('按钮名称 (最长4个字，如: 划线)')
+  const name = prompt(t('deviceClient.btnNamePrompt'))
   if (!name) return
-  const cmd = prompt('ADB Shell 命令 (如: settings put system pointer_location 1)')
+  const cmd = prompt(t('deviceClient.adbCmdPrompt'))
   if (!cmd) return
   customButtons.value.push({ name: name.substring(0, 4), cmd })
   localStorage.setItem('cloudphone_custom_btns', JSON.stringify(customButtons.value))
 }
 
 function removeCustomButton(index) {
-  if (confirm('确定删除此按键？')) {
+  if (confirm(t('deviceClient.confirmDeleteBtn'))) {
     customButtons.value.splice(index, 1)
     localStorage.setItem('cloudphone_custom_btns', JSON.stringify(customButtons.value))
   }
@@ -2112,16 +2115,16 @@ function sendClipboardToDevice() {
         const ok = setDeviceClipboard(text, { paste: true, source: CLIPBOARD_SOURCE_LOCAL })
         if (ok) debugLog('[Clipboard] Sent to device')
       } else {
-        alert('本地剪切板为空')
+        alert(t('deviceClient.clipboardEmpty'))
       }
     }).catch(err => {
-      const text = prompt('请输入要发送到设备的剪切板内容：', lastLocalClipboardText)
+      const text = prompt(t('deviceClient.enterClipboardText'), lastLocalClipboardText)
       if (text) {
         setDeviceClipboard(text, { paste: true, source: CLIPBOARD_SOURCE_LOCAL })
       }
     })
   } else {
-    const text = prompt('请输入要发送到设备的剪切板内容：', lastLocalClipboardText)
+    const text = prompt(t('deviceClient.enterClipboardText'), lastLocalClipboardText)
     if (text) {
       setDeviceClipboard(text, { paste: true, source: CLIPBOARD_SOURCE_LOCAL })
     }
@@ -2139,18 +2142,18 @@ function getClipboardFromDevice() {
 
 const statusText = computed(() => {
   const map = {
-    'connected': '已连接',
-    'connecting': '连接中',
-    'signaling': '信令中',
-    'disconnected': '断开',
-    'error': '错误'
+    'connected': t('deviceClient.statusConnected'),
+    'connecting': t('deviceClient.statusConnecting'),
+    'signaling': t('deviceClient.statusSignaling'),
+    'disconnected': t('deviceClient.statusDisconnected'),
+    'error': t('deviceClient.statusError')
   }
   return map[currentWebRTC.value.status.value] || currentWebRTC.value.status.value
 })
 
 const loadingText = computed(() => {
-  if (currentWebRTC.value.status.value === 'waiting_offer') return '等待设备...'
-  return '建立连接...'
+  if (currentWebRTC.value.status.value === 'waiting_offer') return t('deviceClient.waitingDevice')
+  return t('deviceClient.establishingConn')
 })
 
 // 蒙板上方：当前连接用户 + 账号剩余有效期（每 30s 刷新一次显示）
@@ -2161,9 +2164,9 @@ function formatDuration(ms) {
   const d = Math.floor(ms / 86400000)
   const h = Math.floor((ms % 86400000) / 3600000)
   const m = Math.floor((ms % 3600000) / 60000)
-  if (d > 0) return `${d} 天 ${h} 小时`
-  if (h > 0) return `${h} 小时 ${m} 分`
-  return `${Math.max(1, m)} 分钟`
+  if (d > 0) return t('common.remainDaysHours', { d, h })
+  if (h > 0) return t('common.remainHoursMins', { h, m })
+  return t('common.remainMins', { m: Math.max(1, m) })
 }
 
 const connMetaText = computed(() => {
@@ -2173,11 +2176,11 @@ const connMetaText = computed(() => {
   const p = authStore.userPolicy
   const leases = p && Array.isArray(p.leases) ? p.leases : []
   const lease = leases.find(l => l && l.device_id === currentId.value)
-  const t = lease && lease.expires_at ? new Date(lease.expires_at) : null
-  if (!t || Number.isNaN(t.getTime()) || t.getFullYear() <= 1) return `👤 ${name}`
-  const ms = t.getTime() - nowTick.value
-  if (ms <= 0) return `👤 ${name} · 租约已到期`
-  return `👤 ${name} · 租约剩余 ${formatDuration(ms)}`
+  const expDate = lease && lease.expires_at ? new Date(lease.expires_at) : null
+  if (!expDate || Number.isNaN(expDate.getTime()) || expDate.getFullYear() <= 1) return `👤 ${name}`
+  const ms = expDate.getTime() - nowTick.value
+  if (ms <= 0) return t('deviceClient.leaseExpiredUser', { name })
+  return t('deviceClient.leaseRemainingUser', { name, duration: formatDuration(ms) })
 })
 
 const showOverlay = computed(() => currentWebRTC.value.status.value !== 'connected')
@@ -2309,7 +2312,7 @@ function toggleWebFullscreen() {
 
     // 若是 iOS 设备且当前不是独立的 PWA 模式，弹出友好提示
     if (isIOS.value && !isStandalonePWA.value) {
-      triggerQuickTextToast('💡 iOS 限制浏览器隐藏地址栏。点击 Safari 底部分享 ⎋ ->「添加到主屏幕」即可免地址栏沉浸全屏')
+      triggerQuickTextToast(t('deviceClient.iosPwaTip'))
     }
   } else {
     document.body.classList.remove('has-web-fullscreen')
@@ -2434,7 +2437,7 @@ function togglePageMute() {
 }
 
 function quitAgent() {
-  if (confirm(`警告：确定要停止设备 "${currentId.value}" 上的 Agent 进程吗？停止后该设备将下线。`)) {
+  if (confirm(t('deviceClient.confirmStopAgent', { id: currentId.value }))) {
     deviceStore.quitAgent(currentId.value)
   }
 }

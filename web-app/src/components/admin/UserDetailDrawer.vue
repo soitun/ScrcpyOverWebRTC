@@ -9,8 +9,8 @@
             <div class="drawer-user-meta">
               <div class="drawer-username">{{ user.username }}</div>
               <div class="drawer-subline">
-                <span :class="['role-badge', user.role]">{{ user.role === 'admin' ? '👑 管理员' : '普通用户' }}</span>
-                <span class="online-chip" :class="{ online: user.online }">{{ user.online ? '在线' : '离线' }}</span>
+                <span :class="['role-badge', user.role]">{{ user.role === 'admin' ? ('👑 ' + $t('users.table.admin')) : $t('users.table.standard') }}</span>
+                <span class="online-chip" :class="{ online: user.online }">{{ user.online ? $t('users.table.online') : $t('users.table.offline') }}</span>
               </div>
             </div>
           </div>
@@ -35,45 +35,45 @@
           <!-- ================== Tab 1: 基础与安全 ================== -->
           <div v-if="activeTab === 'basic'" class="tab-pane">
             <section class="drawer-section">
-              <div class="section-title">用户角色</div>
+              <div class="section-title">{{ $t('users.drawer.role') }}</div>
               <div class="role-display-card">
                 <div class="role-display-name">
-                  {{ user.role === 'admin' ? '👑 管理员 (Admin)' : '👤 普通用户 (User)' }}
+                  {{ user.role === 'admin' ? ('👑 ' + $t('users.table.admin')) : $t('users.table.standard') }}
                 </div>
                 <div class="role-display-sub">
                   {{ user.role === 'admin'
-                    ? '拥有系统全局控制、用户管理与设备运营权限'
-                    : '设备使用受租约管控，权限由「权限设置」页配置' }}
+                    ? $t('users.drawer.adminDesc')
+                    : $t('users.drawer.userDesc') }}
                 </div>
               </div>
             </section>
 
             <section class="drawer-section">
-              <div class="section-title">基本信息</div>
+              <div class="section-title">{{ $t('users.drawer.basicInfo') }}</div>
               <div class="info-row">
-                <span class="info-label">备注</span>
+                <span class="info-label">{{ $t('users.drawer.note') }}</span>
                 <span class="info-value" :title="user.note">{{ user.note || '-' }}</span>
               </div>
               <div class="info-row">
-                <span class="info-label">账号截止日</span>
+                <span class="info-label">{{ $t('users.drawer.expiresAt') }}</span>
                 <span class="info-value" :class="{ expired: isExpiredAt(user.expires_at) }">
                   {{ formatExpire(user.expires_at) }}
                   <span class="remain-text">{{ formatRemain(user.expires_at) }}</span>
                 </span>
               </div>
               <div class="basic-actions">
-                <button class="drawer-btn" @click="$emit('edit-note', user)">📝 编辑备注</button>
-                <button class="drawer-btn" @click="$emit('rename', user)">🏷️ 重命名</button>
-                <button class="drawer-btn" @click="$emit('reset-pwd', user)">🔒 重置密码</button>
-                <button class="drawer-btn" @click="$emit('share', user)">📤 分享账号</button>
+                <button class="drawer-btn" @click="$emit('edit-note', user)">{{ $t('users.drawer.editNote') }}</button>
+                <button class="drawer-btn" @click="$emit('rename', user)">{{ $t('users.drawer.rename') }}</button>
+                <button class="drawer-btn" @click="$emit('reset-pwd', user)">{{ $t('users.drawer.resetPwd') }}</button>
+                <button class="drawer-btn" @click="$emit('share', user)">{{ $t('users.drawer.share') }}</button>
               </div>
             </section>
 
             <!-- 危险区 -->
             <section class="drawer-section danger-zone" v-if="user.username !== authStore.username">
-              <div class="section-title danger-title">危险操作</div>
-              <p class="danger-desc">删除用户将强制切断其所有在线连接并移除全部设备租约，该操作不可恢复。</p>
-              <button class="danger-delete-btn" @click="$emit('delete-user', user)">🗑️ 删除该用户</button>
+              <div class="section-title danger-title">{{ $t('users.drawer.dangerZone') }}</div>
+              <p class="danger-desc">{{ $t('users.drawer.dangerDesc') }}</p>
+              <button class="danger-delete-btn" @click="$emit('delete-user', user)">{{ $t('users.drawer.deleteUser') }}</button>
             </section>
           </div>
 
@@ -81,12 +81,12 @@
           <div v-if="activeTab === 'devices'" class="tab-pane">
             <!-- 当前控制（活跃设备，可踢下线） -->
             <section class="drawer-section" v-if="user.active_devices && user.active_devices.length > 0">
-              <div class="section-title">当前控制（{{ user.active_devices.length }} 台）</div>
+              <div class="section-title">{{ $t('users.drawer.activeDevices', { count: user.active_devices.length }) }}</div>
               <div class="active-dev-list">
                 <div v-for="devId in user.active_devices" :key="devId" class="active-dev-tag">
                   <span class="pulse-icon"></span>
                   <span class="dev-tag-text">{{ devId }}</span>
-                  <button class="kick-btn" @click="confirmKick(devId)" title="强行断开此设备的连接">✕</button>
+                  <button class="kick-btn" @click="confirmKick(devId)" :title="$t('users.drawer.kickDevice')">✕</button>
                 </div>
               </div>
             </section>
@@ -94,99 +94,99 @@
             <!-- 开租约 -->
             <section class="drawer-section">
               <div class="section-title lease-title">
-                <span>设备租约</span>
+                <span>{{ $t('users.drawer.deviceLeases') }}</span>
                 <span class="lease-title-btns">
-                  <button class="lease-refresh" @click="fetchLeases" :disabled="leasesLoading" title="刷新租约">⟳</button>
-                  <button class="drawer-btn small primary" v-if="!showCreateLease" @click="openCreateLease">＋ 开租约</button>
+                  <button class="lease-refresh" @click="fetchLeases" :disabled="leasesLoading" :title="$t('users.drawer.refreshLeases')">⟳</button>
+                  <button class="drawer-btn small primary" v-if="!showCreateLease" @click="openCreateLease">{{ $t('users.drawer.createLease') }}</button>
                 </span>
               </div>
 
               <!-- 开租约内联表单 -->
               <div v-if="showCreateLease" class="create-lease-box">
                 <div class="form-item">
-                  <label class="item-label">空闲设备</label>
+                  <label class="item-label">{{ $t('users.drawer.idleDevices') }}</label>
                   <select v-model="createLeaseForm.deviceId" class="drawer-select" :disabled="idleDevicesLoading">
-                    <option value="" disabled>{{ idleDevicesLoading ? '加载设备中...' : (idleDevices.length ? '请选择设备' : '暂无空闲设备') }}</option>
+                    <option value="" disabled>{{ idleDevicesLoading ? $t('users.drawer.loadingDevices') : (idleDevices.length ? $t('users.drawer.selectDevice') : $t('users.drawer.noIdleDevices')) }}</option>
                     <option v-for="dev in idleDevices" :key="dev.id" :value="dev.id">
                       {{ dev.id }}{{ dev.model ? `（${dev.model}）` : '' }}
                     </option>
                   </select>
                 </div>
                 <div class="form-item">
-                  <label class="item-label">租期</label>
+                  <label class="item-label">{{ $t('users.drawer.leaseDuration') }}</label>
                   <div class="lease-duration-row">
                     <select v-model="createLeaseForm.duration" class="drawer-select">
-                      <option :value="86400">1 天</option>
-                      <option :value="604800">7 天</option>
-                      <option :value="2592000">30 天</option>
-                      <option value="custom">自定义天数</option>
+                      <option :value="86400">{{ $t('users.drawer.days1') }}</option>
+                      <option :value="604800">{{ $t('users.drawer.days7') }}</option>
+                      <option :value="2592000">{{ $t('users.drawer.days30') }}</option>
+                      <option value="custom">{{ $t('users.drawer.customDays') }}</option>
                     </select>
                     <input
                       v-if="createLeaseForm.duration === 'custom'"
                       v-model.number="createLeaseForm.customDays"
                       type="number"
                       min="1"
-                      placeholder="天数"
+                      :placeholder="$t('users.drawer.customDaysPlaceholder')"
                       class="drawer-select custom-days-input"
                     />
                   </div>
                 </div>
                 <div class="form-item">
-                  <label class="item-label">备注（可选）</label>
-                  <input type="text" v-model="createLeaseForm.note" class="drawer-select" placeholder="例如：包月客户" />
+                  <label class="item-label">{{ $t('users.drawer.leaseNote') }}</label>
+                  <input type="text" v-model="createLeaseForm.note" class="drawer-select" :placeholder="$t('users.drawer.leaseNotePlaceholder')" />
                 </div>
                 <div class="create-lease-actions">
-                  <button class="drawer-btn small" @click="showCreateLease = false">取消</button>
+                  <button class="drawer-btn small" @click="showCreateLease = false">{{ $t('users.drawer.cancel') }}</button>
                   <button
                     class="drawer-btn small primary"
                     @click="submitCreateLease"
                     :disabled="!createLeaseForm.deviceId || leaseOperating"
-                  >{{ leaseOperating ? '提交中...' : '确认开租' }}</button>
+                  >{{ leaseOperating ? $t('users.drawer.submitting') : $t('users.drawer.confirmLease') }}</button>
                 </div>
               </div>
 
-              <div v-if="leasesLoading" class="lease-empty">加载中...</div>
-              <div v-else-if="leases.length === 0" class="lease-empty">该用户暂无设备租约，可点击「＋ 开租约」为其分配设备。</div>
+              <div v-if="leasesLoading" class="lease-empty">{{ $t('users.drawer.loading') }}</div>
+              <div v-else-if="leases.length === 0" class="lease-empty">{{ $t('users.drawer.noLeases') }}</div>
               <div v-else class="lease-list">
                 <div v-for="lease in leases" :key="lease.lease_id" class="lease-item" :class="{ inactive: !lease.active }">
                   <div class="lease-main">
                     <div class="lease-device-row">
                       <span class="lease-device">{{ lease.device_id }}</span>
                       <span class="lease-status-chip" :class="lease.revoked ? 'revoked' : (lease.active ? 'active' : 'expired')">
-                        {{ lease.revoked ? '已收回' : (lease.active ? '生效中' : '已到期') }}
+                        {{ lease.revoked ? $t('users.drawer.revoked') : (lease.active ? $t('users.drawer.active') : $t('users.drawer.expired')) }}
                       </span>
                     </div>
                     <div class="lease-remaining" :class="{ warn: lease.active && isLeaseExpiringSoon(lease) }">
                       {{ formatLeaseRemaining(lease.remaining_seconds) }}
                     </div>
-                    <div class="lease-note" v-if="lease.note" :title="lease.note">备注：{{ lease.note }}</div>
+                    <div class="lease-note" v-if="lease.note" :title="lease.note">{{ $t('users.drawer.note') }}: {{ lease.note }}</div>
                     <div class="lease-created">
-                      创建：{{ formatTime(lease.created_at) }}
-                      <template v-if="lease.revoked && lease.revoked_at"> · 收回：{{ formatTime(lease.revoked_at) }}</template>
+                      {{ $t('users.drawer.created') }}: {{ formatTime(lease.created_at) }}
+                      <template v-if="lease.revoked && lease.revoked_at"> · {{ $t('users.drawer.revoke') }}: {{ formatTime(lease.revoked_at) }}</template>
                     </div>
                   </div>
                   <div class="lease-actions" v-if="lease.active">
                     <template v-if="extendingLeaseId === lease.lease_id">
                       <select v-model="extendChoice" class="extend-select">
-                        <option :value="86400">+1 天</option>
-                        <option :value="604800">+7 天</option>
-                        <option :value="2592000">+30 天</option>
-                        <option value="custom">自定义天数</option>
+                        <option :value="86400">+{{ $t('users.drawer.days1') }}</option>
+                        <option :value="604800">+{{ $t('users.drawer.days7') }}</option>
+                        <option :value="2592000">+{{ $t('users.drawer.days30') }}</option>
+                        <option value="custom">{{ $t('users.drawer.customDays') }}</option>
                       </select>
                       <input
                         v-if="extendChoice === 'custom'"
                         v-model.number="extendCustomDays"
                         type="number"
                         min="1"
-                        placeholder="天数"
+                        :placeholder="$t('users.drawer.customDaysPlaceholder')"
                         class="extend-days"
                       />
-                      <button class="drawer-btn primary small" @click="submitExtend(lease)" :disabled="leaseOperating">确认</button>
-                      <button class="drawer-btn small" @click="cancelExtend">取消</button>
+                      <button class="drawer-btn primary small" @click="submitExtend(lease)" :disabled="leaseOperating">{{ $t('users.drawer.confirm') }}</button>
+                      <button class="drawer-btn small" @click="cancelExtend">{{ $t('users.drawer.cancel') }}</button>
                     </template>
                     <template v-else>
-                      <button class="drawer-btn small" @click="startExtend(lease)">⏳ 续期</button>
-                      <button class="drawer-btn small danger" @click="confirmRevoke(lease)" :disabled="leaseOperating">收回</button>
+                      <button class="drawer-btn small" @click="startExtend(lease)">{{ $t('users.drawer.extend') }}</button>
+                      <button class="drawer-btn small danger" @click="confirmRevoke(lease)" :disabled="leaseOperating">{{ $t('users.drawer.revoke') }}</button>
                     </template>
                   </div>
                 </div>
@@ -199,35 +199,35 @@
           <div v-if="activeTab === 'policy'" class="tab-pane">
             <!-- 账号截止日（可选）：日常时长由设备租约管理，此处仅用于彻底停用账号 -->
             <section class="drawer-section">
-              <div class="section-title">账号截止日（可选）</div>
+              <div class="section-title">{{ $t('users.drawer.expiresAt') }}</div>
               <div class="expiry-status-box" :class="{ expired: isExpiredAt(user.expires_at) }">
                 <div class="expiry-icon">⏳</div>
                 <div class="expiry-info">
                   <div class="expiry-headline">
-                    {{ isExpiredAt(user.expires_at) ? '账号已停用' : formatExpire(user.expires_at) }}
+                    {{ isExpiredAt(user.expires_at) ? $t('users.drawer.accountDisabled') : formatExpire(user.expires_at) }}
                   </div>
                   <div class="expiry-sub">
-                    {{ isExpiredAt(user.expires_at) ? '已超过截止日无法登录，改为永久或未来日期即可恢复' : (formatRemain(user.expires_at) || '永久有效。日常时长通过「设备租约」管理，此处仅用于彻底停用账号') }}
+                    {{ isExpiredAt(user.expires_at) ? $t('users.drawer.accountDisabledDesc') : (formatRemain(user.expires_at) || $t('users.table.permanent')) }}
                   </div>
                 </div>
               </div>
               <div class="expire-edit-row">
                 <select v-model="expireChoice" class="drawer-select">
-                  <option value="keep">保持不变</option>
-                  <option value="0">♾️ 永久有效</option>
-                  <option value="86400">1 天（从现在开始）</option>
-                  <option value="604800">7 天（从现在开始）</option>
-                  <option value="2592000">30 天（从现在开始）</option>
-                  <option value="7776000">90 天（从现在开始）</option>
-                  <option value="31536000">1 年（从现在开始）</option>
-                  <option value="custom">⚙️ 自定义天数…</option>
+                  <option value="keep">{{ $t('users.drawer.keepUnchanged') }}</option>
+                  <option value="0">{{ $t('users.drawer.permanentOption') }}</option>
+                  <option value="86400">{{ $t('users.drawer.fromNow1Day') }}</option>
+                  <option value="604800">{{ $t('users.drawer.fromNow7Days') }}</option>
+                  <option value="2592000">{{ $t('users.drawer.fromNow30Days') }}</option>
+                  <option value="7776000">{{ $t('users.drawer.fromNow90Days') }}</option>
+                  <option value="31536000">{{ $t('users.drawer.fromNow1Year') }}</option>
+                  <option value="custom">{{ $t('users.drawer.customDaysOption') }}</option>
                 </select>
                 <input
                   v-if="expireChoice === 'custom'"
                   v-model.number="customDays"
                   type="number"
                   min="1"
-                  placeholder="天数"
+                  :placeholder="$t('users.drawer.customDaysPlaceholder')"
                   class="drawer-select custom-days-input"
                 />
               </div>
@@ -237,8 +237,8 @@
 
             <!-- 设置锁定（7 个 forbid 位） -->
             <section class="drawer-section">
-              <div class="section-title">设置锁定（管控项）</div>
-              <p class="section-desc">开启后用户端对应设置项将被锁定置灰，由服务端强制使用下方配置值，下次连接生效。</p>
+              <div class="section-title">{{ $t('users.drawer.policyLockTitle') }}</div>
+              <p class="section-desc">{{ $t('users.drawer.policyLockDesc') }}</p>
               <div class="policy-toggle-grid">
                 <label
                   v-for="dim in forbidDims"
@@ -257,24 +257,24 @@
 
             <!-- 设置值 -->
             <section class="drawer-section">
-              <div class="section-title">强制设置值</div>
+              <div class="section-title">{{ $t('users.drawer.forcedSettings') }}</div>
               <div class="settings-summary">
                 <template v-if="draftSettings">
-                  <span>码率 {{ bitrateText }} · 帧率 {{ draftSettings.fps || '不限' }} · 分辨率 {{ draftSettings.size || '不限' }} · 音频 {{ draftSettings.audio ? '开' : '关' }}</span>
+                  <span>{{ $t('settings.bitrate') }} {{ bitrateText }} · {{ $t('settings.maxFps') }} {{ draftSettings.fps || $t('common.none') }} · {{ $t('settings.maxSize') }} {{ draftSettings.size || $t('common.none') }} · {{ $t('settings.audio') }} {{ draftSettings.audio ? $t('common.on') : $t('common.off') }}</span>
                 </template>
                 <template v-else>
-                  <span class="settings-none">未配置（被锁定的项回落设备默认值）</span>
+                  <span class="settings-none">{{ $t('users.drawer.notConfigured') }}</span>
                 </template>
               </div>
               <div class="basic-actions">
-                <button class="drawer-btn" @click="openSettingsEditor">编辑设置值…</button>
-                <button v-if="draftSettings" class="drawer-btn danger" @click="draftSettings = null">清除配置</button>
+                <button class="drawer-btn" @click="openSettingsEditor">{{ $t('users.drawer.editSettings') }}</button>
+                <button v-if="draftSettings" class="drawer-btn danger" @click="draftSettings = null">{{ $t('users.drawer.clearSettings') }}</button>
               </div>
             </section>
 
             <div class="action-footer">
               <button class="save-btn" @click="savePolicy" :disabled="saving">
-                {{ saving ? '保存中...' : '💾 保存权限设置' }}
+                {{ saving ? $t('users.drawer.saving') : $t('users.drawer.savePolicy') }}
               </button>
             </div>
           </div>
@@ -283,20 +283,20 @@
           <div v-if="activeTab === 'audit'" class="tab-pane">
             <section class="drawer-section">
               <div class="section-title lease-title">
-                <span>操作记录（针对该用户）</span>
-                <button class="lease-refresh" @click="fetchAudit" :disabled="auditLoading" title="刷新">⟳</button>
+                <span>{{ $t('users.drawer.auditTitle') }}</span>
+                <button class="lease-refresh" @click="fetchAudit" :disabled="auditLoading" :title="$t('deviceClient.retry')">⟳</button>
               </div>
-              <div v-if="auditLoading" class="lease-empty">加载中...</div>
+              <div v-if="auditLoading" class="lease-empty">{{ $t('users.drawer.loading') }}</div>
               <div v-else-if="auditError" class="lease-error">{{ auditError }}</div>
-              <div v-else-if="userAuditEntries.length === 0" class="lease-empty">最近 200 条审计日志中暂无针对该用户的操作记录。</div>
+              <div v-else-if="userAuditEntries.length === 0" class="lease-empty">{{ $t('users.drawer.noAudit') }}</div>
               <div v-else class="audit-table-wrapper">
                 <table class="audit-table">
                   <thead>
                     <tr>
-                      <th>时间</th>
-                      <th>动作</th>
-                      <th>详情</th>
-                      <th>IP</th>
+                      <th>{{ $t('users.drawer.time') }}</th>
+                      <th>{{ $t('users.drawer.action') }}</th>
+                      <th>{{ $t('users.drawer.detail') }}</th>
+                      <th>{{ $t('users.drawer.ip') }}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -330,6 +330,7 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'
 import { authHeaders, readError } from '@/utils/api'
 import { isExpiredAt, formatExpire, formatRemain, formatLeaseRemaining } from '@/utils/format'
@@ -342,14 +343,15 @@ const props = defineProps({
 })
 const emit = defineEmits(['close', 'edit-note', 'rename', 'reset-pwd', 'share', 'delete-user', 'kick', 'updated'])
 
+const { t } = useI18n()
 const authStore = useAuthStore()
 
-const tabs = [
-  { key: 'basic', label: '👤 基础与安全' },
-  { key: 'devices', label: '📱 设备租约' },
-  { key: 'policy', label: '⚙️ 权限设置' },
-  { key: 'audit', label: '📜 操作记录' }
-]
+const tabs = computed(() => [
+  { key: 'basic', label: '👤 ' + t('users.drawer.tabs.basic') },
+  { key: 'devices', label: '📱 ' + t('users.drawer.tabs.devices') },
+  { key: 'policy', label: '⚙️ ' + t('users.drawer.tabs.policy') },
+  { key: 'audit', label: '📜 ' + t('users.drawer.tabs.audit') }
+])
 const activeTab = ref(props.initialTab || 'basic')
 
 // 操作反馈
@@ -454,18 +456,21 @@ async function submitCreateLease() {
       })
     })
     if (res.status === 409) {
-      let msg = '该设备已有活跃租约'
+      let msg = t('devicesAdmin.hasActiveLease')
       try {
         const data = await res.json()
         if (data.existing_lease) {
-          msg = `该设备已出租给「${data.existing_lease.username}」（${formatLeaseRemaining(data.existing_lease.remaining_seconds)}），请先收回原租约`
+          msg = t('users.drawer.alreadyRentedHint', {
+            user: data.existing_lease.username,
+            remain: formatLeaseRemaining(data.existing_lease.remaining_seconds)
+          })
         }
       } catch (e) { /* ignore */ }
       throw new Error(msg)
     }
-    if (!res.ok) throw new Error(await readError(res, '开租失败'))
+    if (!res.ok) throw new Error(await readError(res, t('devicesAdmin.btnCreateLease')))
     showCreateLease.value = false
-    showToast(`已为 ${props.user.username} 开通设备 ${form.deviceId} 的租约`)
+    showToast(t('users.drawer.alreadyRentedHint', { user: props.user.username, remain: '' }) ? `${props.user.username} -> ${form.deviceId}` : '')
     await fetchLeases()
     emit('updated')
   } catch (err) {
@@ -509,7 +514,7 @@ async function submitExtend(lease) {
 }
 
 async function confirmRevoke(lease) {
-  if (!confirm(`确定要收回用户 "${lease.username}" 对设备 "${lease.device_id}" 的租约吗？其在该设备上的会话将被踢断。`)) return
+  if (!confirm(t('users.confirmRevokeLease', { username: lease.username, deviceId: lease.device_id }))) return
   leaseOperating.value = true
   leaseError.value = ''
   try {
@@ -529,22 +534,22 @@ async function confirmRevoke(lease) {
 }
 
 function confirmKick(deviceId) {
-  if (!confirm(`确定要断开用户 "${props.user.username}" 对云手机 "${deviceId}" 的控制连接吗？`)) return
+  if (!confirm(t('users.confirmDisconnectDevice', { username: props.user.username, deviceId }))) return
   emit('kick', { username: props.user.username, deviceId })
 }
 
 // ---------------- Tab 3: 权限与有效期 ----------------
 const saving = ref(false)
 
-const forbidDims = [
-  { key: 'forbid_bitrate', title: '锁定码率设置', desc: '禁止用户自行调整视频码率' },
-  { key: 'forbid_fps', title: '锁定帧率设置', desc: '禁止用户自行调整最大帧率' },
-  { key: 'forbid_resolution', title: '锁定分辨率', desc: '禁止用户自行切换分辨率' },
-  { key: 'forbid_audio', title: '锁定音频开关', desc: '禁止用户自行开关音频通道' },
-  { key: 'forbid_file_push', title: '禁止文件传输', desc: '禁止文件上传/下载' },
-  { key: 'forbid_terminal', title: '禁止终端 Shell', desc: '禁止使用网页终端' },
-  { key: 'forbid_share', title: '禁止创建分享', desc: '禁止生成分享链接' }
-]
+const forbidDims = computed(() => [
+  { key: 'forbid_bitrate', title: t('users.drawer.forbids.bitrate'), desc: t('users.drawer.forbids.bitrateDesc') },
+  { key: 'forbid_fps', title: t('users.drawer.forbids.fps'), desc: t('users.drawer.forbids.fpsDesc') },
+  { key: 'forbid_resolution', title: t('users.drawer.forbids.resolution'), desc: t('users.drawer.forbids.resolutionDesc') },
+  { key: 'forbid_audio', title: t('users.drawer.forbids.audio'), desc: t('users.drawer.forbids.audioDesc') },
+  { key: 'forbid_file_push', title: t('users.drawer.forbids.filePush'), desc: t('users.drawer.forbids.filePushDesc') },
+  { key: 'forbid_terminal', title: t('users.drawer.forbids.terminal'), desc: t('users.drawer.forbids.terminalDesc') },
+  { key: 'forbid_share', title: t('users.drawer.forbids.share'), desc: t('users.drawer.forbids.shareDesc') }
+])
 const formPolicy = ref({})
 const draftSettings = ref(null)
 const expireChoice = ref('keep')
@@ -563,7 +568,7 @@ const editorSettings = computed(() => draftSettings.value || getDeviceSettings('
 
 function resetPolicyForm() {
   const p = {}
-  forbidDims.forEach(dim => { p[dim.key] = !!props.user[dim.key] })
+  forbidDims.value.forEach(dim => { p[dim.key] = !!props.user[dim.key] })
   formPolicy.value = p
   draftSettings.value = props.user.settings
     ? { ...getDeviceSettings(''), ...props.user.settings }
@@ -586,7 +591,7 @@ async function savePolicy() {
   saving.value = true
   try {
     const policy = { settings: draftSettings.value }
-    forbidDims.forEach(dim => { policy[dim.key] = !!formPolicy.value[dim.key] })
+    forbidDims.value.forEach(dim => { policy[dim.key] = !!formPolicy.value[dim.key] })
     const body = { username: props.user.username, policy }
     if (expireChoice.value === 'keep') {
       body.expire_seconds = -1 // -1 = 有效期不变
@@ -601,7 +606,7 @@ async function savePolicy() {
       body: JSON.stringify(body)
     })
     if (!res.ok) throw new Error(await readError(res, '保存失败'))
-    showToast('权限设置已保存')
+    showToast(t('users.drawer.savePolicy') + ' ✓')
     emit('updated')
   } catch (err) {
     showToast(err.message, 'error')
@@ -865,7 +870,9 @@ watch(() => props.user.username, () => {
 .info-label {
   color: #8b949e;
   flex-shrink: 0;
-  width: 72px;
+  min-width: 80px;
+  width: auto;
+  max-width: 140px;
 }
 
 .info-value {
@@ -901,6 +908,8 @@ watch(() => props.user.username, () => {
   padding: 7px 12px;
   cursor: pointer;
   transition: all 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .drawer-btn:hover {

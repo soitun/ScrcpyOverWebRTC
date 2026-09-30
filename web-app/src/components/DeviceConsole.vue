@@ -1,12 +1,12 @@
 <template>
   <div ref="consoleMainRef" class="device-console" :class="{ 'is-maximized': isMaximized, 'is-mobile-view': isMobile }" :style="{ height: isMaximized ? '100vh' : height }">
     <!-- 移动端半屏抽屉指示条 (仅在移动端展示，点击可直接收起关闭) -->
-    <div class="mobile-sheet-handle-bar" @click="handleConsoleClose" title="点击收起控制台">
+    <div class="mobile-sheet-handle-bar" @click="handleConsoleClose" :title="$t('console.clickCollapse')">
       <span class="sheet-handle-pill"></span>
     </div>
 
     <!-- 顶部拖拽拉伸手柄 (PC端使用) -->
-    <div class="console-resizer" v-if="!isMaximized && !isMobile" @mousedown="startResizingConsole" title="拖动调整控制台高度"></div>
+    <div class="console-resizer" v-if="!isMaximized && !isMobile" @mousedown="startResizingConsole" :title="$t('console.dragHeightHint')"></div>
 
     <!-- 轻量 Toast 提示 -->
     <transition name="console-fade">
@@ -22,51 +22,51 @@
           v-if="!forbidTerminal"
           :class="{ active: activeTab === 'shell' }"
           @click="activeTab = 'shell'"
-          title="Android Shell 命令分发与并发执行"
+          :title="$t('console.tabs.shell')"
         >
           <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
-          <span class="tab-label-text">执行命令</span>
-          <span class="tab-label-short">命令</span>
+          <span class="tab-label-text">{{ $t('console.tabs.shell') }}</span>
+          <span class="tab-label-short">{{ $t('console.tabs.shellShort') }}</span>
         </button>
         <button
           v-if="!forbidTerminal"
           :class="{ active: activeTab === 'adb' }"
           @click="activeTab = 'adb'"
-          title="ADB 交互式终端 (xterm.js)"
+          :title="$t('console.tabs.adb')"
         >
           <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect><path d="M12 18h.01"></path></svg>
-          <span class="tab-label-text">ADB 调试</span>
-          <span class="tab-label-short">ADB</span>
+          <span class="tab-label-text">{{ $t('console.tabs.adb') }}</span>
+          <span class="tab-label-short">{{ $t('console.tabs.adbShort') }}</span>
         </button>
         <button
           v-if="!forbidTerminal"
           :class="{ active: activeTab === 'ai' }"
           @click="activeTab = 'ai'"
-          title="AI 智能排障与助手"
+          :title="$t('console.tabs.ai')"
         >
           <svg class="tab-icon ai-spin-hover" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>
-          <span class="tab-label-text">AI 助手</span>
-          <span class="tab-label-short">AI</span>
+          <span class="tab-label-text">{{ $t('console.tabs.ai') }}</span>
+          <span class="tab-label-short">{{ $t('console.tabs.aiShort') }}</span>
           <span class="beta-badge">Agent</span>
         </button>
         <button 
           :class="{ active: activeTab === 'text' }" 
           @click="activeTab = 'text'"
-          title="批量文本下发与快速短语管理"
+          :title="$t('console.tabs.text')"
         >
           <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-          <span class="tab-label-text">文本下发</span>
-          <span class="tab-label-short">文本</span>
+          <span class="tab-label-text">{{ $t('console.tabs.text') }}</span>
+          <span class="tab-label-short">{{ $t('console.tabs.textShort') }}</span>
         </button>
         <button
           v-if="authStore.isAdmin"
           :class="{ active: activeTab === 'files' }"
           @click="activeTab = 'files'"
-          title="批量安装 APK 与文件分发传输"
+          :title="$t('console.tabs.files')"
         >
           <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="18" x2="12" y2="15"></line></svg>
-          <span class="tab-label-text">批量安装/传输</span>
-          <span class="tab-label-short">分发</span>
+          <span class="tab-label-text">{{ $t('console.tabs.files') }}</span>
+          <span class="tab-label-short">{{ $t('console.tabs.filesShort') }}</span>
         </button>
       </div>
       
@@ -79,13 +79,13 @@
             @change="onDeviceSelectChange"
             class="device-selector-dropdown"
           >
-            <option v-if="deviceId === 'default'" value="default" disabled>-- 请选择设备 --</option>
+            <option v-if="deviceId === 'default'" value="default" disabled>{{ $t('console.selectDevice') }}</option>
             <option 
               v-for="d in deviceStore.devices" 
               :key="d.id" 
               :value="d.id"
             >
-              {{ d.id }}{{ d.status === 'online' ? '' : ' (离线)' }}
+              {{ d.id }}{{ d.status === 'online' ? '' : ` (${$t('console.offline')})` }}
             </option>
           </select>
         </div>
@@ -94,7 +94,7 @@
         <button 
           class="console-tool-btn max-btn" 
           @click="toggleMaximize" 
-          :title="isMaximized ? '还原窗口' : '全屏显示'"
+          :title="isMaximized ? $t('console.restore') : $t('console.maximize')"
         >
           <svg v-if="!isMaximized" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
@@ -105,14 +105,14 @@
         </button>
 
         <!-- 最小化隐藏按钮 (PC端显示) -->
-        <button class="console-tool-btn pc-only-tool-btn" @click="deviceStore.closeGlobalConsole()" title="收起隐藏控制台 (终端继续后台运行)">
+        <button class="console-tool-btn pc-only-tool-btn" @click="deviceStore.closeGlobalConsole()" :title="$t('console.collapseHint')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <line x1="5" y1="12" x2="19" y2="12"></line>
           </svg>
         </button>
 
         <!-- 关闭控制台按钮 (移动端与PC端统一切换) -->
-        <button class="console-close-btn" @click="handleConsoleClose" :title="isMobile ? '收起控制台' : '关闭控制台 (断开所有终端连接)'">
+        <button class="console-close-btn" @click="handleConsoleClose" :title="isMobile ? $t('console.collapse') : $t('console.closeHint')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <line x1="18" y1="6" x2="6" y2="18"></line>
             <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -129,16 +129,16 @@
           <div v-for="(log, idx) in consoleLogs" :key="idx" :class="['log-item', log.type]">
             <template v-if="log.type === 'batch_result'">
               <div class="batch-result-header">
-                <span class="log-cmd">$ {{ Object.keys(log.results).length > 1 ? `[批量执行] ${log.cmd} (共 ${Object.keys(log.results).length} 台)` : log.cmd }}</span>
+                <span class="log-cmd">$ {{ Object.keys(log.results).length > 1 ? $t('console.batchExecWithCount', { cmd: log.cmd, count: Object.keys(log.results).length }) : log.cmd }}</span>
                 <div class="batch-summary-stats">
                   <span class="stat-pill success" v-if="getBatchStat(log.results, 'success') > 0">
-                    ✅ {{ Object.keys(log.results).length > 1 ? `${getBatchStat(log.results, 'success')} 成功` : '执行成功' }}
+                    ✅ {{ Object.keys(log.results).length > 1 ? $t('console.successBatch', { count: getBatchStat(log.results, 'success') }) : $t('console.success') }}
                   </span>
                   <span class="stat-pill failed" v-if="getBatchStat(log.results, 'failed') > 0">
-                    ❌ {{ Object.keys(log.results).length > 1 ? `${getBatchStat(log.results, 'failed')} 失败` : '执行失败' }}
+                    ❌ {{ Object.keys(log.results).length > 1 ? $t('console.failedBatch', { count: getBatchStat(log.results, 'failed') }) : $t('console.failed') }}
                   </span>
                   <span class="stat-pill running" v-if="getBatchStat(log.results, 'running') > 0">
-                    ⏳ 执行中
+                    ⏳ {{ $t('console.running') }}
                   </span>
                   <button 
                     v-if="Object.keys(log.results).length > 1 && getBatchStat(log.results, 'failed') > 0"
@@ -146,7 +146,7 @@
                     :class="{ active: log.showFailedOnly }"
                     @click="log.showFailedOnly = !log.showFailedOnly"
                   >
-                    {{ log.showFailedOnly ? '查看全部设备' : '仅看失败设备' }}
+                    {{ log.showFailedOnly ? $t('console.viewAllDevices') : $t('console.viewFailedDevices') }}
                   </button>
                 </div>
               </div>
@@ -160,7 +160,7 @@
                   <div class="row-header">
                     <span class="dev-tag">[{{ devId }}]</span>
                     <span class="status-tag" :class="res.status">
-                      {{ res.status === 'running' ? '⏳ 执行中' : (res.status === 'success' ? '✅ 成功' : '❌ 失败') }}
+                      res.status === 'running' ? `⏳ ${$t('console.running')}` : (res.status === 'success' ? `✅ ${$t('console.success')}` : `❌ ${$t('console.failed')}`)
                     </span>
                   </div>
                   <pre class="dev-output">{{ res.output }}</pre>
@@ -174,7 +174,7 @@
           </div>
           <div v-if="consoleLogs.length === 0" class="console-empty">
             <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-            等待命令分发执行...
+            {{ $t('console.waitingExec') }}
           </div>
         </div>
         <div class="console-shortcuts">
@@ -183,19 +183,19 @@
             :key="idx" 
             @click="quickCmd(item.cmd)"
           >
-            {{ item.name }}
+            {{ getShortcutName(item) }}
           </button>
-          <button @click="consoleLogs = []" class="system-btn">清屏</button>
-          <button @click="showShortcutModal = true" class="system-btn edit-btn">⚙️ 自定义</button>
+          <button @click="consoleLogs = []" class="system-btn">{{ $t('console.clearBtn') }}</button>
+          <button @click="showShortcutModal = true" class="system-btn edit-btn">{{ $t('console.customizeShortcuts') }}</button>
         </div>
 
         <!-- 并发下发目标设备选择（高密海量设备选择架构） -->
         <div class="shell-targets-bar" v-if="authStore.isAdmin">
           <div class="targets-control-row">
             <div class="targets-left-info">
-              <span class="label">并发目标：</span>
+              <span class="label">{{ $t('console.targetDevices') }}</span>
               <span class="targets-summary-pill" :class="{ 'is-batch': batchShellSelectedIds.length > 0 }">
-                {{ batchShellSelectedIds.length === 0 ? `当前单机 (${deviceId})` : `已选 ${targetDeviceIds.length} 台设备` }}
+                {{ batchShellSelectedIds.length === 0 ? $t('console.currentSingle', { id: deviceId }) : $t('console.selectedCount', { count: targetDeviceIds.length }) }}
               </span>
             </div>
 
@@ -204,22 +204,22 @@
                 class="target-quick-btn"
                 :class="{ active: isAllDevicesSelected }"
                 @click="isAllDevicesSelected = !isAllDevicesSelected"
-                title="快速全选所有在线设备"
+                :title="$t('console.selectAllOnlineHint')"
               >
-                ⚡ 全选在线 ({{ deviceStore.devices.filter(d => d.status === 'online').length }})
+                ⚡ {{ $t('console.selectAllOnline', { count: deviceStore.devices.filter(d => d.status === 'online').length }) }}
               </button>
               <button
                 v-if="batchShellSelectedIds.length > 0"
                 class="target-quick-btn"
                 @click="batchShellSelectedIds = []"
-                title="清空多选，仅保留当前主设备"
+                :title="$t('console.onlyCurrentDeviceHint')"
               >
-                仅当前单机
+                {{ $t('console.onlyCurrentDevice') }}
               </button>
             </div>
 
             <div class="tag-filters" v-if="tagStore.tags.length > 0">
-              <span class="tag-filter-label">标签组：</span>
+              <span class="tag-filter-label">{{ $t('console.tagGroup') }}</span>
               <button 
                 v-for="tag in tagStore.tags" 
                 :key="tag.id" 
@@ -230,7 +230,7 @@
                   color: isTagAllSelected(tag.id) ? '#fff' : tag.color 
                 }"
                 @click="toggleTagDevices(tag.id)"
-                :title="`快速切换标签【${tag.name}】下的所有在线设备`"
+                :title="$t('console.switchTagHint', { name: tag.name })"
               >
                 {{ tag.name }}
               </button>
@@ -240,13 +240,13 @@
               class="target-picker-toggle-btn"
               :class="{ open: activeTargetPicker === 'shell' }"
               @click="openTargetPicker('shell')"
-              title="展开海量设备搜索与精细化勾选列表"
+              :title="$t('console.expandTargetPicker')"
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
                 <circle cx="11" cy="11" r="8"></circle>
                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
               </svg>
-              <span>设备选择列表 ({{ targetDeviceIds.length }})</span>
+              <span>{{ $t('console.deviceSelectionList', { count: targetDeviceIds.length }) }}</span>
               <span class="arrow-indicator">{{ activeTargetPicker === 'shell' ? '▲' : '▼' }}</span>
             </button>
           </div>
@@ -259,27 +259,27 @@
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="search-icon"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                   <input 
                     v-model="targetSearchText" 
-                    placeholder="输入设备 ID 或型号模糊快速检索 (如 pixel, redroid)..." 
+                    :placeholder="$t('console.searchDevicesPlaceholder2')" 
                     class="drawer-search-input"
                   />
                   <button v-if="targetSearchText" class="search-clear-btn" @click="targetSearchText = ''">✕</button>
                 </div>
                 <div class="drawer-actions">
-                  <button class="drawer-action-btn" @click="selectFilteredTargets('shell')" title="勾选当前筛选出的所有在线设备">全选匹配项</button>
-                  <button class="drawer-action-btn" @click="invertFilteredTargets('shell')" title="反选当前匹配项">反向选择</button>
-                  <button class="drawer-action-btn" @click="batchShellSelectedIds = []" title="清空其他设备">清空</button>
-                  <button class="drawer-action-btn primary" @click="closeTargetPicker">完成 (已选 {{ targetDeviceIds.length }})</button>
+                  <button class="drawer-action-btn" @click="selectFilteredTargets('shell')" :title="$t('console.selectAllMatchedHint')">{{ $t('console.selectAllMatched') }}</button>
+                  <button class="drawer-action-btn" @click="invertFilteredTargets('shell')" :title="$t('console.invertSelectionHint')">{{ $t('console.invertSelection') }}</button>
+                  <button class="drawer-action-btn" @click="batchShellSelectedIds = []" :title="$t('console.clearOtherDevices')">{{ $t('console.clearSelection') }}</button>
+                  <button class="drawer-action-btn primary" @click="closeTargetPicker">{{ $t('console.doneSelection', { count: targetDeviceIds.length }) }}</button>
                 </div>
               </div>
 
               <div class="drawer-tag-strip" v-if="tagStore.tags.length > 0">
-                <span class="strip-label">按标签过滤：</span>
+                <span class="strip-label">{{ $t('console.filterByTag') }}</span>
                 <button 
                   class="drawer-tag-pill" 
                   :class="{ active: targetActiveTag === null }"
                   @click="targetActiveTag = null"
                 >
-                  全部 ({{ deviceStore.devices.length }})
+                  {{ $t('console.allCount', { count: deviceStore.devices.length }) }}
                 </button>
                 <button 
                   v-for="tag in tagStore.tags" 
@@ -298,7 +298,7 @@
                   <input type="checkbox" checked disabled />
                   <span class="device-status-dot online"></span>
                   <span class="device-id-text" :title="deviceId">{{ deviceId }}</span>
-                  <span class="current-badge">当前主控</span>
+                  <span class="current-badge">{{ $t('console.currentMaster') }}</span>
                 </label>
                 <label 
                   v-for="d in filteredPickerDevices.filter(dev => dev.id !== deviceId)" 
@@ -314,7 +314,7 @@
                   />
                   <span class="device-status-dot" :class="d.status"></span>
                   <span class="device-id-text" :title="d.id">{{ d.id }}</span>
-                  <span v-if="d.status !== 'online'" class="offline-badge">离线</span>
+                  <span v-if="d.status !== 'online'" class="offline-badge">{{ $t('console.offline') }}</span>
                   <span 
                     v-for="tId in (tagStore.deviceTags[d.id] || [])" 
                     :key="tId" 
@@ -324,7 +324,7 @@
                   ></span>
                 </label>
                 <div v-if="filteredPickerDevices.length === 0" class="drawer-empty-hint">
-                  无匹配设备，请更改搜索条件
+                  {{ $t('console.noMatchedDevices') }}
                 </div>
               </div>
             </div>
@@ -337,7 +337,7 @@
             @keyup.enter="execCmd"
             @keydown.up.prevent="navigateHistory('up')"
             @keydown.down.prevent="navigateHistory('down')"
-            placeholder="输入 Android Shell 命令分发执行（支持单机或并发批量）..."
+            :placeholder="$t('console.shellPlaceholder')"
             class="cmd-input"
           />
           <button @click="execCmd" class="send-btn" :disabled="!inputCmd.trim()">{{ sendBtnText }}</button>
@@ -358,18 +358,18 @@
             >
               <span class="tab-status-dot" :class="{ connected: sess.isConnected, disconnected: !sess.isConnected }"></span>
               <span class="sess-name">{{ sess.name }}</span>
-              <span class="close-sess-btn" @click.stop="closeAdbSession(sess.id)" title="关闭会话">×</span>
+              <span class="close-sess-btn" @click.stop="closeAdbSession(sess.id)" :title="$t('console.closeSession')">×</span>
             </button>
             <button 
               class="add-sess-btn" 
               @click="addAdbSession" 
-              title="新建终端会话" 
+              :title="$t('console.newSession')" 
               :disabled="adbSessions.length >= 5 || !isAdbReady"
             >
               +
             </button>
           </div>
-          <span class="max-sess-tip">最多支持开启 5 个终端页</span>
+          <span class="max-sess-tip">{{ $t('console.maxSessionsTip') }}</span>
         </div>
 
         <!-- 断连醒目警示条 (若存在已有会话且连接断开) -->
@@ -379,28 +379,28 @@
             <line x1="12" y1="9" x2="12" y2="13"></line>
             <line x1="12" y1="17" x2="12.01" y2="17"></line>
           </svg>
-          <span class="notice-text">远程设备直连已断开，当前 ADB 调试会话已终止。</span>
-          <button class="notice-reconnect-btn" @click="deviceStore.openDevice(deviceId)">🚀 重新进入设备直控</button>
+          <span class="notice-text">{{ $t('console.adbDisconnectedNotice') }}</span>
+          <button class="notice-reconnect-btn" @click="deviceStore.openDevice(deviceId)">{{ $t('console.reopenControlBtn') }}</button>
         </div>
 
         <div v-if="adbSessions.length === 0" class="adb-placeholder">
           <svg class="adb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><polyline points="9 9 9 15 12 12 15 15 15 9"></polyline></svg>
           <template v-if="isAdbReady">
-            <h3>交互式 ADB Web 终端已就绪</h3>
-            <p>基于 WebRTC P2P 数据加密通道直连，支持 Tab 补全、交互操作与多会话并发调试</p>
+            <h3>{{ $t('console.adbReadyTitle') }}</h3>
+            <p>{{ $t('console.adbReadyDesc') }}</p>
             <button class="adb-connect-btn" @click="addAdbSession">
-              + 新建终端会话
+              {{ $t('console.newSession') }}
             </button>
           </template>
           <template v-else>
-            <h3>ADB 交互终端需在设备直控中运行</h3>
-            <p class="adb-hint-warn">当前设备处于大盘监控模式，未建立屏幕直连通道。请进入设备直控页面，即可直接开启交互式终端。</p>
+            <h3>{{ $t('console.adbDirectRequiredTitle') }}</h3>
+            <p class="adb-hint-warn">{{ $t('console.adbDirectRequiredDesc') }}</p>
             <div class="adb-placeholder-actions">
               <button class="adb-goto-device-btn" @click="deviceStore.openDevice(deviceId)">
-                🚀 进入设备直控
+                {{ $t('console.enterControlBtn') }}
               </button>
               <button class="adb-switch-shell-btn" @click="activeTab = 'shell'">
-                切换至【执行命令】(大盘免直连)
+                {{ $t('console.switchToShellBtn') }}
               </button>
             </div>
           </template>
@@ -422,8 +422,8 @@
         <!-- 侧边快捷模板/技能栏 (PC上侧边栏，移动端折叠或滚动) -->
         <aside class="ai-skills-sidebar">
           <div class="sidebar-header">
-            <h4>🤖 快捷技能模板</h4>
-            <button class="add-skill-btn" @click="addNewSkillPrompt" title="新建自定义技能">+</button>
+            <h4>{{ $t('console.aiSkillsTitle') }}</h4>
+            <button class="add-skill-btn" @click="addNewSkillPrompt" :title="$t('console.newSkillTitle')">+</button>
           </div>
           <div class="skills-list">
             <button 
@@ -447,7 +447,7 @@
           <div class="ai-config-header">
             <button class="ai-settings-toggle" @click="showAiSettings = !showAiSettings">
               <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-              AI 连接参数设置 {{ showAiSettings ? '▲' : '▼' }}
+              {{ $t('console.aiConfigTitle') }} {{ showAiSettings ? '▲' : '▼' }}
             </button>
             <span class="ai-model-badge">{{ aiModel }}</span>
           </div>
@@ -456,13 +456,13 @@
             <div class="ai-settings-panel" v-if="showAiSettings">
               <div class="form-row">
                 <label>API Base URL:</label>
-                <input v-model="aiUrl" placeholder="例如 https://api.openai.com/v1" />
+                <input v-model="aiUrl" :placeholder="$t('console.aiUrlPlaceholder')" />
               </div>
               <div class="form-row">
                 <label>API Key / Token:</label>
                 <div class="password-input-wrapper">
-                  <input v-model="aiKey" :type="showAiKey ? 'text' : 'password'" placeholder="填写您的 API Key (Token)" />
-                  <button type="button" class="eye-toggle-btn" @click="showAiKey = !showAiKey" :title="showAiKey ? '隐藏' : '显示'">
+                  <input v-model="aiKey" :type="showAiKey ? 'text' : 'password'" :placeholder="$t('console.aiApiKeyPlaceholder')" />
+                  <button type="button" class="eye-toggle-btn" @click="showAiKey = !showAiKey" :title="showAiKey ? $t('console.hide') : $t('console.show')">
                     <svg v-if="showAiKey" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
                       <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
                       <line x1="1" y1="1" x2="23" y2="23"></line>
@@ -475,19 +475,19 @@
                 </div>
               </div>
               <div class="form-row">
-                <label>模型 (Model):</label>
-                <input v-model="aiModel" placeholder="例如 gpt-4o-mini 或 deepseek-chat" />
+                <label>{{ $t('console.aiModelLabel') }}</label>
+                <input v-model="aiModel" :placeholder="$t('console.aiModelPlaceholder')" />
               </div>
               <div class="form-row">
-                <label>提供商 (Provider):</label>
+                <label>{{ $t('console.aiProviderLabel') }}</label>
                 <select v-model="aiProvider">
                   <option value="openai">OpenAI</option>
-                  <option value="zhipu">智谱 (Zhipu)</option>
+                  <option value="zhipu">Zhipu (GLM)</option>
                   <option value="claude">Claude</option>
                 </select>
               </div>
               <div class="form-actions">
-                <button class="save-settings-btn" @click="saveAiSettings">保存配置</button>
+                <button class="save-settings-btn" @click="saveAiSettings">{{ $t('console.saveAiConfig') }}</button>
               </div>
             </div>
           </transition>
@@ -495,8 +495,8 @@
           <!-- AI 执行系统追踪日志 (类似 CLI logs) -->
           <div class="ai-trace-panel" v-if="aiLogs.length > 0">
             <div class="trace-header">
-              <span>⚡ AI Agent 思考过程与工具调用日志</span>
-              <button class="clear-trace-btn" @click="aiLogs = []">清空</button>
+              <span>{{ $t('console.aiTraceTitle') }}</span>
+              <button class="clear-trace-btn" @click="aiLogs = []">{{ $t('console.clearSelection') }}</button>
             </div>
             <div class="trace-body">
               <div v-for="(log, idx) in aiLogs" :key="idx" class="trace-log-line">
@@ -509,8 +509,8 @@
           <!-- 聊天会话记录 -->
           <div class="ai-chat-history" ref="chatRef">
             <div v-if="aiMessages.length === 0" class="chat-empty">
-              <h3>🤖 我是您的云虚机 AI 助手</h3>
-              <p>请配置您的 API Key 并在右侧选择诊断技能或直接在下方提问。<br/>我可以直接执行 ADB 命令来帮您诊断网络卡顿、分析应用崩溃并执行各种设备维护任务。</p>
+              <h3>{{ $t('console.aiIntroTitle') }}</h3>
+              <p v-html="$t('console.aiIntroDesc')"></p>
             </div>
             <div 
               v-for="(msg, idx) in visibleMessages" 
@@ -519,13 +519,13 @@
             >
               <div class="chat-bubble">
                 <div class="bubble-header">
-                  <span class="sender-name">{{ msg.role === 'user' ? '用户' : 'AI 助手' }}</span>
+                  <span class="sender-name">{{ msg.role === 'user' ? $t('console.userRole') : $t('console.aiRole') }}</span>
                 </div>
                 <div class="bubble-content">
                   <pre class="formatted-text" v-if="msg.content">{{ msg.content }}</pre>
                   <div class="tool-calls-display" v-if="msg.tool_calls">
                     <div v-for="tc in msg.tool_calls" :key="tc.id" class="tool-badge">
-                      🛠️ 触发工具: {{ tc.function.name }}
+                      {{ $t('console.toolTriggered', { name: tc.function.name }) }}
                     </div>
                   </div>
                 </div>
@@ -536,7 +536,7 @@
                 <div class="loading-dots">
                   <span></span><span></span><span></span>
                 </div>
-                <div class="loading-tip">AI Agent 正在思考或执行 ADB 命令中...</div>
+                <div class="loading-tip">{{ $t('console.aiThinking') }}</div>
               </div>
             </div>
           </div>
@@ -546,7 +546,7 @@
             <textarea 
               v-model="aiInput" 
               @keydown.enter.exact.prevent="sendAiMessage"
-              placeholder="请输入您的问题，例如: '检查磁盘空间并诊断是否有大文件'..."
+              :placeholder="$t('console.aiInputPlaceholder')"
               class="ai-chat-input"
               rows="2"
               :disabled="aiLoading"
@@ -556,7 +556,7 @@
               @click="sendAiMessage"
               :disabled="!aiInput.trim() || aiLoading"
             >
-              发送
+              {{ $t('console.send') }}
             </button>
           </div>
         </div>
@@ -567,12 +567,12 @@
         <!-- 侧边快捷短语栏 (类似于 AI 助手的快捷技能侧边栏 aside.ai-skills-sidebar) -->
         <aside class="quick-text-sidebar" :class="{ collapsed: isQuickTextCollapsed }">
           <div class="sidebar-header">
-            <h4>⚡ 快捷短语</h4>
+            <h4>{{ $t('console.quickPhrasesTitle') }}</h4>
             <div class="sidebar-header-actions">
-              <button class="add-qt-btn" @click="openCreateQuickTextModal" title="新建快捷短语">+</button>
-              <button class="manage-qt-btn" @click="openQuickTextModal" title="短语库管理">⚙️</button>
-              <button class="toggle-collapse-qt-btn" @click="isQuickTextCollapsed = !isQuickTextCollapsed" :title="isQuickTextCollapsed ? '展开短语' : '收起短语'">
-                {{ isQuickTextCollapsed ? '展开' : '收起' }}
+              <button class="add-qt-btn" @click="openCreateQuickTextModal" :title="$t('console.newQuickPhrase')">+</button>
+              <button class="manage-qt-btn" @click="openQuickTextModal" :title="$t('console.managePhrases')">⚙️</button>
+              <button class="toggle-collapse-qt-btn" @click="isQuickTextCollapsed = !isQuickTextCollapsed" :title="isQuickTextCollapsed ? $t('console.expandPhrases') : $t('console.collapsePhrases')">
+                {{ isQuickTextCollapsed ? $t('console.expand') : $t('console.collapse') }}
               </button>
             </div>
           </div>
@@ -586,17 +586,17 @@
             >
               <div class="qt-card-header">
                 <span class="qt-card-title">{{ qt.title }}</span>
-                <span class="qt-card-enter-badge" v-if="qt.autoEnter" title="追加回车">↵</span>
+                <span class="qt-card-enter-badge" v-if="qt.autoEnter" :title="$t('console.appendEnterLabel')">↵</span>
               </div>
               <div class="qt-card-snippet">{{ qt.content }}</div>
               <div class="qt-card-actions">
-                <button class="qt-card-action send-btn-mini" @click.stop="directSendQuickText(qt)" title="直接下发至当前勾选设备">🚀 下发</button>
-                <button class="qt-card-action del-btn-mini" @click.stop="quickTextStore.removeQuickText(qt.id)" title="删除短语">×</button>
+                <button class="qt-card-action send-btn-mini" @click.stop="directSendQuickText(qt)" :title="$t('console.directSendHint')">🚀 {{ $t('console.send') }}</button>
+                <button class="qt-card-action del-btn-mini" @click.stop="quickTextStore.removeQuickText(qt.id)" :title="$t('console.deletePhraseHint')">×</button>
               </div>
             </div>
             <div v-if="quickTextStore.quickTexts.length === 0" class="qt-sidebar-empty">
-              <span>暂无快捷短语</span>
-              <button class="qt-empty-add-btn" @click="openCreateQuickTextModal">+ 新建短语</button>
+              <span>{{ $t('console.noQuickPhrases') }}</span>
+              <button class="qt-empty-add-btn" @click="openCreateQuickTextModal">{{ $t('console.newPhrase') }}</button>
             </div>
           </div>
         </aside>
@@ -607,11 +607,11 @@
           <div class="console-history text-history" ref="textHistoryRef">
             <div v-for="(log, idx) in textLogs" :key="idx" class="log-item batch_result">
               <div class="text-log-header">
-                <span class="text-log-badge">💬 文本下发</span>
+                <span class="text-log-badge">{{ $t('console.textLogBadge') }}</span>
                 <span class="text-log-time">{{ log.time }}</span>
-                <span class="text-log-targets-summary">发送至 {{ log.targetCount }} 台设备</span>
+                <span class="text-log-targets-summary">{{ $t('console.sentToCount', { count: log.targetCount }) }}</span>
                 <span class="text-log-mode-tag">{{ log.modeText }}</span>
-                <span class="text-log-enter-tag" v-if="log.autoEnter">↵ 自动回车</span>
+                <span class="text-log-enter-tag" v-if="log.autoEnter">{{ $t('console.autoEnterTag') }}</span>
               </div>
               <pre class="text-log-body">{{ log.content }}</pre>
               <div class="text-log-dev-pills">
@@ -624,7 +624,7 @@
               <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
               </svg>
-              暂无文本下发历史。请在左侧侧边栏点击快捷短语或在下方输入文本，并勾选目标设备进行一键下发。
+              {{ $t('console.noTextHistory') }}
             </div>
           </div>
 
@@ -632,9 +632,9 @@
           <div class="shell-targets-bar">
             <div class="targets-control-row">
               <div class="targets-left-info">
-                <span class="label">下发目标：</span>
+                <span class="label">{{ $t('console.targetDevices') }}</span>
                 <span class="targets-summary-pill" :class="{ 'is-batch': effectiveTextTargets.length > 1 }">
-                  已勾选 {{ effectiveTextTargets.length }} 台设备
+                  {{ $t('console.selectedCount', { count: effectiveTextTargets.length }) }}
                 </span>
               </div>
 
@@ -643,30 +643,30 @@
                   class="target-quick-btn"
                   :class="{ active: isAllTextTargetsSelected }"
                   @click="isAllTextTargetsSelected = !isAllTextTargetsSelected"
-                  title="快速全选所有在线设备"
+                  :title="$t('console.selectAllOnlineHint')"
                 >
-                  ⚡ 全选在线 ({{ deviceStore.devices.filter(d => d.status === 'online').length }})
+                  ⚡ {{ $t('console.selectAllOnline', { count: deviceStore.devices.filter(d => d.status === 'online').length }) }}
                 </button>
                 <button
                   class="target-quick-btn"
                   :class="{ active: textTargetCurrent && batchTextSelectedIds.length === 0 }"
                   @click="textTargetCurrent = true; batchTextSelectedIds = []"
-                  title="仅选择当前主控单机"
+                  :title="$t('console.onlyCurrentDeviceHint')"
                 >
-                  仅当前单机
+                  {{ $t('console.onlyCurrentDevice') }}
                 </button>
                 <button
                   v-if="effectiveTextTargets.length > 0"
                   class="target-quick-btn"
                   @click="textTargetCurrent = false; batchTextSelectedIds = []"
-                  title="清空所有已选设备"
+                  :title="$t('console.clearSelectionHint')"
                 >
-                  清空
+                  {{ $t('console.clearSelection') }}
                 </button>
               </div>
 
               <div class="tag-filters" v-if="tagStore.tags.length > 0">
-                <span class="tag-filter-label">标签组：</span>
+                <span class="tag-filter-label">{{ $t('console.tagGroup') }}</span>
                 <button 
                   v-for="tag in tagStore.tags" 
                   :key="tag.id" 
@@ -677,7 +677,7 @@
                     color: isTagAllSelectedForText(tag.id) ? '#fff' : tag.color 
                   }"
                   @click="toggleTagDevicesForText(tag.id)"
-                  :title="`快速切换标签【${tag.name}】下的所有在线设备`"
+                  :title="$t('console.switchTagHint', { name: tag.name })"
                 >
                   {{ tag.name }}
                 </button>
@@ -687,13 +687,13 @@
                 class="target-picker-toggle-btn"
                 :class="{ open: activeTargetPicker === 'text' }"
                 @click="openTargetPicker('text')"
-                title="展开海量设备搜索与精细化勾选列表"
+                :title="$t('console.expandTargetPicker')"
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
                   <circle cx="11" cy="11" r="8"></circle>
                   <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                 </svg>
-                <span>设备选择列表 ({{ effectiveTextTargets.length }})</span>
+                <span>{{ $t('console.deviceSelectionList', { count: effectiveTextTargets.length }) }}</span>
                 <span class="arrow-indicator">{{ activeTargetPicker === 'text' ? '▲' : '▼' }}</span>
               </button>
             </div>
@@ -706,27 +706,27 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="search-icon"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                     <input 
                       v-model="targetSearchText" 
-                      placeholder="输入设备 ID 或型号模糊检索..." 
+                      :placeholder="$t('console.searchDevicePlaceholder')" 
                       class="drawer-search-input"
                     />
                     <button v-if="targetSearchText" class="search-clear-btn" @click="targetSearchText = ''">✕</button>
                   </div>
                   <div class="drawer-actions">
-                    <button class="drawer-action-btn" @click="selectFilteredTargets('text')" title="勾选当前筛选出的所有在线设备">全选匹配项</button>
-                    <button class="drawer-action-btn" @click="invertFilteredTargets('text')" title="反选当前匹配项">反向选择</button>
-                    <button class="drawer-action-btn" @click="textTargetCurrent = false; batchTextSelectedIds = []" title="清空全部">清空</button>
-                    <button class="drawer-action-btn primary" @click="closeTargetPicker">完成 (已选 {{ effectiveTextTargets.length }})</button>
+                    <button class="drawer-action-btn" @click="selectFilteredTargets('text')" :title="$t('console.selectAllMatchedHint')">{{ $t('console.selectAllMatched') }}</button>
+                    <button class="drawer-action-btn" @click="invertFilteredTargets('text')" :title="$t('console.invertSelectionHint')">{{ $t('console.invertSelection') }}</button>
+                    <button class="drawer-action-btn" @click="textTargetCurrent = false; batchTextSelectedIds = []" title="$t('console.clearAll')">{{ $t('console.clearSelection') }}</button>
+                    <button class="drawer-action-btn primary" @click="closeTargetPicker">{{ $t('console.doneSelection', { count: effectiveTextTargets.length }) }}</button>
                   </div>
                 </div>
 
                 <div class="drawer-tag-strip" v-if="tagStore.tags.length > 0">
-                  <span class="strip-label">按标签过滤：</span>
+                  <span class="strip-label">{{ $t('console.filterByTag') }}</span>
                   <button 
                     class="drawer-tag-pill" 
                     :class="{ active: targetActiveTag === null }"
                     @click="targetActiveTag = null"
                   >
-                    全部 ({{ deviceStore.devices.length }})
+                    {{ $t('console.allCount', { count: deviceStore.devices.length }) }}
                   </button>
                   <button 
                     v-for="tag in tagStore.tags" 
@@ -745,7 +745,7 @@
                     <input type="checkbox" v-model="textTargetCurrent" />
                     <span class="device-status-dot online"></span>
                     <span class="device-id-text" :title="deviceId">{{ deviceId }}</span>
-                    <span class="current-badge">当前主控</span>
+                    <span class="current-badge">{{ $t('console.currentMaster') }}</span>
                   </label>
                   <label 
                     v-for="d in filteredPickerDevices.filter(dev => dev.id !== deviceId)" 
@@ -761,7 +761,7 @@
                     />
                     <span class="device-status-dot" :class="d.status"></span>
                     <span class="device-id-text" :title="d.id">{{ d.id }}</span>
-                    <span v-if="d.status !== 'online'" class="offline-badge">离线</span>
+                    <span v-if="d.status !== 'online'" class="offline-badge">{{ $t('console.offline') }}</span>
                     <span 
                       v-for="tId in (tagStore.deviceTags[d.id] || [])" 
                       :key="tId" 
@@ -771,7 +771,7 @@
                     ></span>
                   </label>
                   <div v-if="filteredPickerDevices.length === 0" class="drawer-empty-hint">
-                    无匹配设备，请更改搜索条件
+                    {{ $t('console.noMatchedDevices') }}
                   </div>
                 </div>
               </div>
@@ -782,18 +782,18 @@
           <div class="text-input-section">
             <textarea 
               v-model="inputBatchText" 
-              placeholder="在此输入文本（100% 汉字支持、换行、测试文案、账号密码、Emoji 等）..."
+              :placeholder="$t('console.textPlaceholder')"
               class="batch-text-textarea"
               rows="3"
             ></textarea>
 
             <div class="text-input-actions">
               <div class="text-options">
-                <label class="checkbox-label" title="输入完成后自动敲击一次回车键 (KEYCODE_ENTER)">
+                <label class="checkbox-label" :title="$t('console.appendEnterHint')">
                   <input type="checkbox" v-model="textAutoEnter" />
-                  <span>追加 Enter 回车</span>
+                  <span>{{ $t('console.appendEnterLabel') }}</span>
                 </label>
-                <span class="text-char-count">{{ inputBatchText.length }} 字</span>
+                <span class="text-char-count">{{ $t('console.charCount', { count: inputBatchText.length }) }}</span>
               </div>
 
               <div class="btn-group">
@@ -802,14 +802,14 @@
                   @click="inputBatchText = ''" 
                   :disabled="!inputBatchText"
                 >
-                  清空
+                  {{ $t('common.clear') }}
                 </button>
                 <button 
                   class="send-btn text-send-btn" 
                   @click="execSendBatchText" 
                   :disabled="!inputBatchText.trim() || effectiveTextTargets.length === 0 || isSendingText"
                 >
-                  {{ isSendingText ? '下发中...' : `一键下发 (${effectiveTextTargets.length} 台设备)` }}
+                  {{ isSendingText ? $t('console.batchSending') : $t('console.sendToTargetBtn', { count: effectiveTextTargets.length }) }}
                 </button>
               </div>
             </div>
@@ -823,9 +823,9 @@
         <div class="shell-targets-bar files-targets-bar">
           <div class="targets-control-row">
             <div class="targets-left-info">
-              <span class="label">下发目标：</span>
+              <span class="label">{{ $t('console.targetDevices') }}</span>
               <span class="targets-summary-pill" :class="{ 'is-batch': effectiveFileTargets.length > 1 }">
-                已勾选 {{ effectiveFileTargets.length }} 台设备
+                {{ $t('console.selectedCount', { count: effectiveFileTargets.length }) }}
               </span>
             </div>
 
@@ -834,30 +834,30 @@
                 class="target-quick-btn"
                 :class="{ active: isAllFilesTargetsSelected }"
                 @click="isAllFilesTargetsSelected = !isAllFilesTargetsSelected"
-                title="快速全选所有在线设备"
+                :title="$t('console.selectAllOnlineHint')"
               >
-                ⚡ 全选在线 ({{ deviceStore.devices.filter(d => d.status === 'online').length }})
+                ⚡ {{ $t('console.selectAllOnline', { count: deviceStore.devices.filter(d => d.status === 'online').length }) }}
               </button>
               <button
                 class="target-quick-btn"
                 :class="{ active: fileTargetCurrent && batchFilesSelectedIds.length === 0 }"
                 @click="fileTargetCurrent = true; batchFilesSelectedIds = []"
-                title="仅选择当前主控单机"
+                :title="$t('console.onlyCurrentDeviceHint')"
               >
-                仅当前单机
+                {{ $t('console.onlyCurrentDevice') }}
               </button>
               <button
                 v-if="effectiveFileTargets.length > 0"
                 class="target-quick-btn"
                 @click="fileTargetCurrent = false; batchFilesSelectedIds = []"
-                title="清空所有已选设备"
+                :title="$t('console.clearSelectionHint')"
               >
-                清空
+                {{ $t('console.clearSelection') }}
               </button>
             </div>
 
             <div class="tag-filters" v-if="tagStore.tags.length > 0">
-              <span class="tag-filter-label">标签组：</span>
+              <span class="tag-filter-label">{{ $t('console.tagGroup') }}</span>
               <button 
                 v-for="tag in tagStore.tags" 
                 :key="tag.id" 
@@ -868,7 +868,7 @@
                   color: isTagAllSelectedForFiles(tag.id) ? '#fff' : tag.color 
                 }"
                 @click="toggleTagDevicesForFiles(tag.id)"
-                :title="`快速切换标签【${tag.name}】下的所有在线设备`"
+                :title="$t('console.switchTagHint', { name: tag.name })"
               >
                 {{ tag.name }}
               </button>
@@ -878,13 +878,13 @@
               class="target-picker-toggle-btn"
               :class="{ open: activeTargetPicker === 'files' }"
               @click="openTargetPicker('files')"
-              title="展开海量设备搜索与精细化勾选列表"
+              :title="$t('console.expandTargetPicker')"
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
                 <circle cx="11" cy="11" r="8"></circle>
                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
               </svg>
-              <span>设备选择列表 ({{ effectiveFileTargets.length }})</span>
+              <span>{{ $t('console.deviceSelectionList', { count: effectiveFileTargets.length }) }}</span>
               <span class="arrow-indicator">{{ activeTargetPicker === 'files' ? '▲' : '▼' }}</span>
             </button>
           </div>
@@ -897,27 +897,27 @@
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="search-icon"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                   <input 
                     v-model="targetSearchText" 
-                    placeholder="输入设备 ID 或型号模糊检索..." 
+                    :placeholder="$t('console.searchDevicePlaceholder')" 
                     class="drawer-search-input"
                   />
                   <button v-if="targetSearchText" class="search-clear-btn" @click="targetSearchText = ''">✕</button>
                 </div>
                 <div class="drawer-actions">
-                  <button class="drawer-action-btn" @click="selectFilteredTargets('files')" title="勾选当前筛选出的所有在线设备">全选匹配项</button>
-                  <button class="drawer-action-btn" @click="invertFilteredTargets('files')" title="反选当前匹配项">反向选择</button>
-                  <button class="drawer-action-btn" @click="fileTargetCurrent = false; batchFilesSelectedIds = []" title="清空全部">清空</button>
-                  <button class="drawer-action-btn primary" @click="closeTargetPicker">完成 (已选 {{ effectiveFileTargets.length }})</button>
+                  <button class="drawer-action-btn" @click="selectFilteredTargets('files')" :title="$t('console.selectAllMatchedHint')">{{ $t('console.selectAllMatched') }}</button>
+                  <button class="drawer-action-btn" @click="invertFilteredTargets('files')" :title="$t('console.invertSelectionHint')">{{ $t('console.invertSelection') }}</button>
+                  <button class="drawer-action-btn" @click="fileTargetCurrent = false; batchFilesSelectedIds = []" title="$t('console.clearAll')">{{ $t('console.clearSelection') }}</button>
+                  <button class="drawer-action-btn primary" @click="closeTargetPicker">{{ $t('console.doneSelection', { count: effectiveFileTargets.length }) }}</button>
                 </div>
               </div>
 
               <div class="drawer-tag-strip" v-if="tagStore.tags.length > 0">
-                <span class="strip-label">按标签过滤：</span>
+                <span class="strip-label">{{ $t('console.filterByTag') }}</span>
                 <button 
                   class="drawer-tag-pill" 
                   :class="{ active: targetActiveTag === null }"
                   @click="targetActiveTag = null"
                 >
-                  全部 ({{ deviceStore.devices.length }})
+                  {{ $t('console.allCount', { count: deviceStore.devices.length }) }}
                 </button>
                 <button 
                   v-for="tag in tagStore.tags" 
@@ -936,7 +936,7 @@
                   <input type="checkbox" v-model="fileTargetCurrent" />
                   <span class="device-status-dot online"></span>
                   <span class="device-id-text" :title="deviceId">{{ deviceId }}</span>
-                  <span class="current-badge">当前主控</span>
+                  <span class="current-badge">{{ $t('console.currentMaster') }}</span>
                 </label>
                 <label 
                   v-for="d in filteredPickerDevices.filter(dev => dev.id !== deviceId)" 
@@ -952,7 +952,7 @@
                   />
                   <span class="device-status-dot" :class="d.status"></span>
                   <span class="device-id-text" :title="d.id">{{ d.id }}</span>
-                  <span v-if="d.status !== 'online'" class="offline-badge">离线</span>
+                  <span v-if="d.status !== 'online'" class="offline-badge">{{ $t('console.offline') }}</span>
                   <span 
                     v-for="tId in (tagStore.deviceTags[d.id] || [])" 
                     :key="tId" 
@@ -962,7 +962,7 @@
                   ></span>
                 </label>
                 <div v-if="filteredPickerDevices.length === 0" class="drawer-empty-hint">
-                  无匹配设备，请更改搜索条件
+                  {{ $t('console.noMatchedDevices') }}
                 </div>
               </div>
             </div>
@@ -975,12 +975,12 @@
           <div class="files-config-card">
             <div class="card-section-title">
               <span class="icon">📦</span>
-              <span>分发配置与上传</span>
+              <span>{{ $t('console.distributeConfig') }}</span>
             </div>
 
             <!-- 本地文件上传拖拽区 -->
             <div class="form-item">
-              <label class="form-label">1. 上传本地文件 (APK 或 资源文件)</label>
+              <label class="form-label">{{ $t('console.uploadLocalFile') }}</label>
               <div 
                 class="upload-dropzone" 
                 :class="{ dragging: isDraggingFile }"
@@ -995,26 +995,26 @@
                   <line x1="12" y1="18" x2="12" y2="15"></line>
                 </svg>
                 <div v-if="!uploadedFileName" class="dropzone-text">
-                  <span>拖拽文件至此，或 <a href="javascript:void(0)" @click="fileInputRef && fileInputRef.click()">点击上传</a></span>
-                  <p class="dropzone-sub">APK 文件上传后自动配置为批量静默安装任务</p>
+                  <span>{{ $t('console.dragDropFile') }} <a href="javascript:void(0)" @click="fileInputRef && fileInputRef.click()">{{ $t('console.clickToUpload') }}</a></span>
+                  <p class="dropzone-sub">{{ $t('console.apkAutoInstallTip') }}</p>
                 </div>
                 <div v-else class="uploaded-info">
                   <span class="file-name-badge">📄 {{ uploadedFileName }}</span>
                   <span class="file-size-badge">({{ formatBytes(uploadedFileSize) }})</span>
-                  <button class="clear-file-btn" @click="clearUploadedFile">移除</button>
+                  <button class="clear-file-btn" @click="clearUploadedFile">{{ $t('console.removeFile') }}</button>
                 </div>
                 <div class="dropzone-progress" v-if="uploadProgress > 0 && uploadProgress < 100">
                   <div class="progress-bar-fill" :style="{ width: uploadProgress + '%' }"></div>
-                  <span class="progress-label">上传中 {{ uploadProgress }}%</span>
+                  <span class="progress-label">{{ $t('console.uploadingPercent', { progress: uploadProgress }) }}</span>
                 </div>
               </div>
             </div>
 
             <!-- 云端已有文件选择 -->
             <div class="form-item">
-              <label class="form-label">或者：从信令云端选择已有文件</label>
+              <label class="form-label">{{ $t('console.orSelectCloudFile') }}</label>
               <select v-model="selectedCloudFileName" @change="handleCloudFileChange" class="form-select custom-scrollbar">
-                <option value="">-- 选择云端文件中心已有文件 --</option>
+                <option value="">{{ $t('console.selectCloudFilePlaceholder') }}</option>
                 <option v-for="file in cloudFiles" :key="file.name" :value="file.name">
                   {{ file.name }} ({{ formatBytes(file.size) }})
                 </option>
@@ -1024,15 +1024,15 @@
             <!-- 任务类型与路径配置 -->
             <div class="form-row" v-if="uploadedFileName">
               <div class="form-item half">
-                <label class="form-label">任务类型</label>
+                <label class="form-label">{{ $t('console.taskType') }}</label>
                 <select v-model="fileTaskType" class="form-select">
-                  <option value="install">静默安装 APK</option>
-                  <option value="push_file">传输文件并存盘</option>
+                  <option value="install">{{ $t('console.installApk') }}</option>
+                  <option value="push_file">{{ $t('console.pushFile') }}</option>
                 </select>
               </div>
               <div class="form-item half" v-if="fileTaskType === 'push_file'">
-                <label class="form-label">目标存盘绝对路径</label>
-                <input type="text" v-model="destPath" placeholder="例如: /sdcard/Download/file.bin" class="form-input" />
+                <label class="form-label">{{ $t('console.destFilePath') }}</label>
+                <input type="text" v-model="destPath" :placeholder="$t('console.destPathPlaceholder')" class="form-input" />
               </div>
             </div>
 
@@ -1043,7 +1043,7 @@
                 :disabled="effectiveFileTargets.length === 0 || !uploadedFileName || isSubmittingFileTask"
                 @click="submitBatchFileTask"
               >
-                {{ isSubmittingFileTask ? '正在创建任务...' : `🚀 下发批量任务 (${effectiveFileTargets.length} 台设备)` }}
+                {{ isSubmittingFileTask ? $t('console.creatingTask') : $t('console.dispatchBatchTask', { count: effectiveFileTargets.length }) }}
               </button>
             </div>
           </div>
@@ -1052,14 +1052,14 @@
           <div class="files-dashboard-card">
             <div class="card-section-title">
               <span class="icon">📊</span>
-              <span>任务执行进度看板</span>
+              <span>{{ $t('console.taskProgressBoard') }}</span>
               <button 
                 v-if="currentTask" 
                 class="clear-task-btn" 
                 @click="clearCurrentTask" 
-                title="关闭/清除当前任务看板"
+                :title="$t('console.clearBoardHint')"
               >
-                ✕ 清除看板
+                {{ $t('console.clearBoard') }}
               </button>
             </div>
 
@@ -1072,9 +1072,9 @@
                   <span class="task-time-text">{{ formatTaskTime(currentTask.created_at) }}</span>
                 </div>
                 <div class="task-stats-group">
-                  <div class="stat-pill">完成度: <b>{{ taskFinishedCount }}/{{ taskTotalCount }}</b></div>
-                  <div class="stat-pill success">成功: <b>{{ taskSuccessCount }}</b></div>
-                  <div class="stat-pill failed" v-if="taskFailedCount > 0">失败: <b>{{ taskFailedCount }}</b></div>
+                  <div class="stat-pill">{{ $t('console.taskProgressStat', { finished: taskFinishedCount, total: taskTotalCount }) }}</div>
+                  <div class="stat-pill success">{{ $t('console.taskSuccessStat', { count: taskSuccessCount }) }}</div>
+                  <div class="stat-pill failed" v-if="taskFailedCount > 0">{{ $t('console.taskFailedStat', { count: taskFailedCount }) }}</div>
                 </div>
               </div>
 
@@ -1095,11 +1095,11 @@
                 <table class="subtask-table">
                   <thead>
                     <tr>
-                      <th>设备 ID</th>
-                      <th>状态</th>
-                      <th>进度</th>
-                      <th>结果 / 日志</th>
-                      <th>更新时间</th>
+                      <th>{{ $t('console.colDeviceId') }}</th>
+                      <th>{{ $t('console.colStatus') }}</th>
+                      <th>{{ $t('console.colProgress') }}</th>
+                      <th>{{ $t('console.colLog') }}</th>
+                      <th>{{ $t('console.colUpdateTime') }}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1118,14 +1118,14 @@
                       </td>
                       <td class="log-col">
                         <span v-if="sub.status === 'failed'" class="log-err-text" :title="sub.error_msg">
-                          {{ sub.error_msg || '未知错误' }}
+                          {{ sub.error_msg || $t('console.unknownError') }}
                         </span>
                         <button 
                           v-else-if="sub.status === 'success' && sub.error_msg" 
                           class="view-output-btn"
                           @click="showBatchLogModal(sub.device_id, sub.error_msg)"
                         >
-                          查看输出
+                          {{ $t('console.viewOutput') }}
                         </button>
                         <span v-else class="log-empty-dash">-</span>
                       </td>
@@ -1143,8 +1143,8 @@
                 <line x1="8" y1="21" x2="16" y2="21"></line>
                 <line x1="12" y1="17" x2="12" y2="21"></line>
               </svg>
-              <p class="empty-title">暂无正在执行的批量任务</p>
-              <p class="empty-desc">在左侧上传或选取文件并指定目标设备下发后，此处将实时展示各台设备的下载拉取与安装进度。</p>
+              <p class="empty-title">{{ $t('console.noBatchTasks') }}</p>
+              <p class="empty-desc">{{ $t('console.noBatchTasksHint') }}</p>
             </div>
           </div>
         </div>
@@ -1156,33 +1156,33 @@
     <div v-if="showShortcutModal" class="shortcut-modal-overlay" @click.self="showShortcutModal = false">
       <div class="shortcut-modal-card">
         <div class="modal-header">
-          <h3>自定义快捷指令</h3>
+          <h3>{{ $t('console.customShortcutsTitle') }}</h3>
           <button class="close-btn" @click="showShortcutModal = false">✕</button>
         </div>
         <div class="modal-body custom-scrollbar">
           <div class="shortcut-list">
             <div v-for="(item, idx) in modalShortcuts" :key="idx" class="shortcut-item-row">
               <div class="input-col name-col">
-                <label>名称</label>
-                <input v-model="item.name" placeholder="请输入指令名称，如 型号" />
+                <label>{{ $t('console.shortcutName') }}</label>
+                <input v-model="item.name" :placeholder="$t('console.shortcutNamePlaceholder')" />
               </div>
               <div class="input-col cmd-col">
-                <label>Shell 命令</label>
-                <input v-model="item.cmd" placeholder="请输入 Shell 命令，如 getprop ro.product.model" />
+                <label>{{ $t('console.shortcutCmd') }}</label>
+                <input v-model="item.cmd" :placeholder="$t('console.shortcutCmdPlaceholder')" />
               </div>
-              <button class="delete-btn" @click="deleteModalShortcut(idx)" title="删除指令">✕</button>
+              <button class="delete-btn" @click="deleteModalShortcut(idx)" :title="$t('console.deleteShortcutHint')">✕</button>
             </div>
             <div v-if="modalShortcuts.length === 0" class="no-shortcuts">
-              暂无自定义快捷指令
+              {{ $t('console.noCustomShortcuts') }}
             </div>
           </div>
-          <button class="add-row-btn" @click="addModalShortcut">+ 添加快捷指令</button>
+          <button class="add-row-btn" @click="addModalShortcut">{{ $t('console.addShortcut') }}</button>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-reset" @click="resetToDefaultShortcuts">恢复默认</button>
+          <button class="btn btn-reset" @click="resetToDefaultShortcuts">{{ $t('console.resetDefaults') }}</button>
           <div class="footer-actions">
-            <button class="btn btn-cancel" @click="showShortcutModal = false">取消</button>
-            <button class="btn btn-save" @click="saveShortcuts">保存</button>
+            <button class="btn btn-cancel" @click="showShortcutModal = false">{{ $t('console.cancel') }}</button>
+            <button class="btn btn-save" @click="saveShortcuts">{{ $t('console.save') }}</button>
           </div>
         </div>
       </div>
@@ -1192,34 +1192,34 @@
     <div v-if="showQuickTextModal" class="shortcut-modal-overlay" @click.self="showQuickTextModal = false">
       <div class="shortcut-modal-card quick-text-modal-card">
         <div class="modal-header">
-          <h3>自定义快速文本库</h3>
+          <h3>{{ $t('console.customQuickTextsTitle') }}</h3>
           <button class="close-btn" @click="showQuickTextModal = false">✕</button>
         </div>
         <div class="modal-body custom-scrollbar">
-          <p class="modal-intro-tip">定义的短语将同时展示在终端控制台和单机直控窗口下拉菜单中，并自动持久化到云端。</p>
+          <p class="modal-intro-tip">{{ $t('console.quickTextModalIntro') }}</p>
           <div class="quick-text-edit-list">
             <div v-for="(item, idx) in editingQuickTexts" :key="idx" class="quick-text-edit-row">
               <div class="edit-row-header">
-                <input v-model="item.title" placeholder="短语名称（如: 登录欢迎语、测试账号）" class="edit-title-input" />
-                <label class="auto-enter-check" title="选中此项下发时自动追加 Enter 回车">
+                <input v-model="item.title" :placeholder="$t('console.phraseNamePlaceholder')" class="edit-title-input" />
+                <label class="auto-enter-check" :title="$t('console.appendEnterCheckHint')">
                   <input type="checkbox" v-model="item.autoEnter" />
-                  <span>追加 Enter</span>
+                  <span>{{ $t('console.appendEnterLabel') }}</span>
                 </label>
-                <button class="delete-btn" @click="deleteEditingQuickText(idx)" title="删除此条短语">✕</button>
+                <button class="delete-btn" @click="deleteEditingQuickText(idx)" :title="$t('console.deletePhraseHint')">✕</button>
               </div>
-              <textarea v-model="item.content" placeholder="输入要填入的正文文本（支持中文、多行换行）..." class="edit-content-textarea" rows="2"></textarea>
+              <textarea v-model="item.content" :placeholder="$t('console.phraseContentPlaceholder')" class="edit-content-textarea" rows="2"></textarea>
             </div>
             <div v-if="editingQuickTexts.length === 0" class="no-shortcuts">
-              暂无自定义快捷短语，点击下方按钮添加
+              {{ $t('console.noCustomPhrases') }}
             </div>
           </div>
-          <button class="add-row-btn" @click="addEditingQuickText">+ 添加快速文本</button>
+          <button class="add-row-btn" @click="addEditingQuickText">{{ $t('console.addQuickText') }}</button>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-reset" @click="resetToDefaultQuickTexts">恢复默认</button>
+          <button class="btn btn-reset" @click="resetToDefaultQuickTexts">{{ $t('console.resetDefaults') }}</button>
           <div class="footer-actions">
-            <button class="btn btn-cancel" @click="showQuickTextModal = false">取消</button>
-            <button class="btn btn-save" @click="saveQuickTextsFromModal">保存修改</button>
+            <button class="btn btn-cancel" @click="showQuickTextModal = false">{{ $t('console.cancel') }}</button>
+            <button class="btn btn-save" @click="saveQuickTextsFromModal">{{ $t('console.saveChanges') }}</button>
           </div>
         </div>
       </div>
@@ -1229,14 +1229,14 @@
     <div v-if="activeBatchLogOutput" class="shortcut-modal-overlay" @click.self="activeBatchLogOutput = null">
       <div class="shortcut-modal-card log-modal-card">
         <div class="modal-header">
-          <h3>设备 {{ activeBatchLogDevice }} 执行输出</h3>
+          <h3>{{ $t('console.deviceOutputTitle', { id: activeBatchLogDevice }) }}</h3>
           <button class="close-btn" @click="activeBatchLogOutput = null">✕</button>
         </div>
         <div class="modal-body custom-scrollbar">
           <pre class="log-output-pre"><code>{{ activeBatchLogOutput }}</code></pre>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-save" @click="activeBatchLogOutput = null">确定</button>
+          <button class="btn btn-save" @click="activeBatchLogOutput = null">{{ $t('console.confirmBtn') }}</button>
         </div>
       </div>
     </div>
@@ -1245,6 +1245,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useDeviceStore } from '@/stores/devices'
 import { useAuthStore } from '@/stores/auth'
 import { useTagStore } from '@/stores/tags'
@@ -1252,6 +1253,8 @@ import { useQuickTextStore, DEFAULT_QUICK_TEXTS } from '@/stores/quickTexts'
 import { useAdb } from '@/composables/useAdb'
 import { useWebRTC } from '@/composables/useWebRTC'
 import { getDeviceSettings } from '@/utils/settings'
+
+const { t, te } = useI18n()
 
 const props = defineProps({
   deviceId: {
@@ -1495,7 +1498,7 @@ function saveQuickTextsFromModal() {
   const filtered = editingQuickTexts.value
     .map(item => ({
       ...item,
-      title: item.title.trim() || '未命名短语',
+      title: item.title.trim() || t('quickTexts.untitledPhrase'),
       content: item.content || ''
     }))
     .filter(item => item.content.trim() !== '')
@@ -1957,13 +1960,32 @@ function getFilteredBatchResults(results, showFailedOnly) {
 const batchShellSelectedIds = ref([])
 
 const defaultShortcuts = [
-  { name: '三方应用', cmd: 'pm list packages -3' },
-  { name: '型号', cmd: 'getprop ro.product.model' },
-  { name: '当前页面', cmd: 'dumpsys window | grep mCurrentFocus | grep -v null' },
-  { name: '存储空间', cmd: 'df -h /data' },
-  { name: '开启触控轨迹', cmd: 'settings put system pointer_location 1' },
-  { name: '关闭轨迹', cmd: 'settings put system pointer_location 0' }
+  { key: 'thirdPartyApps', name: '三方应用', cmd: 'pm list packages -3' },
+  { key: 'model', name: '型号', cmd: 'getprop ro.product.model' },
+  { key: 'currentFocus', name: '当前页面', cmd: 'dumpsys window | grep mCurrentFocus | grep -v null' },
+  { key: 'storage', name: '存储空间', cmd: 'df -h /data' },
+  { key: 'enablePointer', name: '开启触控轨迹', cmd: 'settings put system pointer_location 1' },
+  { key: 'disablePointer', name: '关闭轨迹', cmd: 'settings put system pointer_location 0' }
 ]
+
+function getShortcutName(item) {
+  if (!item) return ''
+  if (item.key && te(`console.shortcuts.${item.key}`)) {
+    return t(`console.shortcuts.${item.key}`)
+  }
+  const nameMap = {
+    '三方应用': 'console.shortcuts.thirdPartyApps',
+    '型号': 'console.shortcuts.model',
+    '当前页面': 'console.shortcuts.currentFocus',
+    '存储空间': 'console.shortcuts.storage',
+    '开启触控轨迹': 'console.shortcuts.enablePointer',
+    '关闭轨迹': 'console.shortcuts.disablePointer'
+  }
+  if (nameMap[item.name]) {
+    return t(nameMap[item.name])
+  }
+  return item.name
+}
 
 const consoleShortcuts = ref([])
 const showShortcutModal = ref(false)
@@ -2181,11 +2203,11 @@ const aiLogs = ref([])
 
 // 预设技能模板
 const defaultSkills = [
-  { name: '📊 虚机健康检查', desc: '诊断虚机 CPU、可用内存与磁盘空间', prompt: '请对这台设备做一次全面的健康自检，检查系统负载(uptime/top)、可用内存(free)及存储空间(df -h /data)。' },
-  { name: '📶 网络链路分析', desc: '诊断 WebRTC 码率与往返时延', prompt: '请获取当前的 WebRTC 传输质量指标(get_webrtc_stats)，分析 FPS、延迟(RTT/JitterBuffer)状况并给出一份中文分析。' },
-  { name: '🔍 分析异常崩溃', desc: '抓取 logcat 检索最近报错日志', prompt: '检索最近 100 行 logcat 错误日志，查找是否有进程崩溃或 Exception 报错并总结根源。' },
-  { name: '🧹 清理系统空间', desc: '一键检索并清理系统无用缓存', prompt: '检查设备的磁盘存储空间。如果有可以清理的临时垃圾或缓存目录，请执行清理，并对比清理前后的空间容量变化。' },
-  { name: '🔧 诊断连接与网络', desc: '一键分析连接、UDS 与网络拥塞', prompt: '请协助诊断连接失败、画面黑屏或无连接问题。请直接读取设备端 /data/local/tmp/cloudphone-agent.log 日志的最后 200 行，并重点诊断以下几点：\n1. 诊断启动参数：检查日志中是否存在 \"No external NAT mappings configured\"。如果有，说明 Agent 未配置外部 NAT 映射地址（启动参数 -external-addr 或环境变量 CP_AGENT_EXTERNAL_ADDR 缺失），导致跨网段/跨机器连接时物理网络阻断。\n2. 诊断网络环境：检查本端与对端上报的 ICE 候选者（Candidates）。分析设备端是否仅上报了 Docker 内置私有 IP (如 172.17.x.x)；检查本端客户端的 Host IP 中是否包含代理软件虚拟网关（如 Clash Tun 模式，常见 IP 为 198.18.x.x）导致连接流量被拦截。\n3. 检查 WebRTC 与 UDS 通道状态：分析 ICEConnectionState 的变化趋势，检查 UDS 三通道（Video/Control/Touch）是否正常 Dial 连通。\n4. 检查画面渲染状态：检查 CoreService 是否异常退出，分析 KeyframeTrace 里是否频繁出现 \"detail=no-control-conn\" 或 \"request-sync-frame skipped: no active codec\" 从而引发黑屏现象。\n最后请用专业明细的中文给出一份诊断报告和具体的修复建议。' }
+  { key: 'health', name: '📊 虚机健康检查', desc: '诊断虚机 CPU、可用内存与磁盘空间', prompt: '请对这台设备做一次全面的健康自检，检查系统负载(uptime/top)、可用内存(free)及存储空间(df -h /data)。' },
+  { key: 'network', name: '📶 网络链路分析', desc: '诊断 WebRTC 码率与往返时延', prompt: '请获取当前的 WebRTC 传输质量指标(get_webrtc_stats)，分析 FPS、延迟(RTT/JitterBuffer)状况并给出一份分析报告。' },
+  { key: 'crash', name: '🔍 分析异常崩溃', desc: '抓取 logcat 检索最近报错日志', prompt: '检索最近 100 行 logcat 错误日志，查找是否有进程崩溃或 Exception 报错并总结根源。' },
+  { key: 'clean', name: '🧹 清理系统空间', desc: '一键检索并清理系统无用缓存', prompt: '检查设备的磁盘存储空间。如果有可以清理的临时垃圾或缓存目录，请执行清理，并对比清理前后的空间容量变化。' },
+  { key: 'diagnose', name: '🔧 诊断连接与网络', desc: '一键分析连接、UDS 与网络拥塞', prompt: '请协助诊断连接失败、画面黑屏或无连接问题。请直接读取设备端 /data/local/tmp/cloudphone-agent.log 日志的最后 200 行，并重点诊断以下几点：\n1. 启动参数与外部 NAT 映射\n2. 网络环境与 ICE Candidates 匹配\n3. WebRTC 与 UDS 三通道状态\n4. CoreService 与画面帧状态\n请输出明细诊断报告和修复建议。' }
 ]
 
 const getCustomSkills = () => {
@@ -2199,7 +2221,12 @@ const customSkills = ref(getCustomSkills())
 
 const allSkills = computed(() => {
   return [
-    ...defaultSkills,
+    ...defaultSkills.map(s => ({
+      ...s,
+      name: te(`console.aiSkills.${s.key}.name`) ? t(`console.aiSkills.${s.key}.name`) : s.name,
+      desc: te(`console.aiSkills.${s.key}.desc`) ? t(`console.aiSkills.${s.key}.desc`) : s.desc,
+      prompt: te(`console.aiSkills.${s.key}.prompt`) ? t(`console.aiSkills.${s.key}.prompt`) : s.prompt
+    })),
     ...customSkills.value.map(s => ({ ...s, isCustom: true }))
   ]
 })
@@ -2210,10 +2237,10 @@ const visibleMessages = computed(() => {
 })
 
 const statusText = computed(() => {
-  if (webrtcError.value) return `错误: ${webrtcError.value}`
-  if (isAdbReady.value) return '终端已连接 (在线)'
-  if (webrtcStatus.value === 'connecting') return '终端连接中...'
-  return '终端未连接'
+  if (webrtcError.value) return `${t('common.error')}: ${webrtcError.value}`
+  if (isAdbReady.value) return t('console.terminalConnected')
+  if (webrtcStatus.value === 'connecting') return t('console.terminalConnecting')
+  return t('console.terminalDisconnected')
 })
 
 const statusClass = computed(() => {
@@ -2258,8 +2285,8 @@ function setupDeviceConnection(deviceId) {
           s.isConnected = false
         })
         if (prevStatus === 'connected') {
-          showToastNotice('⚠️ 远程设备直连已断开，ADB 调试已断开', 'warning')
-          consoleLogs.value.push({ type: 'error', text: '[系统提示] 远程设备直连已断开。' })
+          showToastNotice(t('console.adbDisconnectedNotice'), 'warning')
+          consoleLogs.value.push({ type: 'error', text: t('console.terminalRemoteDisconnected') })
           scrollToBottom()
         }
       }
@@ -2396,7 +2423,7 @@ async function execCmd() {
   // 单台目标设备下发：无论是否直连 WebRTC，统一走极速信令 command 通道并实时回显终端
   if (targets.length === 1) {
     const targetId = targets[0]
-    consoleLogs.value.push({ type: 'info', cmd: cmd, text: '执行中...' })
+    consoleLogs.value.push({ type: 'info', cmd: cmd, text: t('console.executing') })
     
     let sentViaDirect = false
     const activeRtc = deviceStore.getWebRTC(targetId) || webrtc.value
@@ -3191,12 +3218,51 @@ onUnmounted(() => {
   padding: 0 16px;
   flex-shrink: 0;
   user-select: none;
+  gap: 12px;
 }
 
 .console-right-tools {
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-shrink: 0;
+}
+
+.console-device-badge {
+  flex-shrink: 0;
+}
+
+.device-selector-dropdown {
+  max-width: 200px;
+}
+
+.tabs-group {
+  display: flex;
+  gap: 4px;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tabs-group::-webkit-scrollbar {
+  display: none;
+}
+
+.tabs-group button {
+  background: none;
+  border: none;
+  color: #8b949e;
+  padding: 14px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .console-close-btn {
